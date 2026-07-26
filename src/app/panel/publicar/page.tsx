@@ -55,7 +55,7 @@ export default function PublicarPage() {
     // 2. Subir fotos (máx. 5, también validado en BD)
     for (let i = 0; i < files.length; i++) {
       const file = files[i];
-      const ext = file.name.split(".").pop()?.toLowerCase() ?? "jpg";
+      const ext = { "image/jpeg": "jpg", "image/png": "png", "image/webp": "webp" }[file.type] ?? "jpg";
       const path = `${user.id}/${product.id}/${i + 1}.${ext}`;
       const { error: upErr } = await supabase.storage.from("mkt-photos").upload(path, file, { upsert: true });
       if (!upErr) {

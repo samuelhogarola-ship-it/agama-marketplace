@@ -59,6 +59,11 @@ export default function PanelPage() {
   async function remove(id: number) {
     if (!confirm("¿Eliminar este producto definitivamente?")) return;
     const supabase = createClient();
+    // Borrar también los archivos de Storage (el cascade solo borra las filas)
+    const { data: photos } = await supabase.from("mkt_product_photos").select("path").eq("product_id", id);
+    if (photos && photos.length > 0) {
+      await supabase.storage.from("mkt-photos").remove(photos.map((p) => p.path));
+    }
     await supabase.from("mkt_products").delete().eq("id", id);
     load();
   }
