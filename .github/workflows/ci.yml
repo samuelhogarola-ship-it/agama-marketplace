@@ -1,0 +1,24 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Gitleaks (secret scan)
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # Se activan cuando exista el scaffold Next.js (Fase 1):
+      # - uses: actions/setup-node@v4
+      #   with: { node-version: 20, cache: npm }
+      # - run: npm ci
+      # - run: npm run lint && npm run typecheck
+      # - run: npx playwright install --with-deps chromium
+      # - run: npx playwright test --project=chromium
