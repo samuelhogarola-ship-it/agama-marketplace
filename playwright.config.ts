@@ -9,7 +9,7 @@ export default defineConfig({
   retries: process.env.CI ? 2 : 0,
   reporter: process.env.CI ? 'github' : 'html',
   use: {
-    baseURL: process.env.BASE_URL ?? 'http://localhost:3000',
+    baseURL: process.env.BASE_URL ?? 'http://localhost:3210',
     trace: 'on-first-retry',
     locale: 'es-MX',
   },
@@ -18,8 +18,8 @@ export default defineConfig({
     { name: 'mobile', use: { ...devices['Pixel 7'] } },
   ],
   webServer: {
-    command: 'npm run dev',
-    url: 'http://localhost:3000',
+    command: 'npm run dev -- --port 3210',
+    url: 'http://localhost:3210',
     reuseExistingServer: !process.env.CI,
   },
 });

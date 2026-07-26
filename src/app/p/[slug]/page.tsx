@@ -6,6 +6,7 @@ import { categoryBySlug } from "@/lib/categories";
 import { photoUrl, type Product } from "@/lib/types";
 import { formatPrice } from "@/components/ProductCard";
 import ContactSellerButton from "@/components/ContactSellerButton";
+import { safeJsonLd } from "@/lib/jsonld";
 
 export const revalidate = 300;
 
@@ -71,7 +72,7 @@ export default async function ProductPage({ params }: Props) {
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-12">
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: safeJsonLd(jsonLd) }} />
       <nav className="text-sm text-slate-500">
         <Link href="/" className="hover:text-brand">Inicio</Link>
         {" / "}

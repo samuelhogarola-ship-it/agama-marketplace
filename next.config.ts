@@ -7,11 +7,16 @@ const nextConfig: NextConfig = {
     ],
   },
   async headers() {
-    // El *.vercel.app no debe indexarse nunca; se retira cuando se conecte el dominio final (ver docs/seo.md)
-    if (process.env.ALLOW_INDEXING === "true") return [];
-    return [
-      { source: "/:path*", headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow" }] },
+    const security = [
+      { key: "X-Content-Type-Options", value: "nosniff" },
+      { key: "X-Frame-Options", value: "DENY" },
+      { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+      { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=()" },
     ];
+    // El *.vercel.app no debe indexarse nunca; se retira cuando se conecte el dominio final (ver docs/seo.md)
+    const robots =
+      process.env.ALLOW_INDEXING === "true" ? [] : [{ key: "X-Robots-Tag", value: "noindex, nofollow" }];
+    return [{ source: "/:path*", headers: [...security, ...robots] }];
   },
 };
 

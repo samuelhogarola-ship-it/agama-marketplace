@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import ProductCard from "@/components/ProductCard";
 import type { Product, Profile } from "@/lib/types";
+import { safeJsonLd } from "@/lib/jsonld";
 
 export const revalidate = 300;
 
@@ -43,7 +44,7 @@ export default async function CompanyPage({ params }: Props) {
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-12">
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: safeJsonLd(jsonLd) }} />
       <div className="flex items-center gap-4">
         <div className="w-16 h-16 rounded-full bg-brand-light flex items-center justify-center text-2xl font-bold text-brand-dark">
           {profile.company_name.charAt(0)}

@@ -10,15 +10,17 @@ type Props = { searchParams: Promise<{ q?: string }> };
 export default async function SearchPage({ searchParams }: Props) {
   const { q } = await searchParams;
   const query = (q ?? "").trim().slice(0, 100);
+  // Sin caracteres con significado en la sintaxis de filtros PostgREST ni comodines ilike
+  const safe = query.replace(/[,()%_\\]/g, " ").trim();
   const supabase = await createClient();
 
   let products: Product[] = [];
-  if (query) {
+  if (safe) {
     const { data } = await supabase
       .from("mkt_products")
       .select("*, photos:mkt_product_photos(*), profile:mkt_profiles(company_name, slug, zone)")
       .eq("status", "published")
-      .or(`title.ilike.%${query}%,description.ilike.%${query}%`)
+      .or(`title.ilike.%${safe}%,description.ilike.%${safe}%`)
       .limit(48);
     products = (data as Product[]) ?? [];
     // Log de demanda: el dato más valioso del marketplace (fire-and-forget)

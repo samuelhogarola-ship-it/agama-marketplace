@@ -4,6 +4,7 @@ import { CATEGORIES, categoryBySlug } from "@/lib/categories";
 import { createClient } from "@/lib/supabase/server";
 import ProductCard from "@/components/ProductCard";
 import type { Product } from "@/lib/types";
+import { safeJsonLd } from "@/lib/jsonld";
 
 export const revalidate = 300;
 
@@ -56,7 +57,7 @@ export default async function CategoryPage({ params }: Props) {
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-12">
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: safeJsonLd(jsonLd) }} />
       <h1 className="text-3xl font-bold text-slate-800">{cat.name} de plástico en CDMX</h1>
       <p className="mt-2 text-slate-600 max-w-2xl">
         {cat.description} Contacta directamente a proveedores profesionales de la Ciudad de México por mensajería interna.

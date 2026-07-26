@@ -15,7 +15,8 @@ export default function PerfilPage() {
       const supabase = createClient();
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
-      const { data } = await supabase.from("mkt_profiles").select("*").eq("id", user.id).single();
+      // RPC: el teléfono ya no es legible por select público (grants por columna)
+      const { data } = await supabase.rpc("mkt_my_profile");
       if (data) {
         setForm({
           company_name: data.company_name ?? "",
