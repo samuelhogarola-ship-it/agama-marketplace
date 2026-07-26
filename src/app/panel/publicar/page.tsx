@@ -63,14 +63,34 @@ export default function PublicarPage() {
       }
     }
 
-    // 3. Enviar a moderación (función SECURITY DEFINER decide: published / rejected / pending)
-    const { error: modErr } = await supabase.rpc("mkt_submit_product", { p_product_id: product.id });
-    if (modErr) {
-      setError(`Producto guardado pero no se pudo enviar a revisión: ${modErr.message}`);
+    // 3. Enviar a moderación IA (Edge Function: regex + Claude Haiku texto + visión)
+    const { data: { session } } = await supabase.auth.getSession();
+    const modRes = await fetch(
+      `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/moderate-product`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${session?.access_token}`,
+        },
+        body: JSON.stringify({ product_id: product.id }),
+      },
+    );
+    const modData = await modRes.json().catch(() => ({}));
+
+    if (!modRes.ok) {
+      setError(`No se pudo enviar a revisión: ${modData.error ?? modRes.status}`);
       setLoading(false);
       return;
     }
 
+    if (modData.verdict === "reject") {
+      setError(`Publicación rechazada: ${modData.reason ?? "Contenido no permitido."} Corrige el producto y vuelve a enviar.`);
+      setLoading(false);
+      return;
+    }
+
+    // "approve" o "review" → redirigir al panel (el estado se muestra ahí)
     router.push("/panel");
   }
 
