@@ -2,7 +2,8 @@
 
 ## Gobernanza
 
-- Proyecto **separado** del repo AGAMA principal: no compartir código, datos ni proyecto Supabase con el portal AGAMA.
+- Proyecto **separado** del repo AGAMA principal: no compartir código ni datos con el portal AGAMA.
+- **BD temporal:** las tablas viven en el proyecto Supabase `studio-panel` (iaglqispczaoduoodzwx) con prefijo `mkt_` y RLS estricta, porque el plan free no permite un tercer proyecto (decisión del 2026-07-26). **Antes del lanzamiento público (Fase 4) hay que migrar a un proyecto Supabase propio** (`pg_dump -t 'public.mkt_*'` + bucket `mkt-photos`).
 - No se trabaja directamente en `main`: rama feature + PR siempre.
 - `CHANGELOG.md` es el changelog oficial; se actualiza en cada PR con cambios funcionales.
 - `docs/vision.md` y `docs/roadmap.md` son la fuente canónica del alcance; no implementar nada fuera de la fase activa del roadmap sin acuerdo del propietario.

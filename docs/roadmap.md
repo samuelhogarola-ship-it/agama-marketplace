@@ -6,7 +6,8 @@ Fases secuenciales; cada fase termina con tests Playwright en verde y deploy a s
 
 - [x] Repo + gobernanza (CLAUDE.md, ramas + PR, CHANGELOG)
 - [ ] Elegir stack definitivo (propuesta en [stack.md](stack.md)) y scaffold del proyecto
-- [ ] Proyecto Supabase (auth, Postgres, Storage) — proyecto **separado** del de AGAMA
+- [x] Supabase (auth, Postgres, Storage) — temporalmente en el proyecto `studio-panel` con prefijo `mkt_` (límite del plan free); ver CLAUDE.md
+- [ ] **Bloqueante de Fase 4:** migrar la BD a un proyecto Supabase propio (pausar/upgrade y `pg_dump -t 'public.mkt_*'`)
 - [ ] CI (GitHub Actions): lint + typecheck + Playwright smoke en cada PR
 - [ ] Pre-commit hooks activos (ver `.pre-commit-config.yaml`)
 - [ ] Hosting: **Vercel** (decidido). Primero en subdominio `*.vercel.app`; después se conecta uno de los dominios propios ya registrados (cuál, pendiente de elegir)
