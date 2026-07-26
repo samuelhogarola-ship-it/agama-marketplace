@@ -30,6 +30,10 @@ Cada landing de categoría lleva: H1 con keyword + "CDMX", texto único de 150�
 - Home: `WebSite` + `SearchAction` (sitelinks searchbox).
 - Blog: `Article` + `FAQPage` donde aplique.
 
+## Dominio y lanzamiento
+
+El desarrollo/staging vive en `*.vercel.app`, pero ese subdominio **no debe indexarse nunca** (`X-Robots-Tag: noindex` mientras no haya dominio final). El dominio definitivo (uno de los ya registrados) debe estar conectado **antes** del lanzamiento público de Fase 4: cambiar de dominio con el catálogo ya indexado obliga a una migración con 301 y pérdida temporal de posiciones. Elegir el dominio es, por tanto, un bloqueante de Fase 4, no de Fase 0.
+
 ## Técnico
 
 - `sitemap.xml` dinámico segmentado (categorías / productos / empresas), ping en publicación.

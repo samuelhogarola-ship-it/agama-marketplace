@@ -9,7 +9,7 @@ Criterio: reutilizar lo que AGAMA ya domina (Supabase, Resend, Playwright) y añ
 | Moderación IA | **Claude Haiku** vía Edge Functions de Supabase | Clasificación texto+imagen barata; lógica server-side, nunca en cliente. |
 | Email | **Resend** | Ya en uso en AGAMA. |
 | Pagos (fase 5) | **Stripe** (suscripción Pro) | Estándar; no hay pagos de productos en v1. |
-| Hosting | **Vercel** (o Netlify) | Deploy por PR, previews, ISR. |
+| Hosting | **Vercel** (decidido) | Deploy por PR, previews, ISR. Lanzamiento en `*.vercel.app`; luego dominio propio (uno de los ya registrados, por elegir). |
 | E2E | **Playwright** | Ya en uso en AGAMA. Ver `playwright.config.ts`. |
 | Lint/format | ESLint + Prettier | Vía pre-commit y CI. |
 | Analytics | Plausible (o GA4) | Decisión pendiente. |

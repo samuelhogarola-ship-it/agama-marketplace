@@ -9,7 +9,7 @@ Fases secuenciales; cada fase termina con tests Playwright en verde y deploy a s
 - [ ] Proyecto Supabase (auth, Postgres, Storage) — proyecto **separado** del de AGAMA
 - [ ] CI (GitHub Actions): lint + typecheck + Playwright smoke en cada PR
 - [ ] Pre-commit hooks activos (ver `.pre-commit-config.yaml`)
-- [ ] Dominio y decisión de hosting (p. ej. `marketplace.agama.mx` o dominio propio — decisión de negocio pendiente)
+- [ ] Hosting: **Vercel** (decidido). Primero en subdominio `*.vercel.app`; después se conecta uno de los dominios propios ya registrados (cuál, pendiente de elegir)
 
 ## Fase 1 — MVP catálogo (3–4 semanas)
 
