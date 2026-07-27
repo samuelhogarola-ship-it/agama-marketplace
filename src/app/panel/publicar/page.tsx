@@ -63,19 +63,12 @@ export default function PublicarPage() {
       }
     }
 
-    // 3. Enviar a moderación IA (Edge Function: regex + Claude Haiku texto + visión)
-    const { data: { session } } = await supabase.auth.getSession();
-    const modRes = await fetch(
-      `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/moderate-product`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${session?.access_token}`,
-        },
-        body: JSON.stringify({ product_id: product.id }),
-      },
-    );
+    // 3. Enviar a moderación IA (API route Next.js: regex + Claude Haiku texto + visión)
+    const modRes = await fetch("/api/moderate", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ product_id: product.id }),
+    });
     const modData = await modRes.json().catch(() => ({}));
 
     if (!modRes.ok) {
