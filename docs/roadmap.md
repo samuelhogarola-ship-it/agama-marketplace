@@ -5,34 +5,47 @@ Fases secuenciales; cada fase termina con tests Playwright en verde y deploy a s
 ## Fase 0 — Fundaciones (1 semana)
 
 - [x] Repo + gobernanza (CLAUDE.md, ramas + PR, CHANGELOG)
-- [ ] Elegir stack definitivo (propuesta en [stack.md](stack.md)) y scaffold del proyecto
-- [x] Supabase (auth, Postgres, Storage) — temporalmente en el proyecto `studio-panel` con prefijo `mkt_` (límite del plan free); ver CLAUDE.md
-- [ ] **Bloqueante de Fase 4:** migrar la BD a un proyecto Supabase propio (pausar/upgrade y `pg_dump -t 'public.mkt_*'`)
+- [x] Stack definitivo: Next.js 15 App Router + TypeScript + Tailwind 4 (ver [stack.md](stack.md))
+- [x] Supabase (auth, Postgres, Storage) — temporalmente en `studio-panel` con prefijo `mkt_`; ver CLAUDE.md
+- [ ] **Bloqueante de Fase 4:** migrar BD a proyecto Supabase propio (`pg_dump -t 'public.mkt_*'`)
 - [ ] CI (GitHub Actions): lint + typecheck + Playwright smoke en cada PR
-- [ ] Pre-commit hooks activos (ver `.pre-commit-config.yaml`)
-- [ ] Hosting: **Vercel** (decidido). Primero en subdominio `*.vercel.app`; después se conecta uno de los dominios propios ya registrados (cuál, pendiente de elegir)
+- [x] Playwright smoke suite (9 tests en desktop + mobile)
+- [x] Hosting: Vercel desplegado en `agama-marketplace.vercel.app`
+- [ ] Dominio propio: pendiente de elegir entre los dominios existentes
 
 ## Fase 1 — MVP catálogo (3–4 semanas)
 
-- [ ] Auth: registro/login profesional con verificación de email
-- [ ] Onboarding de empresa: ficha, logo, ubicación, categorías
-- [ ] CRUD de productos con límite de 5 activos (constraint en BD) y 5 fotos (constraint en BD)
-- [ ] Subida de imágenes a Supabase Storage con compresión/resize
-- [ ] Catálogo público: home, categorías, buscador, filtros, ficha de producto
-- [ ] SEO base: SSR/SSG, metas, sitemap, robots, Schema.org (ver [seo.md](seo.md))
-- [ ] Log de búsquedas (`search_queries`)
+- [x] Auth: magic link + contraseña; callback PKCE; middleware de protección de rutas
+- [x] Onboarding de empresa: ficha autocreada en primer acceso, editable (`/panel/perfil`)
+- [x] CRUD de productos con límite 5 activos en BD (trigger) y 5 fotos en BD (trigger)
+- [x] Subida de imágenes a Supabase Storage (MIME-based extension, path validation)
+- [ ] **Compresión/resize de imágenes antes de subir** (pendiente)
+- [ ] **Editar producto** — no hay UI de edición todavía
+- [x] Catálogo público: home con categorías, búsqueda con log de demanda, ficha de producto, ficha de empresa
+- [x] SEO: SSR, metas, sitemap, robots, Schema.org Product + LocalBusiness + ItemList
+- [x] Log de búsquedas en `mkt_search_queries`
+- [x] Branding AGAMA: top bar + header + footer "Un servicio de AGAMA"
+- [x] Legal: términos, privacidad, política de contenido, cookie banner
+- [x] Seguridad: RLS completo, XSS (JSON-LD), filter injection, headers HTTP, phone privacy
 
 **Gate de salida:** un proveedor real puede registrarse y publicar; un comprador encuentra el producto por Google y por el buscador interno.
+→ **Bloqueante real:** SMTP de Supabase sin configurar (signup/magic link no mandan emails).
 
 ## Fase 2 — Watcher IA (2 semanas, en paralelo con final de F1)
 
-- [ ] Pipeline de moderación pre-publicación: texto + imágenes (ver [moderacion-ia.md](moderacion-ia.md))
-- [ ] Estados de producto (`pending_review → published/rejected`) con motivo visible al vendedor
-- [ ] Cola de revisión humana en panel admin para casos dudosos
+- [x] Capa 1 — reglas duras en BD (`mkt_moderate_text`): pigmentos/masterbatch/aditivos, datos de contacto
+- [x] Capa 2 — Claude Haiku texto: clasificación semántica, confianza, categoría detectada
+- [x] Capa 3 — Claude Haiku visión: scan de imágenes (solo si texto pasa)
+- [x] Pipeline en Next.js API route (`/api/moderate`); sin dependencia de Edge Functions
+- [x] `mkt_submit_product` como única vía a `published` (SECURITY DEFINER + veredicto externo)
+- [x] Log en `mkt_moderation_events` (source, confidence, model, violations)
+- [x] Motivo de rechazo visible al vendedor en el panel
+- [ ] **Cola de revisión humana** — panel admin para casos `pending_review` (falta UI)
 - [ ] Re-escaneo al editar producto
 - [ ] Métricas de moderación (tasa de rechazo, falsos positivos)
 
-**Gate de salida:** imposible publicar pigmentos/masterbatch/aditivos o contenido ajeno al plástico sin revisión.
+**Gate de salida:** imposible publicar pigmentos/masterbatch/aditivos sin revisión.
+→ **Bloqueante real:** `ANTHROPIC_API_KEY` pendiente de añadir en Vercel (sin ella solo actúa capa 1).
 
 ## Fase 3 — Mensajería (2 semanas)
 
