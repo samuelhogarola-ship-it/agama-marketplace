@@ -30,9 +30,9 @@ export default function RegistroPage() {
     }
     if (data.session && data.user) {
       // Crear ficha de empresa (el slug único se resuelve en BD si colisiona)
-      await supabase.from("mkt_profiles").insert({
+      await supabase.from("mkt_companies").insert({
         id: data.user.id,
-        company_name: form.company,
+        name: form.company,
         slug: `${slugify(form.company)}-${data.user.id.slice(0, 6)}`,
       });
       router.push("/panel");
@@ -47,7 +47,7 @@ export default function RegistroPage() {
     <div className="mx-auto max-w-md px-4 py-16">
       <h1 className="text-2xl font-bold text-slate-800">Crea tu perfil profesional</h1>
       <p className="mt-2 text-sm text-slate-500">
-        Solo para empresas y proveedores del sector plástico. Publica gratis hasta 5 productos.
+        Solo para empresas y proveedores del sector plástico. Publica gratis hasta 5 anuncios.
       </p>
       <form onSubmit={onSubmit} className="mt-8 space-y-4">
         <input

@@ -35,14 +35,14 @@ function json(data: unknown, status = 200) {
 
 async function setStatus(admin: SupaClient, id: number, status: string, reason: string | null) {
   await admin
-    .from("mkt_products")
-    .update({ status, reject_reason: reason, updated_at: new Date().toISOString() })
+    .from("mkt_listings")
+    .update({ status, rejection_reason: reason, updated_at: new Date().toISOString() })
     .eq("id", id);
 }
 
 async function logEvent(
   admin: SupaClient,
-  productId: number,
+  listingId: number,
   verdict: string,
   violations: string[],
   reason: string | null,
@@ -50,7 +50,7 @@ async function logEvent(
   confidence: number,
 ) {
   await admin.from("mkt_moderation_events").insert({
-    product_id: productId,
+    listing_id: listingId,
     verdict,
     violations,
     reason,
@@ -76,7 +76,7 @@ async function callClaude(messages: unknown[], maxTokens = 300): Promise<string>
 }
 
 async function classifyText(title: string, description: string, category: string): Promise<ModResult> {
-  const prompt = `Eres el moderador de AGAMA Marketplace, portal B2B de plásticos en México.
+  const prompt = `Eres el moderador de TodoPlástico, portal B2B de plásticos en México.
 
 Producto:
 Título: ${title}
@@ -107,7 +107,7 @@ async function classifyImages(urls: string[], title: string): Promise<ModResult>
         ...imageBlocks,
         {
           type: "text",
-          text: `Fotos del producto "${title}" en AGAMA Marketplace (plásticos B2B, México).
+          text: `Fotos del anuncio "${title}" en TodoPlástico (plásticos B2B, México).
 
 ¿Muestran pigmentos, masterbatch, aditivos de color, productos ajenos al plástico, o datos de contacto (teléfonos/emails en carteles)?
 
@@ -128,13 +128,13 @@ Deno.serve(async (req) => {
   const auth = req.headers.get("Authorization");
   if (!auth) return new Response("Unauthorized", { status: 401, headers: CORS });
 
-  let productId: number;
+  let listingId: number;
   try {
     const body = await req.json();
-    productId = Number(body.product_id);
-    if (!productId) throw new Error();
+    listingId = Number(body.listing_id ?? body.product_id);
+    if (!listingId) throw new Error();
   } catch {
-    return json({ error: "product_id requerido" }, 400);
+    return json({ error: "listing_id requerido" }, 400);
   }
 
   const admin = createClient(SUPABASE_URL, SERVICE_KEY, { auth: { persistSession: false } });
@@ -146,20 +146,20 @@ Deno.serve(async (req) => {
   const { data: { user: caller } } = await user.auth.getUser();
   if (!caller) return new Response("Unauthorized", { status: 401, headers: CORS });
 
-  const { data: product } = await admin
-    .from("mkt_products")
-    .select("*, photos:mkt_product_photos(path, position)")
-    .eq("id", productId)
+  const { data: listing } = await admin
+    .from("mkt_listings")
+    .select("*, photos:mkt_listing_photos(storage_path, position)")
+    .eq("id", listingId)
     .single();
 
-  if (!product) return json({ error: "Producto no encontrado" }, 404);
-  if (product.owner_id !== caller.id) return new Response("Forbidden", { status: 403, headers: CORS });
-  if (product.status === "blocked") return json({ error: "Producto bloqueado" }, 403);
+  if (!listing) return json({ error: "Anuncio no encontrado" }, 404);
+  if (listing.company_id !== caller.id) return new Response("Forbidden", { status: 403, headers: CORS });
+  if (listing.status === "blocked") return json({ error: "Anuncio bloqueado" }, 403);
 
   // Mark pending immediately (user sees feedback quickly)
-  await setStatus(admin, productId, "pending_review", null);
+  await setStatus(admin, listingId, "pending_review", null);
 
-  const fullText = `${product.title} ${product.description}`;
+  const fullText = `${listing.title} ${listing.description}`;
 
   // --- Layer 1: hard regex ---
   const hardViolations: string[] = [];
@@ -170,55 +170,55 @@ Deno.serve(async (req) => {
     const reason = hardViolations.includes("competencia_pigmentos_masterbatch_aditivos")
       ? "No se permiten pigmentos, masterbatch, aditivos ni colorantes."
       : "No se permiten teléfonos, emails ni WhatsApp en la publicación.";
-    await setStatus(admin, productId, "rejected", reason);
-    await logEvent(admin, productId, "reject", hardViolations, reason, "rules", 1.0);
+    await setStatus(admin, listingId, "rejected", reason);
+    await logEvent(admin, listingId, "reject", hardViolations, reason, "rules", 1.0);
     return json({ verdict: "reject", reason });
   }
 
   // --- Layer 2: Claude Haiku text (skip if no API key configured) ---
   if (!ANTHROPIC_KEY) {
     // No AI key: publish if regex passed (acceptable for dev/testing)
-    await setStatus(admin, productId, "published", null);
-    await logEvent(admin, productId, "approve", [], null, "rules", 1.0);
+    await setStatus(admin, listingId, "published", null);
+    await logEvent(admin, listingId, "approve", [], null, "rules", 1.0);
     return json({ verdict: "approve" });
   }
 
   let textResult: ModResult;
   try {
-    textResult = await classifyText(product.title, product.description, product.category);
+    textResult = await classifyText(listing.title, listing.description, listing.category);
   } catch (e) {
     console.error("Text classification failed:", e);
-    await logEvent(admin, productId, "review", [], "Error en clasificador IA", "ai", 0);
+    await logEvent(admin, listingId, "review", [], "Error en clasificador IA", "ai", 0);
     return json({ verdict: "review", reason: "Tu publicación está pendiente de revisión." });
   }
 
   if (textResult.verdict === "reject" && textResult.confidence >= 0.8) {
-    await setStatus(admin, productId, "rejected", textResult.reason_es);
-    await logEvent(admin, productId, "reject", textResult.violations, textResult.reason_es, "ai", textResult.confidence);
+    await setStatus(admin, listingId, "rejected", textResult.reason_es);
+    await logEvent(admin, listingId, "reject", textResult.violations, textResult.reason_es, "ai", textResult.confidence);
     return json({ verdict: "reject", reason: textResult.reason_es });
   }
 
   if (textResult.verdict !== "approve" || textResult.confidence < 0.75) {
-    await logEvent(admin, productId, "review", textResult.violations, textResult.reason_es, "ai", textResult.confidence);
+    await logEvent(admin, listingId, "review", textResult.violations, textResult.reason_es, "ai", textResult.confidence);
     return json({ verdict: "review", reason: "Tu publicación está siendo revisada." });
   }
 
   // --- Layer 3: Claude Haiku vision ---
-  const photos = ((product.photos ?? []) as { path: string; position: number }[])
+  const photos = ((listing.photos ?? []) as { storage_path: string; position: number }[])
     .sort((a, b) => a.position - b.position)
     .slice(0, 5);
-  const photoUrls = photos.map((p) => `${SUPABASE_URL}/storage/v1/object/public/mkt-photos/${p.path}`);
+  const photoUrls = photos.map((p) => `${SUPABASE_URL}/storage/v1/object/public/mkt-photos/${p.storage_path}`);
 
   if (photoUrls.length > 0) {
     try {
-      const visionResult = await classifyImages(photoUrls, product.title);
+      const visionResult = await classifyImages(photoUrls, listing.title);
       if (visionResult.verdict === "reject" && visionResult.confidence >= 0.8) {
-        await setStatus(admin, productId, "rejected", visionResult.reason_es);
-        await logEvent(admin, productId, "reject", visionResult.violations, visionResult.reason_es, "ai", visionResult.confidence);
+        await setStatus(admin, listingId, "rejected", visionResult.reason_es);
+        await logEvent(admin, listingId, "reject", visionResult.violations, visionResult.reason_es, "ai", visionResult.confidence);
         return json({ verdict: "reject", reason: visionResult.reason_es });
       }
       if (visionResult.verdict === "review") {
-        await logEvent(admin, productId, "review", visionResult.violations, visionResult.reason_es, "ai", visionResult.confidence);
+        await logEvent(admin, listingId, "review", visionResult.violations, visionResult.reason_es, "ai", visionResult.confidence);
         return json({ verdict: "review", reason: "Las imágenes están siendo revisadas." });
       }
     } catch (e) {
@@ -228,7 +228,7 @@ Deno.serve(async (req) => {
   }
 
   // All layers passed → publish
-  await setStatus(admin, productId, "published", null);
-  await logEvent(admin, productId, "approve", [], null, "ai", textResult.confidence);
+  await setStatus(admin, listingId, "published", null);
+  await logEvent(admin, listingId, "approve", [], null, "ai", textResult.confidence);
   return json({ verdict: "approve" });
 });

@@ -1,75 +1,82 @@
-# Roadmap — AGAMA Marketplace
+# Roadmap — TodoPlástico
 
-Fases secuenciales; cada fase termina con tests Playwright en verde y deploy a staging.
+Estado actualizado: 31 de julio de 2026. Las tres primeras fases de producto están implementadas en código y se entregan en este PR. Las dependencias de operación para producción siguen separadas de la entrega técnica.
 
-## Fase 0 — Fundaciones (1 semana)
+## Fase 0 — Fundaciones
 
-- [x] Repo + gobernanza (CLAUDE.md, ramas + PR, CHANGELOG)
-- [x] Stack definitivo: Next.js 15 App Router + TypeScript + Tailwind 4 (ver [stack.md](stack.md))
-- [x] Supabase (auth, Postgres, Storage) — temporalmente en `studio-panel` con prefijo `mkt_`; ver CLAUDE.md
-- [ ] **Bloqueante de Fase 4:** migrar BD a proyecto Supabase propio (`pg_dump -t 'public.mkt_*'`)
-- [ ] CI (GitHub Actions): lint + typecheck + Playwright smoke en cada PR
-- [x] Playwright smoke suite (9 tests en desktop + mobile)
-- [x] Hosting: Vercel desplegado en `agama-marketplace.vercel.app`
-- [ ] Dominio propio: pendiente de elegir entre los dominios existentes
+Estado: **completa en código**.
 
-## Fase 1 — MVP catálogo (3–4 semanas)
+- [x] Next.js 15 App Router, TypeScript y Tailwind 4.
+- [x] Supabase con Auth, Postgres, Storage y prefijo `mkt_`.
+- [x] Estructura de datos TodoPlástico: empresas, anuncios, fotos, categorías, artículos, banners y moderación.
+- [x] RLS, headers de seguridad, protección de rutas y sanitización de JSON-LD/filtros.
+- [x] Sitemap, robots, metadatos SSR y rutas semánticas.
+- [x] CI en pull requests: instalación limpia, typecheck, build y smoke Playwright.
+- [x] Smoke Playwright en Chromium desktop.
 
-- [x] Auth: magic link + contraseña; callback PKCE; middleware de protección de rutas
-- [x] Onboarding de empresa: ficha autocreada en primer acceso, editable (`/panel/perfil`)
-- [x] CRUD de productos con límite 5 activos en BD (trigger) y 5 fotos en BD (trigger)
-- [x] Subida de imágenes a Supabase Storage (MIME-based extension, path validation)
-- [ ] **Compresión/resize de imágenes antes de subir** (pendiente)
-- [ ] **Editar producto** — no hay UI de edición todavía
-- [x] Catálogo público: home con categorías, búsqueda con log de demanda, ficha de producto, ficha de empresa
-- [x] SEO: SSR, metas, sitemap, robots, Schema.org Product + LocalBusiness + ItemList
-- [x] Log de búsquedas en `mkt_search_queries`
-- [x] Branding AGAMA: top bar + header + footer "Un servicio de AGAMA"
-- [x] Legal: términos, privacidad, política de contenido, cookie banner
-- [x] Seguridad: RLS completo, XSS (JSON-LD), filter injection, headers HTTP, phone privacy
+Pendientes operativos antes de producción: proyecto Supabase propio, SMTP de Supabase/Resend, dominio `todo-plastico.com`, claves de Anthropic y carga inicial de datos.
 
-**Gate de salida:** un proveedor real puede registrarse y publicar; un comprador encuentra el producto por Google y por el buscador interno.
-→ **Bloqueante real:** SMTP de Supabase sin configurar (signup/magic link no mandan emails).
+## Fase 1 — Directorio y catálogo B2B
 
-## Fase 2 — Watcher IA (2 semanas, en paralelo con final de F1)
+Estado: **completa en código**.
 
-- [x] Capa 1 — reglas duras en BD (`mkt_moderate_text`): pigmentos/masterbatch/aditivos, datos de contacto
-- [x] Capa 2 — Claude Haiku texto: clasificación semántica, confianza, categoría detectada
-- [x] Capa 3 — Claude Haiku visión: scan de imágenes (solo si texto pasa)
-- [x] Pipeline en Next.js API route (`/api/moderate`); sin dependencia de Edge Functions
-- [x] `mkt_submit_product` como única vía a `published` (SECURITY DEFINER + veredicto externo)
-- [x] Log en `mkt_moderation_events` (source, confidence, model, violations)
-- [x] Motivo de rechazo visible al vendedor en el panel
-- [ ] **Cola de revisión humana** — panel admin para casos `pending_review` (falta UI)
-- [ ] Re-escaneo al editar producto
-- [ ] Métricas de moderación (tasa de rechazo, falsos positivos)
+- [x] Registro, login por contraseña y magic link con callback PKCE.
+- [x] Onboarding y edición de ficha profesional de empresa.
+- [x] Directorio `/empresas` con búsqueda, categoría, ubicación y perfiles públicos.
+- [x] Catálogo por categoría, buscador general y fichas públicas de anuncios.
+- [x] CRUD de anuncios: publicar, editar, pausar, reactivar y eliminar.
+- [x] Reenvío automático a moderación después de editar un anuncio publicado.
+- [x] Límite de 5 anuncios activos y 5 fotos por anuncio aplicado en BD.
+- [x] Compresión y resize de imágenes en cliente antes de subirlas.
+- [x] Contacto externo por web, teléfono, email, WhatsApp y enlace de empresa.
+- [x] Branding de TodoPlástico e integración visible y sutil de AGAMA.
+- [x] Textos legales y normas de comunidad adaptados al modelo no transaccional.
 
-**Gate de salida:** imposible publicar pigmentos/masterbatch/aditivos sin revisión.
-→ **Bloqueante real:** `ANTHROPIC_API_KEY` pendiente de añadir en Vercel (sin ella solo actúa capa 1).
+## Fase 2 — Moderación, contenido y operación
 
-## Fase 3 — Mensajería (2 semanas)
+Estado: **completa en código**.
 
-- [ ] Conversaciones comprador ↔ vendedor (Supabase Realtime)
-- [ ] Notificaciones por email (Resend) con resumen, sin exponer emails entre partes
-- [ ] Moderación IA de mensajes (mismo watcher, modo ligero)
-- [ ] Anti-spam: límite de conversaciones nuevas/día para cuentas recientes, reportar/bloquear
+- [x] Capa 1: reglas duras para pigmentos, masterbatch, aditivos y datos de contacto en texto.
+- [x] Capa 2: clasificación semántica con Claude Haiku y umbral conservador.
+- [x] Capa 3: revisión visual de fotografías.
+- [x] Estados `published`, `rejected` y `pending_review` con motivos visibles.
+- [x] Cola admin para aprobar/rechazar casos dudosos y métricas básicas de moderación.
+- [x] Reescaneo al editar anuncios.
+- [x] Portal editorial local con 5 artículos, páginas individuales y Schema.org Article.
+- [x] Buscador ampliado a empresas, anuncios y contenido.
+- [x] Sitemap ampliado a empresas, categorías y artículos.
 
-## Fase 4 — Lanzamiento CDMX (2 semanas)
+## Fase 3 — Preparación de lanzamiento
 
-- [ ] Carga inicial de oferta: invitar proveedores conocidos de AGAMA (objetivo: 30–50 proveedores, 150+ productos antes de anunciar)
-- [ ] Landing pages SEO por categoría y por zona
-- [ ] Analytics (Plausible/GA4) + dashboard interno de métricas de éxito
-- [ ] Legal: términos de uso, aviso de privacidad (LFPDPPP México), política de contenido
+Estado: **siguiente**.
 
-## Fase 5 — Monetización Pro (posterior)
+- [ ] Migrar `mkt_*` a un proyecto Supabase propio y validar Storage/RLS.
+- [ ] Configurar SMTP Resend en Supabase Auth.
+- [ ] Añadir `ANTHROPIC_API_KEY`, `SUPABASE_SERVICE_ROLE_KEY` y `TODO_PLASTICO_ADMIN_EMAILS` en el entorno seguro.
+- [ ] Instalar Plausible o GA4 con consentimiento y definir eventos de búsqueda/contacto.
+- [ ] Cargar perfil AGAMA, proveedores iniciales, anuncios reales y artículos revisados.
+- [ ] Revisar legalmente términos, privacidad LFPDPPP y normas de comunidad.
+- [ ] Conectar `todo-plastico.com`, activar indexación y verificar Search Console.
+- [ ] Ejecutar smoke desktop + mobile y checklist de lanzamiento.
 
-- [ ] Plan Pro con Stripe (suscripción): >5 productos, destacados, estadísticas de ficha
-- [ ] Enforcement de límites free/pro en BD y UI
-- [ ] Facturación (CFDI) — evaluar proveedor
+## Fase 4 — Evolución posterior
 
-## Fase 6 — Crecimiento (continuo)
+Fuera de la Fase 1 actual y sin implementación en este PR:
 
-- [ ] Reseñas/valoraciones de proveedores
-- [ ] Alertas de demanda ("avísame cuando haya X")
-- [ ] Informes de mercado con los datos agregados (producto de datos para AGAMA)
-- [ ] Expansión geográfica más allá de CDMX
+- [ ] Mensajería interna o solicitudes de presupuesto, si el modelo lo justifica.
+- [ ] Favoritos, reseñas y alertas de demanda.
+- [ ] Plan Pro, destacados y estadísticas para empresas.
+- [ ] Analítica avanzada y expansión geográfica.
+
+## Gates de entrega
+
+Cada PR debe pasar:
+
+```text
+npm ci
+npm run typecheck
+npm run build
+npx playwright test --project=chromium
+```
+
+El lanzamiento público añade los gates externos de Supabase propio, SMTP, claves IA, dominio, analítica, contenido real y revisión legal.

@@ -1,4 +1,4 @@
-# Estrategia SEO — AGAMA Marketplace
+# Estrategia SEO — TodoPlástico
 
 ## Objetivo
 
@@ -7,17 +7,17 @@ Capturar búsquedas transaccionales del sector plástico en CDMX: "tarimas de pl
 ## Arquitectura de URLs (el SEO se decide aquí)
 
 ```
-/                                → home (marketplace de plásticos en CDMX)
+/                                → home (directorio B2B de plásticos)
 /c/{categoria}                   → landing de categoría (ej. /c/tarimas-y-contenedores)
 /c/{categoria}/{zona}            → categoría + alcaldía/zona (ej. /c/tarimas-y-contenedores/iztapalapa)
-/p/{slug-producto}-{id}          → ficha de producto
+/p/{slug-anuncio}-{id}           → ficha de anuncio
 /e/{slug-empresa}                → ficha de proveedor
 /blog/{slug}                     → contenido editorial (fase 4+)
 ```
 
 - Todo renderizado en servidor (SSR/SSG) — nada de catálogo client-side-only.
 - Slugs en español, sin acentos, con guiones.
-- Productos despublicados → `410` o redirect a su categoría (no 404 masivos).
+- Anuncios despublicados → `410` o redirect a su categoría (no 404 masivos).
 
 ## Páginas de categoría = arma principal
 
@@ -25,14 +25,14 @@ Cada landing de categoría lleva: H1 con keyword + "CDMX", texto único de 150�
 
 ## Datos estructurados (JSON-LD)
 
-- Ficha de producto: `Product` + `Offer` (precio o `priceSpecification` omitido si "a consultar") + `ItemList` en categorías.
+- Ficha de anuncio: `Product` + `Offer` (precio o `priceSpecification` omitido si "a consultar") + `ItemList` en categorías.
 - Ficha de empresa: `LocalBusiness` con dirección y zona.
 - Home: `WebSite` + `SearchAction` (sitelinks searchbox).
 - Blog: `Article` + `FAQPage` donde aplique.
 
 ## Dominio y lanzamiento
 
-El desarrollo/staging vive en `*.vercel.app`, pero ese subdominio **no debe indexarse nunca** (`X-Robots-Tag: noindex` mientras no haya dominio final). El dominio definitivo (uno de los ya registrados) debe estar conectado **antes** del lanzamiento público de Fase 4: cambiar de dominio con el catálogo ya indexado obliga a una migración con 301 y pérdida temporal de posiciones. Elegir el dominio es, por tanto, un bloqueante de Fase 4, no de Fase 0.
+El desarrollo/staging vive en `*.vercel.app`, pero ese subdominio **no debe indexarse nunca** (`X-Robots-Tag: noindex` mientras no haya dominio final). El dominio de lanzamiento es `todo-plastico.com`; debe conectarse antes de publicar el catálogo y acompañarse con canonical y redirecciones 301 desde cualquier URL temporal.
 
 ## Técnico
 

@@ -15,10 +15,10 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # Se activan cuando exista el scaffold Next.js (Fase 1):
-      # - uses: actions/setup-node@v4
-      #   with: { node-version: 20, cache: npm }
-      # - run: npm ci
-      # - run: npm run lint && npm run typecheck
-      # - run: npx playwright install --with-deps chromium
-      # - run: npx playwright test --project=chromium
+      - uses: actions/setup-node@v4
+        with: { node-version: 20, cache: npm }
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm run build
+      - run: npx playwright install --with-deps chromium
+      - run: npx playwright test --project=chromium

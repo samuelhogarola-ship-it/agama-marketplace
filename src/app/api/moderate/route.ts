@@ -36,9 +36,9 @@ async function classifyText(title: string, description: string, category: string
   const raw = await callClaude([
     {
       role: "user",
-      content: `Eres el moderador de AGAMA Marketplace, portal B2B de plásticos en México.
+      content: `Eres el moderador de TodoPlástico, plataforma B2B gratuita de la industria plástica en México, impulsada por AGAMA.
 
-Producto:
+Anuncio:
 Título: ${title}
 Categoría: ${category}
 Descripción: ${description}
@@ -66,7 +66,7 @@ async function classifyImages(urls: string[], title: string): Promise<ModResult>
           ...urls.map((url) => ({ type: "image", source: { type: "url", url } })),
           {
             type: "text",
-            text: `Fotos de "${title}" en AGAMA Marketplace (plásticos B2B México). ¿Muestran pigmentos, masterbatch, aditivos, productos ajenos al plástico, o datos de contacto en carteles?
+            text: `Fotos de "${title}" en TodoPlástico (plásticos B2B México). ¿Muestran pigmentos, masterbatch, aditivos, productos ajenos al plástico, o datos de contacto incrustados en la imagen?
 Devuelve SOLO JSON: {"verdict":"approve","violations":[],"confidence":0.95,"reason_es":null}`,
           },
         ],
@@ -78,22 +78,22 @@ Devuelve SOLO JSON: {"verdict":"approve","violations":[],"confidence":0.95,"reas
 }
 
 export async function POST(req: NextRequest) {
-  const { product_id } = await req.json().catch(() => ({}));
-  if (!product_id) return NextResponse.json({ error: "product_id requerido" }, { status: 400 });
+  const { listing_id } = await req.json().catch(() => ({}));
+  if (!listing_id) return NextResponse.json({ error: "listing_id requerido" }, { status: 400 });
 
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "No autenticado" }, { status: 401 });
 
   const { data: product } = await supabase
-    .from("mkt_products")
-    .select("*, photos:mkt_product_photos(path, position)")
-    .eq("id", product_id)
-    .eq("owner_id", user.id)
+    .from("mkt_listings")
+    .select("*, photos:mkt_listing_photos(storage_path, position)")
+    .eq("id", listing_id)
+    .eq("company_id", user.id)
     .single();
 
-  if (!product) return NextResponse.json({ error: "Producto no encontrado" }, { status: 404 });
-  if (product.status === "blocked") return NextResponse.json({ error: "Producto bloqueado" }, { status: 403 });
+  if (!product) return NextResponse.json({ error: "Anuncio no encontrado" }, { status: 404 });
+  if (product.status === "blocked") return NextResponse.json({ error: "Anuncio bloqueado" }, { status: 403 });
 
   const fullText = `${product.title} ${product.description}`;
 
@@ -106,15 +106,15 @@ export async function POST(req: NextRequest) {
     const reason = hardViolations.includes("competencia_pigmentos_masterbatch_aditivos")
       ? "No se permiten pigmentos, masterbatch, aditivos ni colorantes."
       : "No se permiten teléfonos, emails ni WhatsApp en la publicación.";
-    await supabase.rpc("mkt_submit_product", { p_product_id: product_id, p_verdict: "reject", p_reason: reason });
-    await supabase.from("mkt_moderation_events").insert({ product_id, verdict: "reject", violations: hardViolations, reason, source: "rules", confidence: 1.0 });
+    await supabase.rpc("mkt_submit_listing", { p_listing_id: listing_id, p_verdict: "reject", p_reason: reason });
+    await supabase.from("mkt_moderation_events").insert({ listing_id, verdict: "reject", violations: hardViolations, reason, source: "rules", confidence: 1.0 });
     return NextResponse.json({ verdict: "reject", reason });
   }
 
   // Layer 2: Claude Haiku text (skip gracefully if no key)
   if (!process.env.ANTHROPIC_API_KEY) {
-    await supabase.rpc("mkt_submit_product", { p_product_id: product_id, p_verdict: "approve" });
-    await supabase.from("mkt_moderation_events").insert({ product_id, verdict: "approve", violations: [], reason: null, source: "rules", confidence: 1.0 });
+    await supabase.rpc("mkt_submit_listing", { p_listing_id: listing_id, p_verdict: "approve" });
+    await supabase.from("mkt_moderation_events").insert({ listing_id, verdict: "approve", violations: [], reason: null, source: "rules", confidence: 1.0 });
     return NextResponse.json({ verdict: "approve" });
   }
 
@@ -122,42 +122,42 @@ export async function POST(req: NextRequest) {
   try {
     textResult = await classifyText(product.title, product.description, product.category);
   } catch {
-    await supabase.rpc("mkt_submit_product", { p_product_id: product_id, p_verdict: "pending" });
-    await supabase.from("mkt_moderation_events").insert({ product_id, verdict: "review", violations: [], reason: "Error en clasificador IA", source: "ai", confidence: 0 });
+    await supabase.rpc("mkt_submit_listing", { p_listing_id: listing_id, p_verdict: "pending" });
+    await supabase.from("mkt_moderation_events").insert({ listing_id, verdict: "review", violations: [], reason: "Error en clasificador IA", source: "ai", confidence: 0 });
     return NextResponse.json({ verdict: "review", reason: "Tu publicación está pendiente de revisión." });
   }
 
   if (textResult.verdict === "reject" && textResult.confidence >= 0.8) {
-    await supabase.rpc("mkt_submit_product", { p_product_id: product_id, p_verdict: "reject", p_reason: textResult.reason_es });
-    await supabase.from("mkt_moderation_events").insert({ product_id, verdict: "reject", violations: textResult.violations, reason: textResult.reason_es, source: "ai", confidence: textResult.confidence, model: MODEL });
+    await supabase.rpc("mkt_submit_listing", { p_listing_id: listing_id, p_verdict: "reject", p_reason: textResult.reason_es });
+    await supabase.from("mkt_moderation_events").insert({ listing_id, verdict: "reject", violations: textResult.violations, reason: textResult.reason_es, source: "ai", confidence: textResult.confidence, model: MODEL });
     return NextResponse.json({ verdict: "reject", reason: textResult.reason_es });
   }
 
   if (textResult.verdict !== "approve" || textResult.confidence < 0.75) {
-    await supabase.rpc("mkt_submit_product", { p_product_id: product_id, p_verdict: "pending" });
-    await supabase.from("mkt_moderation_events").insert({ product_id, verdict: "review", violations: textResult.violations, reason: textResult.reason_es, source: "ai", confidence: textResult.confidence, model: MODEL });
+    await supabase.rpc("mkt_submit_listing", { p_listing_id: listing_id, p_verdict: "pending" });
+    await supabase.from("mkt_moderation_events").insert({ listing_id, verdict: "review", violations: textResult.violations, reason: textResult.reason_es, source: "ai", confidence: textResult.confidence, model: MODEL });
     return NextResponse.json({ verdict: "review", reason: "Tu publicación está siendo revisada." });
   }
 
   // Layer 3: Claude Haiku vision
-  const photos = ((product.photos ?? []) as { path: string; position: number }[])
+  const photos = ((product.photos ?? []) as { storage_path: string; position: number }[])
     .sort((a, b) => a.position - b.position)
     .slice(0, 5);
   const photoUrls = photos.map(
-    (p) => `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/mkt-photos/${p.path}`,
+    (p) => `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/mkt-photos/${p.storage_path}`,
   );
 
   if (photoUrls.length > 0) {
     try {
       const visionResult = await classifyImages(photoUrls, product.title);
       if (visionResult.verdict === "reject" && visionResult.confidence >= 0.8) {
-        await supabase.rpc("mkt_submit_product", { p_product_id: product_id, p_verdict: "reject", p_reason: visionResult.reason_es });
-        await supabase.from("mkt_moderation_events").insert({ product_id, verdict: "reject", violations: visionResult.violations, reason: visionResult.reason_es, source: "ai", confidence: visionResult.confidence, model: MODEL });
+        await supabase.rpc("mkt_submit_listing", { p_listing_id: listing_id, p_verdict: "reject", p_reason: visionResult.reason_es });
+        await supabase.from("mkt_moderation_events").insert({ listing_id, verdict: "reject", violations: visionResult.violations, reason: visionResult.reason_es, source: "ai", confidence: visionResult.confidence, model: MODEL });
         return NextResponse.json({ verdict: "reject", reason: visionResult.reason_es });
       }
       if (visionResult.verdict === "review") {
-        await supabase.rpc("mkt_submit_product", { p_product_id: product_id, p_verdict: "pending" });
-        await supabase.from("mkt_moderation_events").insert({ product_id, verdict: "review", violations: visionResult.violations, reason: visionResult.reason_es, source: "ai", confidence: visionResult.confidence, model: MODEL });
+        await supabase.rpc("mkt_submit_listing", { p_listing_id: listing_id, p_verdict: "pending" });
+        await supabase.from("mkt_moderation_events").insert({ listing_id, verdict: "review", violations: visionResult.violations, reason: visionResult.reason_es, source: "ai", confidence: visionResult.confidence, model: MODEL });
         return NextResponse.json({ verdict: "review", reason: "Las imágenes están siendo revisadas." });
       }
     } catch {
@@ -166,7 +166,7 @@ export async function POST(req: NextRequest) {
   }
 
   // All passed → publish
-  await supabase.rpc("mkt_submit_product", { p_product_id: product_id, p_verdict: "approve" });
-  await supabase.from("mkt_moderation_events").insert({ product_id, verdict: "approve", violations: [], reason: null, source: "ai", confidence: textResult.confidence, model: MODEL });
+  await supabase.rpc("mkt_submit_listing", { p_listing_id: listing_id, p_verdict: "approve" });
+  await supabase.from("mkt_moderation_events").insert({ listing_id, verdict: "approve", violations: [], reason: null, source: "ai", confidence: textResult.confidence, model: MODEL });
   return NextResponse.json({ verdict: "approve" });
 }

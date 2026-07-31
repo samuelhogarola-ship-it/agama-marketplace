@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
-import { productPath, type Product, type Profile } from "@/lib/types";
+import { productPath, type Company, type Product } from "@/lib/types";
 import { formatPrice } from "@/components/ProductCard";
 
 const STATUS_LABEL: Record<string, { text: string; cls: string }> = {
@@ -16,7 +16,7 @@ const STATUS_LABEL: Record<string, { text: string; cls: string }> = {
 };
 
 export default function PanelPage() {
-  const [profile, setProfile] = useState<Profile | null>(null);
+  const [profile, setProfile] = useState<Company | null>(null);
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -25,16 +25,16 @@ export default function PanelPage() {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
     let [{ data: prof }, { data: prods }] = await Promise.all([
-      supabase.from("mkt_profiles").select("*").eq("id", user.id).maybeSingle(),
-      supabase.from("mkt_products").select("*").eq("owner_id", user.id).order("created_at", { ascending: false }),
+      supabase.from("mkt_companies").select("*").eq("id", user.id).maybeSingle(),
+      supabase.from("mkt_listings").select("*").eq("company_id", user.id).order("created_at", { ascending: false }),
     ]);
     if (!prof) {
       // Primer acceso vía magic link: crear ficha automáticamente
       const name = (user.user_metadata?.company_name as string) ?? user.email?.split("@")[0] ?? "Mi empresa";
       const slug = `${name.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "").slice(0, 60)}-${user.id.slice(0, 6)}`;
       const { data: created } = await supabase
-        .from("mkt_profiles")
-        .insert({ id: user.id, company_name: name.slice(0, 120), slug })
+        .from("mkt_companies")
+        .insert({ id: user.id, name: name.slice(0, 120), slug })
         .select()
         .single();
       prof = created;
@@ -49,22 +49,22 @@ export default function PanelPage() {
   async function setStatus(id: number, status: "paused" | "pending_review") {
     const supabase = createClient();
     if (status === "pending_review") {
-      await supabase.rpc("mkt_submit_product", { p_product_id: id });
+      await supabase.rpc("mkt_submit_listing", { p_listing_id: id });
     } else {
-      await supabase.from("mkt_products").update({ status }).eq("id", id);
+      await supabase.from("mkt_listings").update({ status }).eq("id", id);
     }
     load();
   }
 
   async function remove(id: number) {
-    if (!confirm("¿Eliminar este producto definitivamente?")) return;
+    if (!confirm("¿Eliminar este anuncio definitivamente?")) return;
     const supabase = createClient();
     // Borrar también los archivos de Storage (el cascade solo borra las filas)
-    const { data: photos } = await supabase.from("mkt_product_photos").select("path").eq("product_id", id);
+    const { data: photos } = await supabase.from("mkt_listing_photos").select("storage_path").eq("listing_id", id);
     if (photos && photos.length > 0) {
-      await supabase.storage.from("mkt-photos").remove(photos.map((p) => p.path));
+      await supabase.storage.from("mkt-photos").remove(photos.map((p) => p.storage_path));
     }
-    await supabase.from("mkt_products").delete().eq("id", id);
+    await supabase.from("mkt_listings").delete().eq("id", id);
     load();
   }
 
@@ -83,9 +83,9 @@ export default function PanelPage() {
     <div className="mx-auto max-w-4xl px-4 py-12">
       <div className="flex items-center justify-between flex-wrap gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-slate-800">{profile?.company_name ?? "Mi panel"}</h1>
+          <h1 className="text-2xl font-bold text-slate-800">{profile?.name ?? "Mi panel"}</h1>
           <p className="text-sm text-slate-500">
-            Plan {profile?.plan === "pro" ? "Pro" : "gratuito"} · {activeCount}/{limit === Infinity ? "∞" : limit} productos activos
+            Plan {profile?.plan === "pro" ? "Pro" : "gratuito"} · {activeCount}/{limit === Infinity ? "∞" : limit} anuncios activos
           </p>
         </div>
         <div className="flex gap-3 items-center">
@@ -93,7 +93,7 @@ export default function PanelPage() {
           <button onClick={signOut} className="text-sm text-slate-400 hover:text-slate-600">Salir</button>
           {activeCount < limit ? (
             <Link href="/panel/publicar" className="rounded-full bg-brand text-white px-5 py-2.5 text-sm font-medium hover:bg-brand-dark">
-              + Publicar producto
+              + Publicar anuncio
             </Link>
           ) : (
             <span className="rounded-full bg-slate-100 text-slate-500 px-5 py-2.5 text-sm">
@@ -106,7 +106,7 @@ export default function PanelPage() {
       <div className="mt-8 space-y-3">
         {products.length === 0 && (
           <div className="rounded-xl border border-dashed border-slate-300 p-12 text-center text-slate-500">
-            Aún no has publicado productos.
+            Aún no has publicado anuncios.
           </div>
         )}
         {products.map((p) => {
@@ -119,11 +119,12 @@ export default function PanelPage() {
                   <p className="font-semibold text-slate-800 truncate">{p.title}</p>
                 </div>
                 <p className="text-sm text-slate-500 mt-1">{formatPrice(p.price_mxn)}</p>
-                {p.status === "rejected" && p.reject_reason && (
-                  <p className="text-sm text-red-600 mt-1">Motivo: {p.reject_reason}</p>
+                {p.status === "rejected" && p.rejection_reason && (
+                  <p className="text-sm text-red-600 mt-1">Motivo: {p.rejection_reason}</p>
                 )}
               </div>
               <div className="flex gap-3 text-sm shrink-0">
+                <Link href={`/panel/editar/${p.id}`} className="text-brand hover:underline">Editar</Link>
                 {p.status === "published" && (
                   <>
                     <Link href={productPath(p)} className="text-brand hover:underline">Ver</Link>

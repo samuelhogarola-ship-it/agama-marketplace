@@ -6,7 +6,7 @@ import { createClient } from "@/lib/supabase/client";
 
 export default function PerfilPage() {
   const router = useRouter();
-  const [form, setForm] = useState({ company_name: "", description: "", zone: "", phone: "" });
+  const [form, setForm] = useState({ name: "", description: "", location: "", website: "", phone: "", email: "", whatsapp: "" });
   const [loading, setLoading] = useState(true);
   const [saved, setSaved] = useState(false);
 
@@ -15,14 +15,16 @@ export default function PerfilPage() {
       const supabase = createClient();
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
-      // RPC: el teléfono ya no es legible por select público (grants por columna)
-      const { data } = await supabase.rpc("mkt_my_profile");
+      const { data } = await supabase.rpc("mkt_my_company");
       if (data) {
         setForm({
-          company_name: data.company_name ?? "",
+          name: data.name ?? "",
           description: data.description ?? "",
-          zone: data.zone ?? "",
+          location: data.location ?? "",
+          website: data.website ?? "",
           phone: data.phone ?? "",
+          email: data.email ?? "",
+          whatsapp: data.whatsapp ?? "",
         });
       }
       setLoading(false);
@@ -34,7 +36,7 @@ export default function PerfilPage() {
     const supabase = createClient();
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
-    await supabase.from("mkt_profiles").update(form).eq("id", user.id);
+    await supabase.from("mkt_companies").update(form).eq("id", user.id);
     setSaved(true);
     setTimeout(() => router.push("/panel"), 800);
   }
@@ -49,8 +51,8 @@ export default function PerfilPage() {
           <label className="block text-sm font-medium text-slate-700">Nombre de la empresa</label>
           <input
             required
-            value={form.company_name}
-            onChange={(e) => setForm({ ...form, company_name: e.target.value })}
+            value={form.name}
+            onChange={(e) => setForm({ ...form, name: e.target.value })}
             className="mt-1 w-full rounded-lg border border-slate-300 px-4 py-2.5 focus:outline-none focus:border-brand"
           />
         </div>
@@ -67,20 +69,51 @@ export default function PerfilPage() {
         </div>
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-slate-700">Zona (alcaldía/municipio)</label>
+            <label className="block text-sm font-medium text-slate-700">Ubicación</label>
             <input
-              value={form.zone}
-              onChange={(e) => setForm({ ...form, zone: e.target.value })}
+              value={form.location}
+              onChange={(e) => setForm({ ...form, location: e.target.value })}
               placeholder="Iztapalapa, CDMX"
               className="mt-1 w-full rounded-lg border border-slate-300 px-4 py-2.5 focus:outline-none focus:border-brand"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-slate-700">Teléfono (privado)</label>
+            <label className="block text-sm font-medium text-slate-700">Teléfono público</label>
             <input
               value={form.phone}
               onChange={(e) => setForm({ ...form, phone: e.target.value })}
-              placeholder="No se muestra públicamente"
+              placeholder="+52 55 0000 0000"
+              className="mt-1 w-full rounded-lg border border-slate-300 px-4 py-2.5 focus:outline-none focus:border-brand"
+            />
+          </div>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-slate-700">Web pública</label>
+            <input
+              type="url"
+              value={form.website}
+              onChange={(e) => setForm({ ...form, website: e.target.value })}
+              placeholder="https://tuempresa.com"
+              className="mt-1 w-full rounded-lg border border-slate-300 px-4 py-2.5 focus:outline-none focus:border-brand"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-slate-700">Email público</label>
+            <input
+              type="email"
+              value={form.email}
+              onChange={(e) => setForm({ ...form, email: e.target.value })}
+              placeholder="ventas@tuempresa.com"
+              className="mt-1 w-full rounded-lg border border-slate-300 px-4 py-2.5 focus:outline-none focus:border-brand"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-slate-700">WhatsApp público</label>
+            <input
+              value={form.whatsapp}
+              onChange={(e) => setForm({ ...form, whatsapp: e.target.value })}
+              placeholder="+52 55 0000 0000"
               className="mt-1 w-full rounded-lg border border-slate-300 px-4 py-2.5 focus:outline-none focus:border-brand"
             />
           </div>

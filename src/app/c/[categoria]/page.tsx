@@ -19,8 +19,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const cat = categoryBySlug(categoria);
   if (!cat) return {};
   return {
-    title: `${cat.name} de plástico en CDMX`,
-    description: `${cat.description} Compra directo a proveedores en Ciudad de México.`,
+    title: `${cat.name} para la industria plástica en México`,
+    description: `${cat.description} Contacta directo a empresas y proveedores del sector plástico en México.`,
     alternates: { canonical: `/c/${cat.slug}` },
   };
 }
@@ -32,8 +32,8 @@ export default async function CategoryPage({ params }: Props) {
 
   const supabase = await createClient();
   const { data: products } = await supabase
-    .from("mkt_products")
-    .select("*, photos:mkt_product_photos(*), profile:mkt_profiles(company_name, slug, zone)")
+    .from("mkt_listings")
+    .select("*, photos:mkt_listing_photos(*), company:mkt_companies(name, slug, location)")
     .eq("status", "published")
     .eq("category", cat.slug)
     .order("created_at", { ascending: false })
@@ -42,7 +42,7 @@ export default async function CategoryPage({ params }: Props) {
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "CollectionPage",
-    name: `${cat.name} de plástico en CDMX`,
+    name: `${cat.name} para la industria plástica en México`,
     description: cat.description,
     mainEntity: {
       "@type": "ItemList",
@@ -58,9 +58,9 @@ export default async function CategoryPage({ params }: Props) {
   return (
     <div className="mx-auto max-w-6xl px-4 py-12">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: safeJsonLd(jsonLd) }} />
-      <h1 className="text-3xl font-bold text-slate-800">{cat.name} de plástico en CDMX</h1>
+      <h1 className="text-3xl font-bold text-slate-800">{cat.name} para la industria plástica en México</h1>
       <p className="mt-2 text-slate-600 max-w-2xl">
-        {cat.description} Contacta directamente a proveedores profesionales de la Ciudad de México por mensajería interna.
+        {cat.description} Contacta directamente a empresas profesionales por sus canales públicos.
       </p>
       {products && products.length > 0 ? (
         <div className="mt-8 grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -70,7 +70,7 @@ export default async function CategoryPage({ params }: Props) {
         </div>
       ) : (
         <div className="mt-12 rounded-xl border border-dashed border-slate-300 p-12 text-center text-slate-500">
-          <p className="font-medium">Aún no hay productos en esta categoría.</p>
+          <p className="font-medium">Aún no hay anuncios en esta categoría.</p>
           <p className="mt-1 text-sm">¿Vendes {cat.name.toLowerCase()}? Sé el primero en publicar gratis.</p>
         </div>
       )}

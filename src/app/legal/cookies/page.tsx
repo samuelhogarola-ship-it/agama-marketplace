@@ -8,11 +8,11 @@ export default function CookiesPage() {
       <h1 className="text-3xl font-bold text-slate-800">Política de cookies</h1>
 
       <h2>Qué cookies usamos</h2>
-      <p>AGAMA Marketplace utiliza únicamente cookies esenciales:</p>
+      <p>TodoPlástico utiliza únicamente cookies esenciales:</p>
       <ul className="list-disc pl-6 mt-2 space-y-1">
         <li>
           <strong>Cookies de sesión</strong> (proveedor de autenticación): mantienen tu sesión iniciada de forma
-          segura. Sin ellas no es posible usar el panel ni la mensajería.
+          segura. Sin ellas no es posible usar el panel.
         </li>
         <li>
           <strong>Preferencia de consentimiento</strong>: recordamos tu elección sobre esta política (almacenamiento

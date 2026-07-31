@@ -5,7 +5,6 @@ import { createClient } from "@/lib/supabase/server";
 import { categoryBySlug } from "@/lib/categories";
 import { photoUrl, type Product } from "@/lib/types";
 import { formatPrice } from "@/components/ProductCard";
-import ContactSellerButton from "@/components/ContactSellerButton";
 import { safeJsonLd } from "@/lib/jsonld";
 
 export const revalidate = 300;
@@ -20,8 +19,8 @@ function parseId(slug: string): number | null {
 async function getProduct(id: number): Promise<Product | null> {
   const supabase = await createClient();
   const { data } = await supabase
-    .from("mkt_products")
-    .select("*, photos:mkt_product_photos(*), profile:mkt_profiles(company_name, slug, zone)")
+    .from("mkt_listings")
+    .select("*, photos:mkt_listing_photos(*), company:mkt_companies(name, slug, location, website, phone, email, whatsapp)")
     .eq("status", "published")
     .eq("id", id)
     .single();
@@ -38,7 +37,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     title: product.title,
     description: product.description.slice(0, 160),
     alternates: { canonical: `/p/${product.slug}-${product.id}` },
-    openGraph: product.photos?.[0] ? { images: [photoUrl(product.photos[0].path)] } : undefined,
+    openGraph: product.photos?.[0] ? { images: [photoUrl(product.photos[0].storage_path)] } : undefined,
   };
 }
 
@@ -57,16 +56,16 @@ export default async function ProductPage({ params }: Props) {
     "@type": "Product",
     name: product.title,
     description: product.description,
-    image: photos.map((p) => photoUrl(p.path)),
+    image: photos.map((p) => photoUrl(p.storage_path)),
     category: cat?.name,
     offers: {
       "@type": "Offer",
       availability: "https://schema.org/InStock",
-      areaServed: "Ciudad de México",
+      areaServed: "México",
       ...(product.price_mxn !== null
         ? { price: product.price_mxn, priceCurrency: "MXN" }
         : {}),
-      seller: { "@type": "Organization", name: product.profile?.company_name },
+      seller: { "@type": "Organization", name: product.company?.name },
     },
   };
 
@@ -84,7 +83,7 @@ export default async function ProductPage({ params }: Props) {
           <div className="aspect-[4/3] rounded-xl bg-slate-100 overflow-hidden">
             {photos[0] ? (
               // eslint-disable-next-line @next/next/no-img-element
-              <img src={photoUrl(photos[0].path)} alt={product.title} className="w-full h-full object-cover" />
+              <img src={photoUrl(photos[0].storage_path)} alt={product.title} className="w-full h-full object-cover" />
             ) : (
               <div className="w-full h-full flex items-center justify-center text-slate-300 text-6xl">◇</div>
             )}
@@ -93,7 +92,7 @@ export default async function ProductPage({ params }: Props) {
             <div className="mt-3 grid grid-cols-5 gap-2">
               {photos.slice(1).map((ph) => (
                 // eslint-disable-next-line @next/next/no-img-element
-                <img key={ph.id} src={photoUrl(ph.path)} alt="" className="aspect-square rounded-lg object-cover bg-slate-100" />
+                <img key={ph.id} src={photoUrl(ph.storage_path)} alt="" className="aspect-square rounded-lg object-cover bg-slate-100" />
               ))}
             </div>
           )}
@@ -105,17 +104,45 @@ export default async function ProductPage({ params }: Props) {
             {formatPrice(product.price_mxn)}
             {product.unit && product.price_mxn !== null && <span className="text-base font-normal text-slate-500"> / {product.unit}</span>}
           </p>
-          {product.zone && <p className="mt-2 text-sm text-slate-500">📍 {product.zone}</p>}
+          {product.location && <p className="mt-2 text-sm text-slate-500">{product.location}</p>}
 
           <div className="mt-6 rounded-xl border border-slate-200 p-4">
-            <p className="text-sm text-slate-500">Vendido por</p>
-            {product.profile && (
-              <Link href={`/e/${product.profile.slug}`} className="font-semibold text-brand-dark hover:underline">
-                {product.profile.company_name}
+            <p className="text-sm text-slate-500">Publicado por</p>
+            {product.company && (
+              <Link href={`/e/${product.company.slug}`} className="font-semibold text-brand-dark hover:underline">
+                {product.company.name}
               </Link>
             )}
-            <ContactSellerButton productId={product.id} sellerId={product.owner_id} />
-            <p className="mt-2 text-xs text-slate-400">El envío se acuerda directamente con el vendedor.</p>
+            {product.company && (
+              <div className="mt-4 flex flex-wrap gap-2 text-sm">
+                {product.company.website && (
+                  <a href={product.company.website} target="_blank" rel="noreferrer" className="rounded-full border border-slate-200 px-3 py-1.5 hover:border-brand">
+                    Web
+                  </a>
+                )}
+                {product.company.phone && (
+                  <a href={`tel:${product.company.phone}`} className="rounded-full border border-slate-200 px-3 py-1.5 hover:border-brand">
+                    Teléfono
+                  </a>
+                )}
+                {product.company.email && (
+                  <a href={`mailto:${product.company.email}`} className="rounded-full border border-slate-200 px-3 py-1.5 hover:border-brand">
+                    Email
+                  </a>
+                )}
+                {product.company.whatsapp && (
+                  <a href={`https://wa.me/${product.company.whatsapp.replace(/\D/g, "")}`} target="_blank" rel="noreferrer" className="rounded-full border border-slate-200 px-3 py-1.5 hover:border-brand">
+                    WhatsApp
+                  </a>
+                )}
+                {product.external_url && (
+                  <a href={product.external_url} target="_blank" rel="noreferrer" className="rounded-full bg-brand text-white px-3 py-1.5 hover:bg-brand-dark">
+                    Ver enlace externo
+                  </a>
+                )}
+              </div>
+            )}
+            <p className="mt-3 text-xs text-slate-400">TodoPlástico no intermedia operaciones: el acuerdo ocurre directamente entre empresas.</p>
           </div>
 
           <div className="mt-8">

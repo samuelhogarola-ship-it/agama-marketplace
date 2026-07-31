@@ -13,19 +13,19 @@ export default function PrivacidadPage() {
       <h2>Responsable</h2>
       <p>
         AGAMA (el «Responsable») es responsable del tratamiento de los datos personales recabados a través de
-        AGAMA Marketplace.
+        TodoPlástico.
       </p>
 
       <h2>Datos que recabamos</h2>
       <ul className="list-disc pl-6 mt-2 space-y-1">
-        <li>Datos de cuenta: nombre de la empresa, email, contraseña (cifrada), teléfono y zona.</li>
-        <li>Contenido publicado: fichas de producto, fotos y mensajes enviados por la mensajería interna.</li>
+        <li>Datos de cuenta y empresa: nombre de la empresa, email, contraseña cifrada, ubicación, web, teléfono y WhatsApp.</li>
+        <li>Contenido publicado: fichas de empresa, anuncios, fotos y enlaces externos.</li>
         <li>Datos de uso: búsquedas realizadas y métricas de navegación agregadas.</li>
       </ul>
 
       <h2>Finalidades</h2>
       <ul className="list-disc pl-6 mt-2 space-y-1">
-        <li>Prestar el servicio: cuentas, catálogo, mensajería y moderación de contenido.</li>
+        <li>Prestar el servicio: cuentas, directorio, catálogo, contacto externo visible y moderación de contenido.</li>
         <li>Seguridad: prevención de fraude, spam y contenido no permitido.</li>
         <li>Mejora del servicio: estadísticas agregadas de oferta y demanda del sector.</li>
         <li>Comunicaciones operativas relacionadas con tu cuenta.</li>
@@ -33,7 +33,7 @@ export default function PrivacidadPage() {
 
       <h2>Moderación automatizada</h2>
       <p>
-        Las publicaciones y mensajes se analizan con sistemas automatizados (incluida inteligencia artificial) para
+        Las publicaciones se analizan con sistemas automatizados (incluida inteligencia artificial) para
         verificar el cumplimiento de las normas de contenido. Las decisiones de rechazo pueden solicitarse a revisión
         humana desde tu panel.
       </p>
