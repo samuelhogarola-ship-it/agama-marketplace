@@ -18,8 +18,6 @@ const categoryImages: Record<string, string> = {
   "reciclado-y-molido": "/category-reciclado.png",
   resinas: "/category-resinas.png",
   "maquinaria-y-refacciones": "/category-maquinaria.png",
-  "productos-terminados": "/category-productos.png",
-  servicios: "/category-servicios.png",
 };
 
 export default async function Home() {
