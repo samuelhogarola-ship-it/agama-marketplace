@@ -25,12 +25,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       <body className="min-h-screen flex flex-col">
         <header className="border-b border-slate-200 bg-white sticky top-0 z-40">
           <div className="mx-auto flex min-h-16 max-w-7xl items-center justify-between gap-4 px-4 py-2 md:py-4">
-            <Link href="/" className="flex items-center gap-2.5 shrink-0">
-              <Image src="/agama-logo.png" alt="AGAMA" width={34} height={34} className="rounded-full" />
-              <span className="font-bold text-xl text-brand-dark leading-none">
-                TodoPlástico
-                <span className="mt-1 block text-[10px] font-medium uppercase tracking-[0.16em] text-brand-sky">Marketplace para la industria plástica</span>
-              </span>
+            <Link href="/" className="flex shrink-0 items-center" aria-label="TodoPlástico, inicio">
+              <Image src="/todoplastico-logo.png" alt="TodoPlástico" width={180} height={90} priority className="h-auto w-[142px] sm:w-[176px]" />
             </Link>
             <form action="/buscar" className="hidden md:block flex-1 max-w-md">
               <input
