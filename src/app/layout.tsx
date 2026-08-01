@@ -27,6 +27,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           <div className="mx-auto flex min-h-16 max-w-7xl items-center justify-between gap-4 px-4 py-2 md:py-4">
             <Link href="/" className="flex shrink-0 items-center gap-2.5" aria-label="TodoPlástico, inicio">
               <Image src="/agama-logo.png" alt="AGAMA" width={34} height={34} priority className="rounded-full" />
+              <Image src="/todoplastico-symbol.png" alt="" width={32} height={20} priority className="h-5 w-8 object-contain mix-blend-multiply drop-shadow-[0_2px_3px_rgba(15,23,42,0.2)]" />
               <span className="text-lg font-bold leading-none text-brand-dark sm:text-xl">
                 TodoPlástico
                 <span className="mt-1 block text-[9px] font-medium uppercase tracking-[0.14em] text-brand-sky sm:text-[10px]">Marketplace para la industria plástica</span>
