@@ -38,12 +38,9 @@ test.describe("smoke — páginas públicas", () => {
     await expect(page.getByText("cookies esenciales")).toBeHidden();
   });
 
-  test("login ofrece contraseña y enlace mágico", async ({ page }) => {
+  test("login ofrece enlace mágico", async ({ page }) => {
     await page.goto("/ingresar");
-    await expect(page.getByRole("button", { name: "Contraseña" })).toBeVisible();
-    await page.getByRole("button", { name: "Enlace mágico" }).click();
     await expect(page.getByRole("button", { name: /Enviarme enlace/ })).toBeVisible();
-    await expect(page.getByPlaceholder("Contraseña")).toBeHidden();
   });
 
   test("panel redirige a ingresar sin sesión", async ({ page }) => {
