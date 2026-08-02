@@ -21,7 +21,13 @@ export async function middleware(request: NextRequest) {
     }
   );
 
-  const { data: { user } } = await supabase.auth.getUser();
+  let user = null;
+  try {
+    const result = await supabase.auth.getUser();
+    user = result.data.user;
+  } catch {
+    // Public pages remain available when the auth backend is unavailable.
+  }
 
   const protectedPaths = ["/panel", "/mensajes"];
   const previewMode = process.env.NODE_ENV !== "production" && request.nextUrl.searchParams.get("preview") === "1";
