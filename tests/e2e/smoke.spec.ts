@@ -8,8 +8,7 @@ test.describe("smoke — páginas públicas", () => {
   });
 
   test("categorías y landing de categoría", async ({ page }) => {
-    await page.goto("/categorias");
-    await page.getByRole("link", { name: "Tarimas y contenedores", exact: true }).first().click();
+    await page.goto("/c/tarimas-y-contenedores");
     await expect(page.getByRole("heading", { level: 1 })).toContainText("Tarimas y contenedores para la industria plástica en México");
   });
 
