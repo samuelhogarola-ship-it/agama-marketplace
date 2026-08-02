@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
-import { createAdminClient, isAdminEmail } from "@/lib/supabase/admin";
+import { createAdminClient, isAdminUser } from "@/lib/supabase/admin";
 import AdminListingForm from "@/components/AdminListingForm";
 
 type Props = { searchParams: Promise<{ preview?: string }> };
@@ -11,7 +11,7 @@ export default async function NewAdminListingPage({ searchParams }: Props) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user && !previewMode) return <div className="mx-auto max-w-xl px-5 py-20"><h1 className="text-3xl font-semibold text-brand-dark">Panel de administración</h1><p className="mt-4 text-slate-600">Inicia sesión con una cuenta autorizada para continuar.</p><Link href="/ingresar?next=/admin/nuevo-anuncio" className="mt-7 inline-flex rounded-full bg-brand-dark px-6 py-3 text-sm font-semibold text-white">Ingresar</Link></div>;
-  if (user && !isAdminEmail(user.email) && user.user_metadata?.role !== "admin" && !previewMode) return <div className="mx-auto max-w-xl px-5 py-20"><h1 className="text-3xl font-semibold text-brand-dark">Área privada</h1><p className="mt-4 text-slate-600">Esta sección está reservada para el equipo de TodoPlástico.</p></div>;
+  if (user && !isAdminUser(user) && !previewMode) return <div className="mx-auto max-w-xl px-5 py-20"><h1 className="text-3xl font-semibold text-brand-dark">Área privada</h1><p className="mt-4 text-slate-600">Esta sección está reservada para el equipo de TodoPlástico.</p></div>;
   const admin = createAdminClient();
   let companies: Array<{ id: string; name: string; location: string | null; website: string | null }> = [];
   if (admin) {

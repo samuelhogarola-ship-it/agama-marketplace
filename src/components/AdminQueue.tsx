@@ -8,8 +8,10 @@ export default function AdminQueue({ initialItems }: { initialItems: QueueItem[]
   const [items, setItems] = useState(initialItems);
   const [busy, setBusy] = useState<number | null>(null);
   async function decide(id: number, action: "approve" | "reject") {
+    const reason = action === "reject" ? window.prompt("Motivo del rechazo")?.trim() : undefined;
+    if (action === "reject" && !reason) return;
     setBusy(id);
-    const response = await fetch("/api/admin/moderation", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id, action }) });
+    const response = await fetch("/api/admin/moderation", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id, action, reason }) });
     if (response.ok) setItems((current) => current.filter((item) => item.id !== id));
     setBusy(null);
   }

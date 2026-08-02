@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { createAdminClient, isAdminEmail } from "@/lib/supabase/admin";
+import { createAdminClient, isAdminUser } from "@/lib/supabase/admin";
 import { CATEGORIES, slugify } from "@/lib/categories";
 import { isSaleUnit, parseMinimumPurchase } from "@/lib/listing-options";
 import { buildContactOverride, isOwnAdvertiserUrl } from "@/lib/listing-policy";
@@ -10,7 +10,7 @@ const TYPES = new Set(["product", "service", "ad"]);
 export async function POST(request: Request) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user || (!isAdminEmail(user.email) && user.user_metadata?.role !== "admin")) return NextResponse.json({ error: "No autorizado" }, { status: 403 });
+  if (!isAdminUser(user)) return NextResponse.json({ error: "No autorizado" }, { status: 403 });
   const formData = await request.formData().catch(() => null);
   if (!formData) return NextResponse.json({ error: "Solicitud inválida." }, { status: 400 });
   const body = Object.fromEntries(formData.entries());

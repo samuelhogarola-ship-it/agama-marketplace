@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
-import { createAdminClient, isAdminEmail } from "@/lib/supabase/admin";
+import { createAdminClient, isAdminUser } from "@/lib/supabase/admin";
 import AdminQueue from "@/components/AdminQueue";
 
 const dateFormatter = new Intl.DateTimeFormat("es-MX", { day: "2-digit", month: "short", year: "numeric" });
@@ -27,7 +27,7 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
     );
   }
 
-  if (user && !isAdminEmail(user.email) && user.user_metadata?.role !== "admin" && !previewMode) {
+  if (user && !isAdminUser(user) && !previewMode) {
     return <div className="mx-auto max-w-xl px-5 py-20"><h1 className="text-3xl font-semibold text-brand-dark">Área privada</h1><p className="mt-4 text-slate-600">Esta sección está reservada para el equipo de TodoPlástico.</p></div>;
   }
 
