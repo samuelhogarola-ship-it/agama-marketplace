@@ -1,5 +1,6 @@
 import crypto from "node:crypto";
 import fs from "node:fs";
+import path from "node:path";
 import { createClient } from "@supabase/supabase-js";
 
 if (fs.existsSync(".env.local")) {
@@ -130,6 +131,25 @@ async function seedAgamaSampleListing() {
   return data.id;
 }
 
+async function seedSamplePhotos(listingId) {
+  const files = ["agama-cups-1.png", "agama-cups-2.png", "agama-cups-3.png"];
+  const rows = [];
+  for (const [index, filename] of files.entries()) {
+    const storagePath = `demo-agama/${listingId}/${index + 1}.png`;
+    const file = fs.readFileSync(path.join(process.cwd(), "public", "sample", filename));
+    const { error: uploadError } = await supabase.storage.from("mkt-photos").upload(storagePath, file, {
+      contentType: "image/png",
+      upsert: true,
+    });
+    if (uploadError) throw uploadError;
+    rows.push({ listing_id: listingId, storage_path: storagePath, position: index, alt_text: "Tazas de plástico reutilizables AGAMA" });
+  }
+  const { error: deleteError } = await supabase.from("mkt_listing_photos").delete().eq("listing_id", listingId);
+  if (deleteError) throw deleteError;
+  const { error: insertError } = await supabase.from("mkt_listing_photos").insert(rows);
+  if (insertError) throw insertError;
+}
+
 const { error: categoryError } = await supabase.from("mkt_categories").upsert(
   categories.map(([slug, name, description, position]) => ({ slug, name, description, position })),
   { onConflict: "slug" }
@@ -138,6 +158,7 @@ const { error: categoryError } = await supabase.from("mkt_categories").upsert(
 if (categoryError) throw categoryError;
 
 const sampleListingId = await seedAgamaSampleListing();
+await seedSamplePhotos(sampleListingId);
 
 if (!adminEmail) {
   console.log(`Categorias sembradas + anuncio modelo AGAMA ficticio (${sampleListingId}). Define TODO_PLASTICO_SEED_ADMIN_EMAIL para crear AGAMA admin.`);

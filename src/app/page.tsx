@@ -22,12 +22,21 @@ const categoryImages: Record<string, string> = {
 
 export default async function Home() {
   const supabase = await createClient();
-  const { data: latest } = await supabase
-    .from("mkt_listings")
-    .select("*, photos:mkt_listing_photos(*), company:mkt_companies(name, slug, location)")
-    .eq("status", "published")
-    .order("created_at", { ascending: false })
-    .limit(8);
+  const [{ data: featured }, { data: latest }] = await Promise.all([
+    supabase
+      .from("mkt_listings")
+      .select("*, photos:mkt_listing_photos(*), company:mkt_companies!inner(name, slug, location, is_featured)")
+      .eq("status", "published")
+      .eq("company.is_featured", true)
+      .order("created_at", { ascending: false })
+      .limit(4),
+    supabase
+      .from("mkt_listings")
+      .select("*, photos:mkt_listing_photos(*), company:mkt_companies(name, slug, location)")
+      .eq("status", "published")
+      .order("created_at", { ascending: false })
+      .limit(8),
+  ]);
 
   return (
     <>
@@ -114,6 +123,25 @@ export default async function Home() {
           ))}
         </div>
       </section>
+
+      {featured && featured.length > 0 && (
+        <section className="mx-auto max-w-7xl px-5 py-20 sm:px-8 lg:px-12 lg:py-24">
+          <div className="flex items-end justify-between gap-6">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-brand-sky">Selección TodoPlástico</p>
+              <h2 className="mt-3 text-3xl font-semibold tracking-[-0.03em] text-brand-dark sm:text-4xl">Anuncios destacados.</h2>
+            </div>
+            <Link href="/buscar" className="hidden text-sm font-semibold text-brand-dark underline decoration-slate-300 underline-offset-8 hover:decoration-brand sm:block">
+              Ver todos ↗
+            </Link>
+          </div>
+          <div className="mt-12 grid grid-cols-2 gap-4 md:grid-cols-4">
+            {(featured as Product[]).map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </div>
+        </section>
+      )}
 
       {latest && latest.length > 0 && (
         <section className="bg-slate-50">
