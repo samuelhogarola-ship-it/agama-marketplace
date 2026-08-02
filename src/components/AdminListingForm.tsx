@@ -123,30 +123,38 @@ export default function AdminListingForm({ companies, previewMode }: { companies
         <div className="flex flex-wrap items-center gap-4"><button type="submit" disabled={loading || previewMode || companies.length === 0} className="rounded-full bg-brand-dark px-6 py-3 text-sm font-semibold text-white hover:bg-brand disabled:cursor-not-allowed disabled:opacity-50">{loading ? "Guardando…" : "Crear y enviar a revisión"}</button><button type="button" onClick={() => router.back()} className="text-sm font-semibold text-slate-500 hover:text-brand-dark">Cancelar</button></div>
       </div>
 
-      <aside className="h-fit rounded-2xl border border-brand/20 bg-brand-light p-5 lg:sticky lg:top-8">
-        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-brand-sky">Control editorial</p>
-        <h2 className="mt-2 text-lg font-semibold text-brand-dark">Listo para moderar.</h2>
-        <p className="mt-2 text-sm leading-6 text-slate-600">El anuncio se crea como pendiente de revisión. Desde la cola podrás aprobarlo o rechazarlo con un motivo.</p>
-        <ul className="mt-5 space-y-3 text-sm text-slate-700"><li>• No pigmentos, masterbatch ni aditivos.</li><li>• Sin teléfonos, emails ni WhatsApp en el texto.</li><li>• Mejor con fotografías claras del producto.</li></ul>
-        <div className="mt-5 rounded-xl bg-white/75 px-4 py-4">
-          <p className="text-sm font-semibold text-brand-dark">Modelo obligatorio</p>
-          <ul className="mt-3 space-y-2 text-xs leading-5 text-slate-600">
-            {LISTING_MODEL_FIELDS.slice(0, 6).map((field) => <li key={field}>• {field}</li>)}
-          </ul>
+      <details className="h-fit rounded-2xl border border-brand/20 bg-brand-light p-5 lg:sticky lg:top-8">
+        <summary className="cursor-pointer list-none [&::-webkit-details-marker]:hidden">
+          <span className="block text-xs font-semibold uppercase tracking-[0.16em] text-brand-sky">Control editorial</span>
+          <span className="mt-2 flex items-center justify-between gap-3 text-lg font-semibold text-brand-dark">
+            Listo para moderar.
+            <span aria-hidden="true" className="text-2xl font-normal leading-none text-brand">+</span>
+          </span>
+          <span className="mt-2 block text-sm leading-6 text-slate-600">El anuncio se crea como pendiente de revisión.</span>
+        </summary>
+        <div className="mt-5 border-t border-brand/15 pt-5">
+          <p className="text-sm leading-6 text-slate-600">Desde la cola podrás aprobarlo o rechazarlo con un motivo.</p>
+          <ul className="mt-5 space-y-3 text-sm text-slate-700"><li>• No pigmentos, masterbatch ni aditivos.</li><li>• Sin teléfonos, emails ni WhatsApp en el texto.</li><li>• Mejor con fotografías claras del producto.</li></ul>
+          <div className="mt-5 rounded-xl bg-white/75 px-4 py-4">
+            <p className="text-sm font-semibold text-brand-dark">Modelo obligatorio</p>
+            <ul className="mt-3 space-y-2 text-xs leading-5 text-slate-600">
+              {LISTING_MODEL_FIELDS.slice(0, 6).map((field) => <li key={field}>• {field}</li>)}
+            </ul>
+          </div>
+          <div className="mt-4 rounded-xl bg-white/75 px-4 py-4">
+            <p className="text-sm font-semibold text-brand-dark">Reglas clave</p>
+            <ul className="mt-3 space-y-2 text-xs leading-5 text-slate-600">
+              {LISTING_MODEL_RULES.slice(0, 3).map((rule) => <li key={rule}>• {rule}</li>)}
+            </ul>
+          </div>
+          <div className="mt-5 rounded-xl bg-white/75 px-4 py-4">
+            <p className="text-sm font-semibold text-brand-dark">¿Quieres publicar más rápido?</p>
+            <p className="mt-1 text-sm leading-6 text-slate-600">Los clientes premium tienen revisión preferente.</p>
+          </div>
+          <a href="/legal/comunidad" className="mt-5 block text-sm font-semibold text-brand-dark underline decoration-brand/30 underline-offset-4 hover:text-brand">Ver política de uso y condiciones</a>
+          {previewMode ? <p className="mt-5 rounded-xl bg-white/70 px-3 py-3 text-xs leading-5 text-slate-600">Vista previa local: conecta una sesión admin y datos reales para activar el guardado.</p> : null}
         </div>
-        <div className="mt-4 rounded-xl bg-white/75 px-4 py-4">
-          <p className="text-sm font-semibold text-brand-dark">Reglas clave</p>
-          <ul className="mt-3 space-y-2 text-xs leading-5 text-slate-600">
-            {LISTING_MODEL_RULES.slice(0, 3).map((rule) => <li key={rule}>• {rule}</li>)}
-          </ul>
-        </div>
-        <div className="mt-5 rounded-xl bg-white/75 px-4 py-4">
-          <p className="text-sm font-semibold text-brand-dark">¿Quieres publicar más rápido?</p>
-          <p className="mt-1 text-sm leading-6 text-slate-600">Los clientes premium tienen revisión preferente.</p>
-        </div>
-        <a href="/legal/comunidad" className="mt-5 block text-sm font-semibold text-brand-dark underline decoration-brand/30 underline-offset-4 hover:text-brand">Ver política de uso y condiciones</a>
-        {previewMode ? <p className="mt-5 rounded-xl bg-white/70 px-3 py-3 text-xs leading-5 text-slate-600">Vista previa local: conecta una sesión admin y datos reales para activar el guardado.</p> : null}
-      </aside>
+      </details>
     </form>
   );
 }
