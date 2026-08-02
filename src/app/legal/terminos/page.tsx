@@ -28,9 +28,11 @@ export default function TerminosPage() {
       <p>Solo se permite publicar productos, servicios y anuncios directamente relacionados con la industria plástica. Está prohibido publicar:</p>
       <ul className="list-disc pl-6 mt-2 space-y-1">
         <li>Pigmentos, masterbatch, concentrados de color y aditivos, en cualquier forma.</li>
+        <li>Spam, enlaces engañosos, captación masiva o anuncios repetidos sin valor real.</li>
         <li>Productos o servicios ajenos al sector plástico.</li>
         <li>Productos ilegales, falsificados o peligrosos.</li>
         <li>Datos de contacto incrustados en títulos, descripciones o imágenes; los canales públicos deben colocarse en los campos específicos de empresa o anuncio.</li>
+        <li>Enlaces que no pertenezcan a la web propia del anunciante o a una página del mismo dominio.</li>
       </ul>
       <p>
         Toda publicación pasa por sistemas de moderación automática y revisión humana. El Operador puede
@@ -41,6 +43,11 @@ export default function TerminosPage() {
       <p>
         El plan gratuito permite mantener hasta 5 anuncios publicados con un máximo de 5 fotos por anuncio.
         Los planes de pago, cuando estén disponibles, se regirán por sus condiciones específicas.
+      </p>
+      <p>
+        Si una cuenta premium publica spam, productos no permitidos o contenido que incumpla estas condiciones, el
+        Operador podrá emitir un primer aviso cuando la infracción sea corregible. Una segunda infracción relevante
+        podrá implicar el bloqueo de la cuenta sin opción de devolución del servicio contratado.
       </p>
 
       <h2>5. Responsabilidad</h2>

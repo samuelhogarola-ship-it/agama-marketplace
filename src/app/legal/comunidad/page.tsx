@@ -32,6 +32,7 @@ export default function ComunidadPage() {
       <p>No aceptamos publicaciones que incluyan:</p>
       <ul className="mt-2 list-disc space-y-1 pl-6">
         <li>Pigmentos, masterbatch, concentrados de color, aditivos o colorantes.</li>
+        <li>Spam, captación masiva, anuncios repetidos o contenido creado para manipular búsquedas.</li>
         <li>Armas, materiales peligrosos, mercancía ilegal o productos falsificados.</li>
         <li>Contenido adulto, ofensivo o ajeno a la industria plástica.</li>
         <li>Datos de contacto escritos dentro del título, descripción o fotografías.</li>
@@ -42,12 +43,22 @@ export default function ComunidadPage() {
         Los datos de contacto deben colocarse únicamente en los campos específicos de empresa o anuncio. No uses
         textos, imágenes o enlaces para enviar spam, malware, formularios engañosos o redirecciones peligrosas.
       </p>
+      <p>
+        Los enlaces de un anuncio deben dirigir a la web propia de la empresa anunciante o a una página del mismo
+        dominio. No se permiten acortadores, marketplaces externos, landings de terceros ni URLs pensadas para
+        ocultar el destino real.
+      </p>
 
       <h2>5. Moderación y medidas</h2>
       <p>
         Revisamos los anuncios mediante reglas automáticas, sistemas de moderación asistida y, cuando corresponde,
         revisión humana. Podemos rechazar, pausar, retirar anuncios o bloquear cuentas que incumplan estas normas,
         especialmente ante fraude, reincidencia o riesgo para otras empresas.
+      </p>
+      <p>
+        La venta de spam, productos no permitidos o servicios ajenos a estas normas puede implicar el bloqueo de la
+        cuenta. En usuarios premium podrá emitirse un primer aviso cuando el riesgo sea corregible; una segunda
+        infracción relevante supondrá el bloqueo de la cuenta sin derecho a devolución del servicio contratado.
       </p>
       <p>
         Si consideras que una decisión fue incorrecta, puedes solicitar una revisión desde tu panel cuando la opción

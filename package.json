@@ -7,6 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
+    "db:push": "node scripts/push-migrations.mjs",
+    "seed:launch": "node scripts/seed-launch-data.mjs",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {

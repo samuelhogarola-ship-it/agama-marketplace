@@ -31,12 +31,14 @@ export type Listing = {
   tags: string[] | null;
   price_mxn: number | null; // null = "a consultar"
   unit: string | null;
+  min_purchase_qty: number | null;
   location: string | null;
-  contact_override: Record<string, string | null> | null;
+  contact_override: { method?: string | null; value?: string | null } | null;
   external_url: string | null;
   status: ListingStatus;
   rejection_reason: string | null;
   created_at: string;
+  updated_at?: string | null;
   photos?: ListingPhoto[];
   company?: Pick<Company, "name" | "slug" | "location" | "website" | "phone" | "email" | "whatsapp">;
 };

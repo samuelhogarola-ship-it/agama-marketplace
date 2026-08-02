@@ -1,6 +1,6 @@
 # Roadmap — TodoPlástico
 
-Estado actualizado: 31 de julio de 2026. Las tres primeras fases de producto están implementadas en código y se entregan en este PR. Las dependencias de operación para producción siguen separadas de la entrega técnica.
+Estado actualizado: 2 de agosto de 2026. Las fases de producto están implementadas en código y la infraestructura del nuevo Supabase ya está creada. El trabajo activo es preparación de lanzamiento y operación.
 
 ## Fase 0 — Fundaciones
 
@@ -50,11 +50,14 @@ Estado: **completa en código**.
 
 Estado: **siguiente**.
 
-- [ ] Migrar `mkt_*` a un proyecto Supabase propio y validar Storage/RLS.
-- [ ] Configurar SMTP Resend en Supabase Auth.
+- [x] Migrar `mkt_*` a un proyecto Supabase propio y validar tablas, Storage y RLS inicial.
+- [x] Preparar Docker, healthcheck y configuración base para el VPS de AGAMA.
+- [ ] Configurar SMTP Resend en Supabase Auth siguiendo `docs/resend-magic-link.md`.
 - [ ] Añadir `ANTHROPIC_API_KEY`, `SUPABASE_SERVICE_ROLE_KEY` y `TODO_PLASTICO_ADMIN_EMAILS` en el entorno seguro.
+- [ ] Crear usuario admin real y conectar las variables del nuevo Supabase en WF Studio.
 - [ ] Instalar Plausible o GA4 con consentimiento y definir eventos de búsqueda/contacto.
-- [ ] Cargar perfil AGAMA, proveedores iniciales, anuncios reales y artículos revisados.
+- [x] Preparar seed repetible de categorías y perfil AGAMA.
+- [ ] Cargar proveedores iniciales, anuncios reales y artículos revisados.
 - [ ] Revisar legalmente términos, privacidad LFPDPPP y normas de comunidad.
 - [ ] Conectar `todo-plastico.com`, activar indexación y verificar Search Console.
 - [ ] Ejecutar smoke desktop + mobile y checklist de lanzamiento.

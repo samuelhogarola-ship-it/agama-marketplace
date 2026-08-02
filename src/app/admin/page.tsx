@@ -3,19 +3,144 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient, isAdminEmail } from "@/lib/supabase/admin";
 import AdminQueue from "@/components/AdminQueue";
 
-export default async function AdminPage() {
+const dateFormatter = new Intl.DateTimeFormat("es-MX", { day: "2-digit", month: "short", year: "numeric" });
+
+function formatDate(value?: string | null) {
+  return value ? dateFormatter.format(new Date(value)) : "Sin actividad";
+}
+
+type AdminPageProps = { searchParams: Promise<{ preview?: string }> };
+
+export default async function AdminPage({ searchParams }: AdminPageProps) {
+  const params = await searchParams;
+  const previewMode = process.env.NODE_ENV !== "production" && params.preview === "1";
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return <div className="mx-auto max-w-xl px-5 py-20"><h1 className="text-3xl font-semibold text-brand-dark">Panel de administración</h1><p className="mt-4 text-slate-600">Inicia sesión con una cuenta autorizada para continuar.</p><Link href="/ingresar?next=/admin" className="mt-7 inline-flex rounded-full bg-brand-dark px-6 py-3 text-sm font-semibold text-white">Ingresar</Link></div>;
-  if (!isAdminEmail(user.email) && user.user_metadata?.role !== "admin") return <div className="mx-auto max-w-xl px-5 py-20"><h1 className="text-3xl font-semibold text-brand-dark">Área privada</h1><p className="mt-4 text-slate-600">Esta sección está reservada para el equipo de TodoPlástico.</p></div>;
+
+  if (!user && !previewMode) {
+    return (
+      <div className="mx-auto max-w-xl px-5 py-20">
+        <h1 className="text-3xl font-semibold text-brand-dark">Panel de administración</h1>
+        <p className="mt-4 text-slate-600">Inicia sesión con una cuenta autorizada para continuar.</p>
+        <Link href="/ingresar?next=/admin" className="mt-7 inline-flex rounded-full bg-brand-dark px-6 py-3 text-sm font-semibold text-white">Ingresar</Link>
+      </div>
+    );
+  }
+
+  if (user && !isAdminEmail(user.email) && user.user_metadata?.role !== "admin" && !previewMode) {
+    return <div className="mx-auto max-w-xl px-5 py-20"><h1 className="text-3xl font-semibold text-brand-dark">Área privada</h1><p className="mt-4 text-slate-600">Esta sección está reservada para el equipo de TodoPlástico.</p></div>;
+  }
+
   const admin = createAdminClient();
-  if (!admin) return <div className="mx-auto max-w-xl px-5 py-20"><h1 className="text-3xl font-semibold text-brand-dark">Configuración pendiente</h1><p className="mt-4 text-slate-600">Añade `SUPABASE_SERVICE_ROLE_KEY` y `TODO_PLASTICO_ADMIN_EMAILS` al entorno local para activar la cola de moderación.</p></div>;
-  const [{ data }, { count: published }, { count: rejected }, { count: reviewed }] = await Promise.all([
-    admin.from("mkt_listings").select("id, title, slug, description, category, location, status, rejection_reason, created_at, company:mkt_companies(name, slug), photos:mkt_listing_photos(*)").eq("status", "pending_review").order("created_at", { ascending: true }).limit(50),
-    admin.from("mkt_listings").select("id", { count: "exact", head: true }).eq("status", "published"),
-    admin.from("mkt_listings").select("id", { count: "exact", head: true }).eq("status", "rejected"),
-    admin.from("mkt_moderation_events").select("id", { count: "exact", head: true }),
-  ]);
-  const queue = (data ?? []).map((item) => ({ ...item, company: Array.isArray(item.company) ? item.company[0] : item.company }));
-  return <div className="mx-auto max-w-7xl px-5 py-14 sm:px-8 lg:px-12"><p className="text-xs font-semibold uppercase tracking-[0.24em] text-brand-sky">Operación</p><h1 className="mt-4 text-4xl font-semibold tracking-[-0.04em] text-brand-dark">Cola de moderación.</h1><p className="mt-4 text-slate-600">Revisa los anuncios dudosos y decide si cumplen las normas de la comunidad.</p><div className="mt-10 grid grid-cols-2 gap-4 border-y border-slate-200 py-5 sm:grid-cols-4"><div><p className="text-2xl font-semibold text-brand-dark">{queue.length}</p><p className="mt-1 text-xs uppercase tracking-[0.14em] text-slate-400">En revisión</p></div><div><p className="text-2xl font-semibold text-brand-dark">{published ?? 0}</p><p className="mt-1 text-xs uppercase tracking-[0.14em] text-slate-400">Publicados</p></div><div><p className="text-2xl font-semibold text-brand-dark">{rejected ?? 0}</p><p className="mt-1 text-xs uppercase tracking-[0.14em] text-slate-400">Rechazados</p></div><div><p className="text-2xl font-semibold text-brand-dark">{reviewed ?? 0}</p><p className="mt-1 text-xs uppercase tracking-[0.14em] text-slate-400">Eventos IA</p></div></div><AdminQueue initialItems={queue} /></div>;
+  if (!admin && !previewMode) {
+    return <div className="mx-auto max-w-xl px-5 py-20"><h1 className="text-3xl font-semibold text-brand-dark">Configuración pendiente</h1><p className="mt-4 text-slate-600">Añade `SUPABASE_SERVICE_ROLE_KEY` y `TODO_PLASTICO_ADMIN_EMAILS` al entorno local para activar el panel operativo.</p></div>;
+  }
+
+  let queue: Array<{ id: number; title: string; slug: string; description: string; category: string; location: string | null; status: string; rejection_reason: string | null; created_at: string; company?: { name?: string } | null; photos?: unknown[] }> = [];
+  let publishedCount = 0;
+  let rejectedCount = 0;
+  let reviewedCount = 0;
+  let usersError = false;
+  let users: Array<{ id: string; email?: string; created_at: string; last_sign_in_at?: string | null; email_confirmed_at?: string | null; user_metadata?: { company_name?: string } }> = [];
+  let companies: Array<{ id: string; name: string; slug: string; location: string | null; plan: string; is_verified: boolean; status: string; created_at: string }> = [];
+
+  if (admin) {
+    const [queueResult, publishedResult, rejectedResult, reviewedResult, usersResult, companiesResult] = await Promise.all([
+      admin.from("mkt_listings").select("id, title, slug, description, category, location, status, rejection_reason, created_at, company:mkt_companies(name, slug), photos:mkt_listing_photos(*)").eq("status", "pending_review").order("created_at", { ascending: true }).limit(50),
+      admin.from("mkt_listings").select("id", { count: "exact", head: true }).eq("status", "published"),
+      admin.from("mkt_listings").select("id", { count: "exact", head: true }).eq("status", "rejected"),
+      admin.from("mkt_moderation_events").select("id", { count: "exact", head: true }),
+      admin.auth.admin.listUsers({ page: 1, perPage: 100 }),
+      admin.from("mkt_companies").select("id, name, slug, location, plan, is_verified, status, created_at").order("created_at", { ascending: false }).limit(50),
+    ]);
+    queue = (queueResult.data ?? []).map((item) => ({ ...item, company: Array.isArray(item.company) ? item.company[0] : item.company })) as typeof queue;
+    publishedCount = publishedResult.count ?? 0;
+    rejectedCount = rejectedResult.count ?? 0;
+    reviewedCount = reviewedResult.count ?? 0;
+    users = (usersResult.data?.users ?? []) as typeof users;
+    usersError = Boolean(usersResult.error);
+    companies = (companiesResult.data ?? []) as typeof companies;
+  }
+
+  return (
+    <div className="mx-auto max-w-7xl px-5 py-10 sm:px-8 lg:px-12 lg:py-14">
+      <div className="flex flex-wrap items-end justify-between gap-5">
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-brand-sky">Fuengirola · Operación</p>
+          <h1 className="mt-3 text-4xl font-semibold tracking-[-0.05em] text-brand-dark sm:text-5xl">Panel de control.</h1>
+          <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-600">Usuarios, registros de empresas y revisión de anuncios en un mismo espacio operativo.</p>
+        </div>
+        <nav aria-label="Secciones del panel" className="flex flex-wrap gap-2 text-sm font-semibold">
+          <Link href={previewMode ? "/admin/nuevo-anuncio?preview=1" : "/admin/nuevo-anuncio"} className="rounded-full bg-brand px-4 py-2 text-white hover:bg-brand-dark">Nuevo anuncio</Link>
+          <a href="#usuarios" className="rounded-full border border-slate-200 px-4 py-2 text-slate-600 hover:border-brand hover:text-brand">Usuarios</a>
+          <a href="#empresas" className="rounded-full border border-slate-200 px-4 py-2 text-slate-600 hover:border-brand hover:text-brand">Registros</a>
+          <a href="#anuncios" className="rounded-full bg-brand-dark px-4 py-2 text-white hover:bg-brand">Revisar anuncios</a>
+        </nav>
+      </div>
+
+      <section className="mt-10 grid grid-cols-2 gap-x-5 gap-y-7 border-y border-slate-200 py-6 sm:grid-cols-3 lg:grid-cols-6" aria-label="Métricas operativas">
+        {[
+          ["En revisión", queue.length],
+          ["Publicados", publishedCount],
+          ["Rechazados", rejectedCount],
+          ["Eventos IA", reviewedCount],
+          ["Usuarios", users.length],
+          ["Empresas", companies.length],
+        ].map(([label, value]) => (
+          <div key={String(label)}>
+            <p className="text-2xl font-semibold tracking-[-0.04em] text-brand-dark">{value}</p>
+            <p className="mt-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-400">{label}</p>
+          </div>
+        ))}
+      </section>
+
+      <div className="mt-12 grid gap-12 xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
+        <section id="usuarios" className="min-w-0 scroll-mt-24">
+          <div className="flex items-end justify-between gap-4 border-b border-slate-200 pb-4">
+            <div><p className="text-xs font-semibold uppercase tracking-[0.2em] text-brand-sky">Accesos</p><h2 className="mt-2 text-2xl font-semibold tracking-[-0.03em] text-brand-dark">Usuarios registrados</h2></div>
+            <span className="text-sm text-slate-500">Últimos 100</span>
+          </div>
+          {usersError ? <p className="mt-5 rounded-xl bg-amber-50 px-4 py-3 text-sm text-amber-800">No se pudo cargar el listado de usuarios.</p> : (
+            <div className="mt-4 overflow-x-auto rounded-2xl border border-slate-200">
+              <table className="w-full min-w-[560px] text-left text-sm">
+                <thead className="bg-slate-50 text-xs uppercase tracking-[0.12em] text-slate-400"><tr><th className="px-4 py-3 font-semibold">Usuario</th><th className="px-4 py-3 font-semibold">Registro</th><th className="px-4 py-3 font-semibold">Último acceso</th><th className="px-4 py-3 font-semibold">Estado</th></tr></thead>
+                <tbody className="divide-y divide-slate-100">
+                  {users.slice(0, 12).map((registeredUser) => (
+                    <tr key={registeredUser.id} className="text-slate-600">
+                      <td className="px-4 py-3"><p className="font-semibold text-brand-dark">{registeredUser.email ?? "Sin email"}</p><p className="mt-0.5 text-xs text-slate-400">{registeredUser.user_metadata?.company_name ?? "Sin empresa indicada"}</p></td>
+                      <td className="whitespace-nowrap px-4 py-3 text-xs">{formatDate(registeredUser.created_at)}</td>
+                      <td className="whitespace-nowrap px-4 py-3 text-xs">{formatDate(registeredUser.last_sign_in_at)}</td>
+                      <td className="px-4 py-3"><span className={`rounded-full px-2.5 py-1 text-[11px] font-semibold ${registeredUser.email_confirmed_at ? "bg-emerald-100 text-emerald-800" : "bg-amber-100 text-amber-800"}`}>{registeredUser.email_confirmed_at ? "Confirmado" : "Pendiente"}</span></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              {users.length === 0 ? <p className="px-4 py-10 text-center text-sm text-slate-500">Todavía no hay usuarios registrados.</p> : null}
+            </div>
+          )}
+        </section>
+
+        <section id="empresas" className="min-w-0 scroll-mt-24">
+          <div className="flex items-end justify-between gap-4 border-b border-slate-200 pb-4">
+            <div><p className="text-xs font-semibold uppercase tracking-[0.2em] text-brand-sky">Altas</p><h2 className="mt-2 text-2xl font-semibold tracking-[-0.03em] text-brand-dark">Registros de empresas</h2></div>
+            <span className="text-sm text-slate-500">Últimas 50</span>
+          </div>
+          <div className="mt-4 divide-y divide-slate-200">
+            {companies.map((company) => (
+              <div key={company.id} className="flex items-center justify-between gap-4 py-4">
+                <div className="min-w-0"><p className="truncate text-sm font-semibold text-brand-dark">{company.name}</p><p className="mt-1 truncate text-xs text-slate-500">{company.location ?? "Sin ubicación"} · Alta {formatDate(company.created_at)}</p></div>
+                <div className="flex shrink-0 items-center gap-2">{company.is_verified ? <span className="rounded-full bg-emerald-100 px-2.5 py-1 text-[11px] font-semibold text-emerald-800">Verificada</span> : null}<span className="text-xs capitalize text-slate-400">{company.plan}</span></div>
+              </div>
+            ))}
+            {companies.length === 0 ? <p className="py-10 text-center text-sm text-slate-500">Todavía no hay empresas registradas.</p> : null}
+          </div>
+        </section>
+      </div>
+
+      <section id="anuncios" className="mt-14 scroll-mt-24">
+        <div className="border-b border-slate-200 pb-4"><p className="text-xs font-semibold uppercase tracking-[0.2em] text-brand-sky">Moderación</p><h2 className="mt-2 text-2xl font-semibold tracking-[-0.03em] text-brand-dark">Revisión de anuncios</h2><p className="mt-2 text-sm text-slate-500">Aprueba o rechaza las publicaciones que esperan revisión humana.</p></div>
+        <AdminQueue initialItems={queue} />
+      </section>
+    </div>
+  );
 }

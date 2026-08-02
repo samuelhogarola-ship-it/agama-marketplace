@@ -1,0 +1,11 @@
+node_modules
+.next
+.git
+.env*
+playwright-report
+test-results
+README.md
+CLAUDE.md
+docs
+supabase
+*.log
