@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 import { CATEGORIES } from "@/lib/categories";
+import { ARTICLES } from "@/lib/articles";
 import { createClient } from "@/lib/supabase/server";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
@@ -7,13 +8,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const supabase = await createClient();
 
   const [{ data: products }, { data: profiles }] = await Promise.all([
-    supabase.from("mkt_products").select("id, slug, created_at").eq("status", "published").limit(5000),
-    supabase.from("mkt_profiles").select("slug, created_at").limit(5000),
+    supabase.from("mkt_listings").select("id, slug, created_at").eq("status", "published").limit(5000),
+    supabase.from("mkt_companies").select("slug, created_at").eq("status", "active").limit(5000),
   ]);
 
   return [
     { url: base, changeFrequency: "daily", priority: 1 },
     { url: `${base}/categorias`, changeFrequency: "weekly", priority: 0.8 },
+    { url: `${base}/empresas`, changeFrequency: "daily", priority: 0.85 },
+    { url: `${base}/articulos`, changeFrequency: "weekly", priority: 0.8 },
     ...CATEGORIES.map((c) => ({
       url: `${base}/c/${c.slug}`,
       changeFrequency: "daily" as const,
@@ -28,6 +31,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       url: `${base}/e/${e.slug}`,
       lastModified: e.created_at,
       priority: 0.5,
+    })),
+    ...ARTICLES.map((article) => ({
+      url: `${base}/articulos/${article.slug}`,
+      lastModified: article.date,
+      priority: 0.6,
     })),
   ];
 }

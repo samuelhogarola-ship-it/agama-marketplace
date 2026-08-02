@@ -18,8 +18,14 @@ export default function CookieBanner() {
   if (!visible) return null;
 
   return (
-    <div className="fixed bottom-0 inset-x-0 z-50 border-t border-slate-200 bg-white/95 backdrop-blur p-4">
-      <div className="mx-auto max-w-6xl flex flex-col md:flex-row items-start md:items-center gap-4 text-sm">
+    <div
+      className="p-4"
+      style={{ position: "fixed", left: 0, right: 0, bottom: 0, zIndex: 2147483647, pointerEvents: "none" }}
+    >
+      <div
+        className="mx-auto max-w-6xl border border-slate-200 bg-white/95 backdrop-blur shadow-[0_-8px_24px_rgba(15,23,42,0.08)] rounded-lg p-4 flex flex-col md:flex-row items-start md:items-center gap-4 text-sm"
+        style={{ position: "relative", zIndex: 2147483647, pointerEvents: "auto" }}
+      >
         <p className="text-slate-600 flex-1">
           Usamos cookies esenciales para el funcionamiento del sitio (sesión de usuario). No usamos cookies
           publicitarias. Más información en la{" "}
@@ -29,12 +35,14 @@ export default function CookieBanner() {
           <button
             onClick={() => decide("essential")}
             className="rounded-full border border-slate-300 px-4 py-2 hover:bg-slate-50"
+            style={{ position: "relative", zIndex: 2147483647, pointerEvents: "auto" }}
           >
             Solo esenciales
           </button>
           <button
             onClick={() => decide("accepted")}
             className="rounded-full bg-brand-dark text-white px-4 py-2 hover:bg-brand-navy"
+            style={{ position: "relative", zIndex: 2147483647, pointerEvents: "auto" }}
           >
             Aceptar
           </button>

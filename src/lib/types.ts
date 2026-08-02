@@ -1,58 +1,59 @@
-export type ProductStatus = "draft" | "pending_review" | "published" | "rejected" | "paused" | "blocked";
+export type ListingStatus = "draft" | "pending_review" | "published" | "rejected" | "paused" | "blocked";
+export type ListingType = "product" | "service" | "ad";
 
-export type Profile = {
+export type Company = {
   id: string;
-  company_name: string;
+  name: string;
   slug: string;
   description: string | null;
+  location: string | null;
+  website: string | null;
   phone: string | null;
-  zone: string | null;
-  logo_path: string | null;
+  email: string | null;
+  whatsapp: string | null;
+  categories: string[] | null;
+  logo_url: string | null;
   plan: "free" | "pro";
+  is_verified: boolean;
+  is_featured: boolean;
+  status: "active" | "blocked";
   created_at: string;
 };
 
-export type Product = {
+export type Listing = {
   id: number;
-  owner_id: string;
+  company_id: string;
   title: string;
   slug: string;
   description: string;
+  type: ListingType;
   category: string;
+  tags: string[] | null;
   price_mxn: number | null; // null = "a consultar"
   unit: string | null;
-  zone: string | null;
-  status: ProductStatus;
-  reject_reason: string | null;
+  min_purchase_qty: number | null;
+  location: string | null;
+  contact_override: { method?: string | null; value?: string | null } | null;
+  external_url: string | null;
+  status: ListingStatus;
+  rejection_reason: string | null;
   created_at: string;
-  photos?: ProductPhoto[];
-  profile?: Pick<Profile, "company_name" | "slug" | "zone">;
+  updated_at?: string | null;
+  photos?: ListingPhoto[];
+  company?: Pick<Company, "name" | "slug" | "location" | "website" | "phone" | "email" | "whatsapp" | "logo_url">;
 };
 
-export type ProductPhoto = { id: number; product_id: number; path: string; position: number };
+export type ListingPhoto = { id: number; listing_id: number; storage_path: string; position: number; alt_text: string | null };
 
-export type Conversation = {
-  id: number;
-  product_id: number | null;
-  buyer_id: string;
-  seller_id: string;
-  created_at: string;
-  last_message_at: string;
-};
-
-export type Message = {
-  id: number;
-  conversation_id: number;
-  sender_id: string;
-  body: string;
-  status: "delivered" | "rejected";
-  created_at: string;
-};
+export type Product = Listing;
+export type Profile = Company;
 
 export function photoUrl(path: string): string {
   return `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/mkt-photos/${path}`;
 }
 
-export function productPath(p: Pick<Product, "slug" | "id">): string {
+export function listingPath(p: Pick<Listing, "slug" | "id">): string {
   return `/p/${p.slug}-${p.id}`;
 }
+
+export const productPath = listingPath;

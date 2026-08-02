@@ -21,10 +21,17 @@ export async function middleware(request: NextRequest) {
     }
   );
 
-  const { data: { user } } = await supabase.auth.getUser();
+  let user = null;
+  try {
+    const result = await supabase.auth.getUser();
+    user = result.data.user;
+  } catch {
+    // Public pages remain available when the auth backend is unavailable.
+  }
 
   const protectedPaths = ["/panel", "/mensajes"];
-  if (!user && protectedPaths.some((p) => request.nextUrl.pathname.startsWith(p))) {
+  const previewMode = process.env.NODE_ENV !== "production" && request.nextUrl.searchParams.get("preview") === "1";
+  if (!user && !previewMode && protectedPaths.some((p) => request.nextUrl.pathname.startsWith(p))) {
     const url = request.nextUrl.clone();
     url.pathname = "/ingresar";
     url.searchParams.set("next", request.nextUrl.pathname);

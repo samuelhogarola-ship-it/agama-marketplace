@@ -1,19 +1,22 @@
-# CLAUDE.md — Reglas para agama-marketplace
+# CLAUDE.md — Reglas para TodoPlástico
 
 ## Gobernanza
 
 - Proyecto **separado** del repo AGAMA principal: no compartir código ni datos con el portal AGAMA.
-- **BD temporal:** las tablas viven en el proyecto Supabase `studio-panel` (iaglqispczaoduoodzwx) con prefijo `mkt_` y RLS estricta, porque el plan free no permite un tercer proyecto (decisión del 2026-07-26). **Antes del lanzamiento público (Fase 4) hay que migrar a un proyecto Supabase propio** (`pg_dump -t 'public.mkt_*'` + bucket `mkt-photos`).
+- **BD temporal:** las tablas viven en el proyecto Supabase `studio-panel` (iaglqispczaoduoodzwx) con prefijo `mkt_` y RLS estricta, porque el plan free no permite un tercer proyecto (decisión del 2026-07-26). **Antes del lanzamiento público hay que migrar a un proyecto Supabase propio** (`pg_dump -t 'public.mkt_*'` + bucket `mkt-photos`).
 - No se trabaja directamente en `main`: rama feature + PR siempre.
 - `CHANGELOG.md` es el changelog oficial; se actualiza en cada PR con cambios funcionales.
-- `docs/vision.md` y `docs/roadmap.md` son la fuente canónica del alcance; no implementar nada fuera de la fase activa del roadmap sin acuerdo del propietario.
+- `docs/scope-fase1.md` es la fuente canónica del alcance actual. `docs/vision.md` y `docs/roadmap.md` deben mantenerse sincronizados con ese alcance.
 
 ## Reglas de producto no negociables
 
-- Límites free: **5 productos activos, 5 fotos por producto** — aplicados en BD (constraint/trigger), no solo en UI.
+- TodoPlástico es una **plataforma B2B gratuita de descubrimiento**, no un marketplace transaccional.
+- La marca visible es **TodoPlástico**, con texto **"Impulsado por AGAMA"**.
+- Límites free: **5 anuncios activos, 5 fotos por anuncio** — aplicados en BD (constraint/trigger), no solo en UI.
 - **Pigmentos, masterbatch y aditivos prohibidos** en la plataforma (competencia de AGAMA). La lista de prohibidos vive en `docs/moderacion-ia.md` y en la config del watcher; mantenerlas sincronizadas.
 - Nada se publica sin pasar por el pipeline de moderación (`pending_review` primero).
-- Contacto solo por mensajería interna; no exponer emails/teléfonos entre usuarios.
+- El contacto es **externo y público**: web, teléfono, email y WhatsApp en campos específicos de empresa/anuncio. No hay mensajería interna en Fase 1.
+- No se permiten datos de contacto incrustados en título, descripción o imágenes: esos datos van en los campos dedicados.
 
 ## Seguridad
 

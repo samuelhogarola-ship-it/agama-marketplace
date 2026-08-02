@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "eslint .",
+    "db:push": "node scripts/push-migrations.mjs",
+    "seed:launch": "node scripts/seed-launch-data.mjs",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
@@ -18,10 +20,14 @@
   },
   "devDependencies": {
     "@playwright/test": "^1.62.0",
+    "eslint": "^9.31.0",
+    "eslint-config-next": "^15.5.22",
     "@tailwindcss/postcss": "^4.1.7",
     "@types/node": "^22",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "eslint": "^9.39.5",
+    "eslint-config-next": "^16.2.12",
     "tailwindcss": "^4.1.7",
     "typescript": "^5"
   }

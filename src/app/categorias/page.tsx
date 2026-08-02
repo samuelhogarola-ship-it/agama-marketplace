@@ -3,8 +3,8 @@ import Link from "next/link";
 import { CATEGORIES } from "@/lib/categories";
 
 export const metadata: Metadata = {
-  title: "Categorías de productos de plástico",
-  description: "Todas las categorías del marketplace: envases, bolsas, tarimas, resinas, reciclado, maquinaria y más.",
+  title: "Categorías de la industria plástica",
+  description: "Todas las categorías de TodoPlástico para encontrar productos y proveedores de la industria plástica.",
 };
 
 export default function CategoriasPage() {

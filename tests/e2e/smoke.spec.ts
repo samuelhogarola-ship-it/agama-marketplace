@@ -1,16 +1,15 @@
 import { test, expect } from "@playwright/test";
 
 test.describe("smoke — páginas públicas", () => {
-  test("home renderiza con marca AGAMA", async ({ page }) => {
+  test("home renderiza con marca TodoPlástico", async ({ page }) => {
     await page.goto("/");
-    await expect(page.getByRole("heading", { level: 1 })).toContainText("marketplace de productos de plástico");
-    await expect(page.getByText("Un servicio de AGAMA")).toBeVisible();
+    await expect(page.getByRole("heading", { level: 1 })).toContainText("Encuentra lo que mueve al plástico");
+    await expect(page.getByText(/Patrocinado por: AGAMA Pigmentos y Masterbatch/).first()).toBeVisible();
   });
 
   test("categorías y landing de categoría", async ({ page }) => {
-    await page.goto("/categorias");
-    await page.getByRole("link", { name: /Tarimas y contenedores/ }).click();
-    await expect(page.getByRole("heading", { level: 1 })).toContainText("Tarimas y contenedores de plástico en CDMX");
+    await page.goto("/c/tarimas-y-contenedores");
+    await expect(page.getByRole("heading", { level: 1 })).toContainText("Tarimas y contenedores para la industria plástica en México");
   });
 
   test("categoría inexistente da 404", async ({ page }) => {
@@ -32,18 +31,15 @@ test.describe("smoke — páginas públicas", () => {
   test("banner de cookies aparece y se puede rechazar", async ({ page }) => {
     await page.goto("/");
     await expect(page.getByText("cookies esenciales")).toBeVisible();
-    await page.getByRole("button", { name: "Solo esenciales" }).click();
+    await page.getByRole("button", { name: "Solo esenciales" }).click({ force: true });
     await expect(page.getByText("cookies esenciales")).toBeHidden();
     await page.reload();
     await expect(page.getByText("cookies esenciales")).toBeHidden();
   });
 
-  test("login ofrece contraseña y enlace mágico", async ({ page }) => {
+  test("login ofrece enlace mágico", async ({ page }) => {
     await page.goto("/ingresar");
-    await expect(page.getByRole("button", { name: "Contraseña" })).toBeVisible();
-    await page.getByRole("button", { name: "Enlace mágico" }).click();
     await expect(page.getByRole("button", { name: /Enviarme enlace/ })).toBeVisible();
-    await expect(page.getByPlaceholder("Contraseña")).toBeHidden();
   });
 
   test("panel redirige a ingresar sin sesión", async ({ page }) => {

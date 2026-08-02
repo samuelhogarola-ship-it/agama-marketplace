@@ -1,6 +1,6 @@
 @import "tailwindcss";
 
-/* Paleta oficial AGAMA: navy #141251 / #1b2150, azul #2a4edc, cielo #008dd5, acento #fb8500 */
+/* TodoPlástico: graphite, cobalt, white, and restrained sky-blue accents. */
 @theme {
   --color-brand: #2a4edc;
   --color-brand-dark: #141251;
@@ -8,8 +8,15 @@
   --color-brand-sky: #008dd5;
   --color-brand-light: #e8f0fb;
   --color-accent: #fb8500;
+  --color-hot: #ea148c;
 }
 
 body {
   @apply bg-white text-slate-800 antialiased;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+::selection {
+  background: #2a4edc;
+  color: #fff;
 }
