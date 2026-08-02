@@ -21,8 +21,6 @@ const CATEGORY_SUBCATEGORIES: Record<string, readonly (readonly [string, string]
   "cubetas-y-bidones": [["cubetas", "Cubetas"], ["bidones", "Bidones"], ["tambos", "Tambos"], ["garrafones", "Garrafones"]],
   "perfiles-y-laminas": [["perfiles", "Perfiles"], ["laminas", "Láminas"], ["placas", "Placas"], ["planchas", "Planchas"]],
   "tuberia-y-conexiones": [["pvc", "PVC"], ["pead", "PEAD"], ["cpvc", "CPVC"], ["conexiones", "Conexiones"]],
-  "reciclado-y-molido": [["molido", "Molido"], ["escama", "Escama"], ["paca", "Paca"], ["pellet-reprocesado", "Pellet reprocesado"]],
-  resinas: [["pp", "PP"], ["pe", "PE"], ["pet", "PET"], ["ps", "PS"], ["abs", "ABS"]],
   "maquinaria-y-refacciones": [["inyeccion", "Inyección"], ["soplado", "Soplado"], ["extrusion", "Extrusión"], ["refacciones", "Refacciones"]],
 };
 

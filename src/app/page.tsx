@@ -15,8 +15,6 @@ const categoryImages: Record<string, string> = {
   "cubetas-y-bidones": "/category-cubetas.png",
   "perfiles-y-laminas": "/category-perfiles.png",
   "tuberia-y-conexiones": "/category-tuberia.png",
-  "reciclado-y-molido": "/category-reciclado.png",
-  resinas: "/category-resinas.png",
   "maquinaria-y-refacciones": "/category-maquinaria.png",
 };
 

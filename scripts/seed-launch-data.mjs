@@ -33,9 +33,7 @@ const categories = [
   ["cubetas-y-bidones", "Cubetas y bidones", "Cubetas, bidones, tambos y garrafones de plástico.", 4],
   ["perfiles-y-laminas", "Perfiles y láminas", "Perfiles, láminas, placas y planchas de plástico.", 5],
   ["tuberia-y-conexiones", "Tubería y conexiones", "Tubería de PVC, PEAD, CPVC y conexiones plásticas.", 6],
-  ["reciclado-y-molido", "Reciclado y molido", "Plástico reciclado, molido, paca y pellet reprocesado.", 7],
-  ["resinas", "Resinas", "Resinas vírgenes y reprocesadas: PP, PE, PET, PS, ABS y más.", 8],
-  ["maquinaria-y-refacciones", "Maquinaria y refacciones", "Máquinas de inyección, soplado, extrusión y sus refacciones.", 9],
+  ["maquinaria-y-refacciones", "Maquinaria y refacciones", "Máquinas de inyección, soplado, extrusión y sus refacciones.", 7],
 ];
 
 function slugify(text) {
@@ -150,6 +148,9 @@ async function seedSamplePhotos(listingId) {
   const { error: insertError } = await supabase.from("mkt_listing_photos").insert(rows);
   if (insertError) throw insertError;
 }
+
+const { error: legacyCategoryError } = await supabase.from("mkt_categories").delete().in("slug", ["reciclado-y-molido", "resinas"]);
+if (legacyCategoryError) throw legacyCategoryError;
 
 const { error: categoryError } = await supabase.from("mkt_categories").upsert(
   categories.map(([slug, name, description, position]) => ({ slug, name, description, position })),
