@@ -40,7 +40,7 @@ export type Listing = {
   created_at: string;
   updated_at?: string | null;
   photos?: ListingPhoto[];
-  company?: Pick<Company, "name" | "slug" | "location" | "website" | "phone" | "email" | "whatsapp">;
+  company?: Pick<Company, "name" | "slug" | "location" | "website" | "phone" | "email" | "whatsapp" | "logo_url">;
 };
 
 export type ListingPhoto = { id: number; listing_id: number; storage_path: string; position: number; alt_text: string | null };

@@ -40,7 +40,7 @@ async function getProduct(id: number): Promise<Product | null> {
   const supabase = await createClient();
   const { data } = await supabase
     .from("mkt_listings")
-    .select("*, photos:mkt_listing_photos(*), company:mkt_companies(name, slug, location, website, phone, email, whatsapp)")
+    .select("*, photos:mkt_listing_photos(*), company:mkt_companies(name, slug, location, website, phone, email, whatsapp, logo_url)")
     .eq("status", "published")
     .eq("id", id)
     .single();
@@ -214,11 +214,21 @@ export default async function ProductPage({ params }: Props) {
             <h2 className="text-lg font-semibold text-brand-dark">Empresa anunciante</h2>
             {product.company ? (
               <div className="mt-4 flex flex-wrap items-center justify-between gap-4">
-                <div>
-                  <Link href={`/e/${product.company.slug}`} className="text-base font-semibold text-brand-dark hover:underline">
-                    {product.company.name}
-                  </Link>
-                  <p className="mt-1 text-sm text-slate-500">{product.company.location ?? product.location ?? "México"}</p>
+                <div className="flex items-center gap-4">
+                  <div className="flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-full border border-slate-200 bg-slate-50">
+                    {product.company.logo_url ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={product.company.logo_url} alt={`Logo de ${product.company.name}`} className="h-full w-full object-contain p-2" />
+                    ) : (
+                      <span className="text-lg font-semibold text-brand-dark">{product.company.name.slice(0, 2).toUpperCase()}</span>
+                    )}
+                  </div>
+                  <div>
+                    <Link href={`/e/${product.company.slug}`} className="text-base font-semibold text-brand-dark hover:underline">
+                      {product.company.name}
+                    </Link>
+                    <p className="mt-1 text-sm text-slate-500">{product.company.location ?? product.location ?? "México"}</p>
+                  </div>
                 </div>
                 <ContactActions product={product} />
               </div>

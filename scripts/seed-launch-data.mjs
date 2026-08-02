@@ -76,6 +76,7 @@ async function seedAgamaSampleListing() {
     description: "Empresa ficticia usada como modelo de anuncio para TodoPlastico. Publica productos plasticos permitidos con informacion clara, contacto externo y enlace propio.",
     location: "Ciudad de Mexico",
     website: "https://agama-envases.com",
+    logo_url: "/agama-logo.png",
     email: "ventas@agama-envases.com",
     phone: "+52 55 4100 2200",
     whatsapp: "+52 55 4100 2200",
