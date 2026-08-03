@@ -8,6 +8,7 @@ import ProductCard from "@/components/ProductCard";
 import type { Product } from "@/lib/types";
 import { safeJsonLd } from "@/lib/jsonld";
 import CategoryFilters from "@/components/CategoryFilters";
+import SortSelect from "@/components/SortSelect";
 
 export const revalidate = 300;
 
@@ -136,22 +137,7 @@ export default async function CategoryPage({ params, searchParams }: Props) {
         <section>
           <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 pb-4">
             <p className="text-sm text-slate-500"><strong className="text-brand-dark">{products?.length ?? 0}</strong> anuncios encontrados</p>
-            <form action={`/c/${cat.slug}`}>
-              {location && <input type="hidden" name="location" value={location} />}
-              {date && <input type="hidden" name="date" value={date} />}
-              {type && <input type="hidden" name="type" value={type} />}
-              {subcategory && <input type="hidden" name="subcategory" value={subcategory} />}
-              {minPrice && <input type="hidden" name="minPrice" value={minPrice} />}
-              {maxPrice && <input type="hidden" name="maxPrice" value={maxPrice} />}
-              <label className="flex items-center gap-2 text-sm text-slate-500">Ordenar
-                <select name="sort" defaultValue={sort} className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-brand-dark outline-none focus:border-brand">
-                  <option value="newest">Más recientes</option>
-                  <option value="price-asc">Precio menor</option>
-                  <option value="price-desc">Precio mayor</option>
-                </select>
-              </label>
-              <button className="mt-2 rounded-lg border border-slate-300 px-3 py-2 text-xs font-semibold text-brand-dark hover:border-brand hover:text-brand">Aplicar orden</button>
-            </form>
+            <SortSelect category={cat.slug} />
           </div>
           {products && products.length > 0 ? (
             <div className="mt-6 grid grid-cols-2 gap-4 md:grid-cols-3">

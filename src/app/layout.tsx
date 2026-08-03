@@ -5,6 +5,7 @@ import "./globals.css";
 import { createClient } from "@/lib/supabase/server";
 import CookieBanner from "@/components/CookieBanner";
 import CategoryBrowseBar from "@/components/CategoryBrowseBar";
+import MobileNav from "@/components/MobileNav";
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"),
@@ -28,7 +29,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     <html lang="es-MX">
       <body className="min-h-screen flex flex-col">
         <header className="border-b border-slate-200 bg-white sticky top-0 z-40">
-          <div className="mx-auto flex min-h-16 max-w-7xl items-center justify-between gap-4 px-4 py-2 md:py-4">
+          <div className="relative mx-auto flex min-h-16 max-w-7xl items-center justify-between gap-4 px-4 py-2 md:py-4">
             <Link href="/" className="flex shrink-0 items-center gap-2.5" aria-label="TodoPlástico, inicio">
               <Image src="/todoplastico-symbol.png" alt="TodoPlástico" width={42} height={26} priority className="h-[26px] w-[42px] object-contain" />
               <span className="text-lg font-bold leading-none text-brand-dark sm:text-xl">
@@ -47,19 +48,16 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             <nav aria-label="Navegación principal" className="flex items-center gap-4 text-sm font-medium">
               <Link href="/empresas" className="hidden text-slate-700 hover:text-brand lg:block">Empresas</Link>
               <Link href="/articulos" className="hidden text-slate-700 hover:text-brand lg:block">Contenido</Link>
-              <Link href="/categorias" className="hover:text-brand text-slate-700">Categorías</Link>
+              <Link href="/categorias" className="hidden text-slate-700 hover:text-brand md:block">Categorías</Link>
               {user ? (
-                <>
-                  <Link href="/panel" className="rounded-full bg-brand text-white px-4 py-2 hover:bg-brand-dark">Mi panel</Link>
-                </>
+                <Link href="/panel" className="hidden rounded-full bg-brand px-4 py-2 text-white hover:bg-brand-dark md:block">Mi panel</Link>
               ) : (
                 <>
-                  <Link href="/ingresar" className="hover:text-brand text-slate-700">Ingresar</Link>
-                  <Link href="/registro" className="rounded-full bg-brand text-white px-4 py-2 hover:bg-brand-dark">
-                    Publicar
-                  </Link>
+                  <Link href="/ingresar" className="hidden text-slate-700 hover:text-brand md:block">Ingresar</Link>
+                  <Link href="/registro" className="hidden rounded-full bg-brand px-4 py-2 text-white hover:bg-brand-dark md:block">Publicar</Link>
                 </>
               )}
+              <MobileNav isLoggedIn={!!user} />
             </nav>
           </div>
         </header>
