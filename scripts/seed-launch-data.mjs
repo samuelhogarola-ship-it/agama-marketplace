@@ -33,7 +33,6 @@ const categories = [
   ["cubetas-y-bidones", "Cubetas y bidones", "Cubetas, bidones, tambos y garrafones de plástico.", 4],
   ["perfiles-y-laminas", "Perfiles y láminas", "Perfiles, láminas, placas y planchas de plástico.", 5],
   ["tuberia-y-conexiones", "Tubería y conexiones", "Tubería de PVC, PEAD, CPVC y conexiones plásticas.", 6],
-  ["maquinaria-y-refacciones", "Maquinaria y refacciones", "Máquinas de inyección, soplado, extrusión y sus refacciones.", 7],
 ];
 
 function slugify(text) {

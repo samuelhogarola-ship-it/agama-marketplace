@@ -15,7 +15,6 @@ const categoryImages: Record<string, string> = {
   "cubetas-y-bidones": "/category-cubetas.png",
   "perfiles-y-laminas": "/category-perfiles.png",
   "tuberia-y-conexiones": "/category-tuberia.png",
-  "maquinaria-y-refacciones": "/category-maquinaria.png",
 };
 
 export default async function Home() {
@@ -50,7 +49,7 @@ export default async function Home() {
             <p className="mb-6 text-xs font-semibold uppercase tracking-[0.28em] text-white/70">
               Directorio profesional · México
             </p>
-            <h1 className="max-w-lg text-5xl font-semibold leading-[0.98] tracking-[-0.04em] sm:text-6xl md:text-7xl">
+            <h1 className="max-w-lg text-left text-5xl font-semibold leading-[0.98] tracking-[-0.04em] sm:text-6xl md:max-w-2xl md:text-7xl">
               Encuentra lo que mueve al plástico.
             </h1>
             <p className="mt-7 max-w-md text-base leading-7 text-white/78 sm:text-lg">
@@ -123,20 +122,22 @@ export default async function Home() {
       </section>
 
       {featured && featured.length > 0 && (
-        <section className="mx-auto max-w-7xl px-5 py-20 sm:px-8 lg:px-12 lg:py-24">
-          <div className="flex items-end justify-between gap-6">
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-brand-sky">Selección TodoPlástico</p>
-              <h2 className="mt-3 text-3xl font-semibold tracking-[-0.03em] text-brand-dark sm:text-4xl">Anuncios destacados.</h2>
+        <section className="bg-[#f4faef]">
+          <div className="mx-auto max-w-7xl px-5 py-20 sm:px-8 lg:px-12 lg:py-24">
+            <div className="flex items-end justify-between gap-6">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.24em] text-brand-sky">Selección TodoPlástico</p>
+                <h2 className="mt-3 text-3xl font-semibold tracking-[-0.03em] text-brand-dark sm:text-4xl">Anuncios destacados.</h2>
+              </div>
+              <Link href="/buscar" className="hidden text-sm font-semibold text-brand-dark underline decoration-slate-300 underline-offset-8 hover:decoration-brand sm:block">
+                Ver todos ↗
+              </Link>
             </div>
-            <Link href="/buscar" className="hidden text-sm font-semibold text-brand-dark underline decoration-slate-300 underline-offset-8 hover:decoration-brand sm:block">
-              Ver todos ↗
-            </Link>
-          </div>
-          <div className="mt-12 grid grid-cols-2 gap-4 md:grid-cols-4">
-            {(featured as Product[]).map((product) => (
-              <ProductCard key={product.id} product={product} />
-            ))}
+            <div className="mt-12 grid grid-cols-2 gap-4 md:grid-cols-4">
+              {(featured as Product[]).map((product) => (
+                <ProductCard key={product.id} product={product} />
+              ))}
+            </div>
           </div>
         </section>
       )}

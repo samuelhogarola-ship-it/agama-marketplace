@@ -1,20 +1,40 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { Suspense, useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { DEMO_COMPANY } from "@/lib/demo-data";
 
-export default function PerfilPage() {
+function PerfilContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const previewMode = searchParams.get("preview") === "1";
   const [form, setForm] = useState({ name: "", description: "", location: "", website: "", phone: "", email: "", whatsapp: "" });
   const [loading, setLoading] = useState(true);
   const [saved, setSaved] = useState(false);
 
   useEffect(() => {
+    if (previewMode) {
+      setForm({
+        name: DEMO_COMPANY.name,
+        description: DEMO_COMPANY.description ?? "",
+        location: DEMO_COMPANY.location ?? "",
+        website: DEMO_COMPANY.website ?? "",
+        phone: DEMO_COMPANY.phone ?? "",
+        email: DEMO_COMPANY.email ?? "",
+        whatsapp: DEMO_COMPANY.whatsapp ?? "",
+      });
+      setLoading(false);
+      return;
+    }
     (async () => {
       const supabase = createClient();
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
+      if (!user) {
+        setLoading(false);
+        router.replace("/ingresar?next=/panel/perfil");
+        return;
+      }
       const { data } = await supabase.rpc("mkt_my_company");
       if (data) {
         setForm({
@@ -29,10 +49,14 @@ export default function PerfilPage() {
       }
       setLoading(false);
     })();
-  }, []);
+  }, [previewMode, router]);
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
+    if (previewMode) {
+      setSaved(true);
+      return;
+    }
     const supabase = createClient();
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
@@ -45,6 +69,7 @@ export default function PerfilPage() {
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-12">
+      {previewMode ? <div className="mb-8 rounded-2xl border border-brand/20 bg-brand-light px-5 py-4 text-sm text-slate-700"><span className="font-semibold text-brand-dark">Vista previa local de AGAMA.</span> Esta ficha muestra cómo verá la empresa el usuario final.</div> : null}
       <h1 className="text-2xl font-bold text-slate-800">Ficha de empresa</h1>
       <form onSubmit={onSubmit} className="mt-8 space-y-5">
         <div>
@@ -119,9 +144,13 @@ export default function PerfilPage() {
           </div>
         </div>
         <button className="rounded-full bg-brand text-white px-8 py-3 font-medium hover:bg-brand-dark">
-          {saved ? "Guardado ✓" : "Guardar"}
+          {saved ? (previewMode ? "Cambios de demo guardados ✓" : "Guardado ✓") : "Guardar"}
         </button>
       </form>
     </div>
   );
+}
+
+export default function PerfilPage() {
+  return <Suspense fallback={<div className="mx-auto max-w-2xl px-4 py-16 text-slate-400">Cargando ficha…</div>}><PerfilContent /></Suspense>;
 }

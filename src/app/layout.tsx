@@ -14,6 +14,10 @@ export const metadata: Metadata = {
   },
   description:
     "Directorio B2B gratuito de empresas, productos, servicios y anuncios de la industria del plástico en México. Impulsado por AGAMA.",
+  icons: {
+    icon: [{ url: "/todoplastico-symbol.png", type: "image/png" }],
+    apple: "/todoplastico-symbol.png",
+  },
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {

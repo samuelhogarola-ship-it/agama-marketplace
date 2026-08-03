@@ -9,7 +9,6 @@ export const CATEGORIES: Category[] = [
   { slug: "cubetas-y-bidones", name: "Cubetas y bidones", description: "Cubetas, bidones, tambos y garrafones de plástico." },
   { slug: "perfiles-y-laminas", name: "Perfiles y láminas", description: "Perfiles, láminas, placas y planchas de plástico." },
   { slug: "tuberia-y-conexiones", name: "Tubería y conexiones", description: "Tubería de PVC, PEAD, CPVC y conexiones plásticas." },
-  { slug: "maquinaria-y-refacciones", name: "Maquinaria y refacciones", description: "Máquinas de inyección, soplado, extrusión y sus refacciones." },
 ];
 
 export const categoryBySlug = (slug: string) => CATEGORIES.find((c) => c.slug === slug);

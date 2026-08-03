@@ -2,6 +2,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient, isAdminUser } from "@/lib/supabase/admin";
 import AdminQueue from "@/components/AdminQueue";
+import { DEMO_COMPANY, DEMO_LISTINGS } from "@/lib/demo-data";
 
 const dateFormatter = new Intl.DateTimeFormat("es-MX", { day: "2-digit", month: "short", year: "numeric" });
 
@@ -60,6 +61,28 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
     users = (usersResult.data?.users ?? []) as typeof users;
     usersError = Boolean(usersResult.error);
     companies = (companiesResult.data ?? []) as typeof companies;
+  }
+
+  if (previewMode) {
+    const pending = DEMO_LISTINGS.find((listing) => listing.status === "pending_review") ?? DEMO_LISTINGS[1];
+    queue = [{
+      id: pending.id,
+      title: pending.title,
+      slug: pending.slug,
+      description: pending.description,
+      category: pending.category,
+      location: pending.location,
+      status: pending.status,
+      rejection_reason: pending.rejection_reason,
+      created_at: pending.created_at,
+      company: { name: DEMO_COMPANY.name },
+      photos: [],
+    }];
+    publishedCount = 1;
+    rejectedCount = 0;
+    reviewedCount = 2;
+    users = [{ id: "agama-admin-preview", email: DEMO_COMPANY.email ?? undefined, created_at: DEMO_COMPANY.created_at, last_sign_in_at: new Date().toISOString(), email_confirmed_at: DEMO_COMPANY.created_at, user_metadata: { company_name: DEMO_COMPANY.name } }];
+    companies = [{ id: DEMO_COMPANY.id, name: DEMO_COMPANY.name, slug: DEMO_COMPANY.slug, location: DEMO_COMPANY.location, plan: DEMO_COMPANY.plan, is_verified: DEMO_COMPANY.is_verified, status: DEMO_COMPANY.status, created_at: DEMO_COMPANY.created_at }];
   }
 
   return (
@@ -139,7 +162,7 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
 
       <section id="anuncios" className="mt-14 scroll-mt-24">
         <div className="border-b border-slate-200 pb-4"><p className="text-xs font-semibold uppercase tracking-[0.2em] text-brand-sky">Moderación</p><h2 className="mt-2 text-2xl font-semibold tracking-[-0.03em] text-brand-dark">Revisión de anuncios</h2><p className="mt-2 text-sm text-slate-500">Aprueba o rechaza las publicaciones que esperan revisión humana.</p></div>
-        <AdminQueue initialItems={queue} />
+        <AdminQueue initialItems={queue} readOnly={previewMode} />
       </section>
     </div>
   );

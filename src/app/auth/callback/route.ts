@@ -11,7 +11,8 @@ export async function GET(request: Request) {
     const supabase = await createClient();
     const { error } = await supabase.auth.exchangeCodeForSession(code);
     if (!error) {
-      return NextResponse.redirect(`${origin}${next.startsWith("/") ? next : "/panel"}`);
+      const safeNext = next.startsWith("/") && !next.startsWith("//") ? next : "/panel";
+      return NextResponse.redirect(`${origin}${safeNext}`);
     }
   }
   return NextResponse.redirect(`${origin}/ingresar?error=enlace-invalido`);
