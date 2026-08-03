@@ -27,7 +27,7 @@ La `service role key` solo se usa en servidor y nunca debe empezar por `NEXT_PUB
 ## Crear el Supabase nuevo
 
 1. Crear un proyecto independiente para TodoPlástico.
-2. Ejecutar las migraciones en orden: `0001`, `0002`, `0003`, `0004`.
+2. Ejecutar todas las migraciones en orden: `0001` a `0008`.
 3. Comprobar las tablas `mkt_*` y el bucket `mkt-photos`.
 4. Configurar Auth con Site URL `https://todo-plastico.com` y redirect `https://todo-plastico.com/auth/callback`.
 5. Configurar SMTP/Resend antes de invitar empresas.

@@ -20,7 +20,7 @@ Pendientes operativos antes de producción: proyecto Supabase propio, SMTP de Su
 
 Estado: **completa en código**.
 
-- [x] Registro, login por contraseña y magic link con callback PKCE.
+- [x] Registro y login por magic link con callback PKCE.
 - [x] Onboarding y edición de ficha profesional de empresa.
 - [x] Directorio `/empresas` con búsqueda, categoría, ubicación y perfiles públicos.
 - [x] Catálogo por categoría, buscador general y fichas públicas de anuncios.
@@ -38,7 +38,7 @@ Estado: **completa en código**.
 
 - [x] Capa 1: reglas duras para pigmentos, masterbatch, aditivos y datos de contacto en texto.
 - [x] Capa 2: clasificación semántica con Claude Haiku y umbral conservador.
-- [x] Capa 3: revisión visual de fotografías.
+- [x] Capa 3: revisión visual de fotografías; si una capa falla, el anuncio queda pendiente.
 - [x] Estados `published`, `rejected` y `pending_review` con motivos visibles.
 - [x] Cola admin para aprobar/rechazar casos dudosos y métricas básicas de moderación.
 - [x] Reescaneo al editar anuncios.
@@ -48,15 +48,19 @@ Estado: **completa en código**.
 
 ## Fase 3 — Preparación de lanzamiento
 
-Estado: **siguiente**.
+Estado: **operativa en demo; pendiente de hardening y configuración de producción**.
 
 - [x] Migrar `mkt_*` a un proyecto Supabase propio y validar tablas, Storage y RLS inicial.
+- [x] Separar envío a revisión de decisiones: solo `service_role` puede publicar o rechazar.
+- [x] Bloquear escritura de eventos de moderación por anunciantes y cerrar la moderación si falla IA.
+- [x] Validar callback de magic link y URLs de empresa en servidor.
 - [x] Preparar Docker, healthcheck y configuración base para el VPS de AGAMA.
 - [ ] Configurar SMTP Resend en Supabase Auth siguiendo `docs/resend-magic-link.md`.
 - [ ] Añadir `ANTHROPIC_API_KEY`, `SUPABASE_SERVICE_ROLE_KEY` y `TODO_PLASTICO_ADMIN_EMAILS` en el entorno seguro.
 - [ ] Crear usuario admin real y conectar las variables del nuevo Supabase en WF Studio.
 - [ ] Instalar Plausible o GA4 con consentimiento y definir eventos de búsqueda/contacto.
 - [x] Preparar seed repetible de categorías y perfil AGAMA.
+- [x] Mantener el seed alineado con el catálogo aprobado.
 - [ ] Cargar proveedores iniciales, anuncios reales y artículos revisados.
 - [ ] Revisar legalmente términos, privacidad LFPDPPP y normas de comunidad.
 - [ ] Conectar `todo-plastico.com`, activar indexación y verificar Search Console.

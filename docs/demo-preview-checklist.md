@@ -3,7 +3,7 @@
 ## Estado actual
 
 - [x] Portada premium con hero, carrusel y CTA.
-- [x] Navegación de categorías congelada con siete categorías aprobadas.
+- [x] Navegación de categorías congelada con seis categorías aprobadas.
 - [x] Panel lateral de categorías en escritorio.
 - [x] Sugerencias y filtros por categoría.
 - [x] Listado público con tres fotografías demo de AGAMA.
@@ -56,7 +56,7 @@
 
 ### Contenido y experiencia
 
-- [ ] Revisar las siete categorías aprobadas con el equipo AGAMA.
+- [ ] Revisar las seis categorías aprobadas con el equipo AGAMA.
 - [ ] Revisar textos legales, comunidad, privacidad, cookies y términos.
 - [ ] Revisar textos de sanciones, avisos premium y pérdida del servicio.
 - [ ] Añadir logo real de cada empresa cuando se incorporen.

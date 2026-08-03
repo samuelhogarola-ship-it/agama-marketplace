@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import Image from "next/image";
 import { notFound } from "next/navigation";
 import { CATEGORIES, categoryBySlug } from "@/lib/categories";
 import { createClient } from "@/lib/supabase/server";
@@ -19,7 +20,6 @@ const CATEGORY_SUGGESTIONS: Record<string, readonly (readonly [string, string])[
   "cubetas-y-bidones": [["Cubetas blancas", "cubetas"], ["Bidones", "bidones"], ["Tambos", "tambos"], ["Garrafones", "garrafones"]],
   "perfiles-y-laminas": [["Perfiles plásticos", "perfiles"], ["Láminas", "laminas"], ["Placas", "placas"], ["Planchas", "planchas"]],
   "tuberia-y-conexiones": [["Tubería PVC", "pvc"], ["Tubería PEAD", "pead"], ["Conexiones", "conexiones"], ["CPVC", "cpvc"]],
-  "maquinaria-y-refacciones": [["Inyección", "inyeccion"], ["Soplado", "soplado"], ["Extrusión", "extrusion"], ["Refacciones", "refacciones"]],
 };
 
 function first(value: string | string[] | undefined) {
@@ -108,10 +108,18 @@ export default async function CategoryPage({ params, searchParams }: Props) {
         <span aria-hidden="true">/</span>
         <span className="text-slate-700">{cat.name}</span>
       </nav>
-      <h1 className="text-3xl font-bold text-slate-800">{cat.name} para la industria plástica en México</h1>
-      <p className="mt-2 max-w-2xl text-slate-600">
-        {cat.description} Contacta directamente a empresas profesionales por sus canales públicos.
-      </p>
+      <div className="mt-8 flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between sm:gap-8">
+        <div>
+          <h1 className="text-3xl font-bold text-slate-800">{cat.name} para la industria plástica en México</h1>
+          <p className="mt-2 max-w-2xl text-slate-600">
+            {cat.description} Contacta directamente a empresas profesionales por sus canales públicos.
+          </p>
+        </div>
+        <div className="flex shrink-0 items-center gap-2 text-xs text-slate-400 sm:pt-1 sm:text-right">
+          <Image src="/agama-logo.png" alt="AGAMA" width={22} height={22} className="rounded-full opacity-65" />
+          <span className="uppercase tracking-[0.14em]">Esponsor AGAMA</span>
+        </div>
+      </div>
       <section className="mt-8" aria-labelledby="suggestions-title">
         <h2 id="suggestions-title" className="text-2xl font-semibold text-brand-dark">Sugerencias para ti</h2>
         <div className="mt-4 flex flex-wrap gap-3">

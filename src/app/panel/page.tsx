@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { productPath, type Company, type Product } from "@/lib/types";
 import { formatPrice } from "@/components/ProductCard";
+import { DEMO_COMPANY, DEMO_LISTINGS } from "@/lib/demo-data";
 
 const STATUS_LABEL: Record<string, { text: string; cls: string }> = {
   pending_review: { text: "En revisión", cls: "bg-amber-100 text-amber-800" },
@@ -23,7 +24,7 @@ function getInitials(name: string) {
 export default function PanelPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const previewMode = process.env.NODE_ENV !== "production" && searchParams.get("preview") === "1";
+  const previewMode = searchParams.get("preview") === "1";
   const [profile, setProfile] = useState<Company | null>(null);
   const [products, setProducts] = useState<Product[]>([]);
   const [email, setEmail] = useState("");
@@ -33,8 +34,8 @@ export default function PanelPage() {
   const load = useCallback(async () => {
     if (previewMode) {
       setEmail("admin@agama-pigmentos.com");
-      setProfile({ id: "agama-preview", name: "AGAMA Pigmentos y Masterbatch", slug: "agama-pigmentos-masterbatch", description: "Empresa especializada en soluciones para la industria plástica.", location: "Fuengirola · Málaga", website: "https://agama.es", phone: null, email: "admin@agama-pigmentos.com", whatsapp: null, categories: ["envases-y-botellas", "tarimas-y-contenedores"], logo_url: null, plan: "pro", is_verified: true, is_featured: true, status: "active", created_at: new Date().toISOString() });
-      setProducts([]);
+      setProfile(DEMO_COMPANY);
+      setProducts(DEMO_LISTINGS);
       setLoading(false);
       return;
     }
@@ -66,10 +67,17 @@ export default function PanelPage() {
     if (previewMode) return;
     setActionError(null);
     const supabase = createClient();
-    const result = status === "pending_review"
-      ? await supabase.rpc("mkt_submit_listing", { p_listing_id: id })
-      : await supabase.from("mkt_listings").update({ status }).eq("id", id);
-    if (result.error) setActionError("No se pudo actualizar el anuncio. Inténtalo de nuevo.");
+    if (status === "pending_review") {
+      const moderation = await fetch("/api/moderate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ listing_id: id }),
+      });
+      if (!moderation.ok) setActionError("No se pudo enviar el anuncio a revisión. Inténtalo de nuevo.");
+    } else {
+      const result = await supabase.from("mkt_listings").update({ status }).eq("id", id);
+      if (result.error) setActionError("No se pudo actualizar el anuncio. Inténtalo de nuevo.");
+    }
     await load();
   }
 
@@ -114,8 +122,8 @@ export default function PanelPage() {
         </div>
         <nav aria-label="Panel de empresa" className="mt-5 grid gap-1 text-sm font-medium">
           <Link href="/panel" className="rounded-lg bg-brand-light px-3 py-2.5 font-semibold text-brand-dark">Resumen</Link>
-          <Link href="/panel/perfil" className="rounded-lg px-3 py-2.5 text-slate-600 hover:bg-slate-50 hover:text-brand-dark">Mi empresa</Link>
-          <Link href="/panel/publicar" className="rounded-lg px-3 py-2.5 text-slate-600 hover:bg-slate-50 hover:text-brand-dark">Publicar anuncio</Link>
+          <Link href={previewMode ? "/panel/perfil?preview=1" : "/panel/perfil"} className="rounded-lg px-3 py-2.5 text-slate-600 hover:bg-slate-50 hover:text-brand-dark">Mi empresa</Link>
+          <Link href={previewMode ? "/panel/publicar?preview=1" : "/panel/publicar"} className="rounded-lg px-3 py-2.5 text-slate-600 hover:bg-slate-50 hover:text-brand-dark">Publicar anuncio</Link>
           <Link href="/empresas" className="rounded-lg px-3 py-2.5 text-slate-600 hover:bg-slate-50 hover:text-brand-dark">Ver directorio</Link>
         </nav>
         <div className="mt-8 border-t border-slate-200 pt-5">
@@ -134,7 +142,7 @@ export default function PanelPage() {
             <h1 className="mt-3 text-4xl font-semibold tracking-[-0.05em] text-brand-dark sm:text-5xl">Tu espacio de trabajo.</h1>
             <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-600">Gestiona tu ficha pública y los anuncios que presentas a la industria plástica.</p>
           </div>
-          {activeCount < limit ? <Link href="/panel/publicar" className="rounded-full bg-brand px-5 py-3 text-sm font-semibold text-white hover:bg-brand-dark">Publicar anuncio</Link> : null}
+          {activeCount < limit ? <Link href={previewMode ? "/panel/publicar?preview=1" : "/panel/publicar"} className="rounded-full bg-brand px-5 py-3 text-sm font-semibold text-white hover:bg-brand-dark">Publicar anuncio</Link> : null}
         </div>
 
         <section className="mt-9 grid gap-3 sm:grid-cols-3" aria-label="Resumen de actividad">
@@ -159,7 +167,7 @@ export default function PanelPage() {
                 <h2 id="complete-profile" className="mt-2 text-xl font-semibold text-brand-dark">Completa tu ficha de empresa.</h2>
                 <p className="mt-1 text-sm text-slate-600">Una ficha clara ayuda a que te encuentren y convierte mejor cada contacto externo.</p>
               </div>
-              <Link href="/panel/perfil" className="text-sm font-semibold text-brand-dark underline decoration-brand/30 underline-offset-4 hover:decoration-brand">Editar ficha ↗</Link>
+              <Link href={previewMode ? "/panel/perfil?preview=1" : "/panel/perfil"} className="text-sm font-semibold text-brand-dark underline decoration-brand/30 underline-offset-4 hover:decoration-brand">Editar ficha ↗</Link>
             </div>
             <div className="mt-5 h-2 overflow-hidden rounded-full bg-white/80"><div className="h-full rounded-full bg-brand" style={{ width: `${profileComplete}%` }} /></div>
             <p className="mt-2 text-xs font-semibold text-brand-dark">{profileComplete}% completada</p>
@@ -181,7 +189,7 @@ export default function PanelPage() {
             <div className="mt-6 rounded-2xl border border-dashed border-slate-300 px-6 py-14 text-center">
               <h3 className="text-lg font-semibold text-brand-dark">Tu catálogo empieza aquí.</h3>
               <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-slate-500">Publica tu primer producto o anuncio B2B y aparecerá en la categoría correspondiente después de la moderación.</p>
-              <Link href="/panel/publicar" className="mt-6 inline-flex rounded-full bg-brand-dark px-5 py-3 text-sm font-semibold text-white hover:bg-brand">Crear primer anuncio</Link>
+              <Link href={previewMode ? "/panel/publicar?preview=1" : "/panel/publicar"} className="mt-6 inline-flex rounded-full bg-brand-dark px-5 py-3 text-sm font-semibold text-white hover:bg-brand">Crear primer anuncio</Link>
             </div>
           ) : (
             <div className="mt-5 divide-y divide-slate-200">
@@ -199,7 +207,7 @@ export default function PanelPage() {
                       {product.status === "rejected" && product.rejection_reason ? <p className="mt-2 text-sm text-red-600">{product.rejection_reason}</p> : null}
                     </div>
                     <div className="flex shrink-0 flex-wrap items-center gap-x-4 gap-y-2 text-sm">
-                      <Link href={`/panel/editar/${product.id}`} className="font-semibold text-brand hover:text-brand-dark">Editar</Link>
+                      <Link href={previewMode ? `/panel/editar/${product.id}?preview=1` : `/panel/editar/${product.id}`} className="font-semibold text-brand hover:text-brand-dark">Editar</Link>
                       {product.status === "published" ? <><Link href={productPath(product)} className="text-slate-500 hover:text-brand-dark">Ver</Link><button onClick={() => setStatus(product.id, "paused")} className="text-slate-500 hover:text-brand-dark">Pausar</button></> : null}
                       {(product.status === "paused" || product.status === "rejected") ? <button onClick={() => setStatus(product.id, "pending_review")} className="font-semibold text-brand hover:text-brand-dark">{product.status === "rejected" ? "Reenviar" : "Reactivar"}</button> : null}
                       <button onClick={() => remove(product.id)} className="text-red-500 hover:text-red-700">Eliminar</button>

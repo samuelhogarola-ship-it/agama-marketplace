@@ -1,16 +1,19 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { Suspense, useEffect, useState } from "react";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { CATEGORIES, slugify } from "@/lib/categories";
 import { SALE_UNITS } from "@/lib/listing-options";
 import { CONTACT_METHODS, buildContactOverride, contactPlaceholder, isOwnAdvertiserUrl } from "@/lib/listing-policy";
 import { compressImage } from "@/lib/compress-image";
+import { DEMO_LISTINGS } from "@/lib/demo-data";
 
-export default function EditListingPage() {
+function EditListingContent() {
   const params = useParams<{ id: string }>();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const previewMode = searchParams.get("preview") === "1";
   const [form, setForm] = useState({
     title: "",
     description: "",
@@ -30,6 +33,24 @@ export default function EditListingPage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    if (previewMode) {
+      const demo = DEMO_LISTINGS.find((item) => String(item.id) === String(params.id)) ?? DEMO_LISTINGS[0];
+      setForm({
+        title: demo.title,
+        description: demo.description,
+        type: demo.type,
+        category: demo.category,
+        price: demo.price_mxn == null ? "" : String(demo.price_mxn),
+        unit: demo.unit ?? "unidad",
+        min_purchase_qty: String(demo.min_purchase_qty ?? 1),
+        location: demo.location ?? "",
+        contact_method: demo.contact_override?.method ?? "email",
+        contact_value: demo.contact_override?.value ?? "",
+        external_url: demo.external_url ?? "",
+      });
+      setLoading(false);
+      return;
+    }
     (async () => {
       const supabase = createClient();
       const { data: { user } } = await supabase.auth.getUser();
@@ -66,7 +87,7 @@ export default function EditListingPage() {
       });
       setLoading(false);
     })();
-  }, [params.id, router]);
+  }, [params.id, previewMode, router]);
 
   async function onFiles(event: React.ChangeEvent<HTMLInputElement>) {
     setFiles(await Promise.all(Array.from(event.target.files ?? []).slice(0, 5).map(compressImage)));
@@ -76,6 +97,12 @@ export default function EditListingPage() {
     event.preventDefault();
     setError(null);
     setSaving(true);
+
+    if (previewMode) {
+      setSaving(false);
+      router.push("/panel?preview=1");
+      return;
+    }
 
     const minPurchaseQty = Number(form.min_purchase_qty);
     const contactOverride = buildContactOverride(form.contact_method, form.contact_value);
@@ -161,6 +188,7 @@ export default function EditListingPage() {
 
   return (
     <div className="mx-auto max-w-2xl px-5 py-12">
+      {previewMode ? <div className="mb-8 rounded-2xl border border-brand/20 bg-brand-light px-5 py-4 text-sm text-slate-700"><span className="font-semibold text-brand-dark">Vista previa local de AGAMA.</span> Puedes revisar el formulario de edición; el guardado real requiere una sesión autenticada.</div> : null}
       <p className="text-xs font-semibold uppercase tracking-[0.2em] text-brand-sky">Mi panel</p>
       <h1 className="mt-3 text-3xl font-semibold tracking-[-0.04em] text-brand-dark">Editar anuncio</h1>
       <p className="mt-3 text-sm text-slate-500">Al guardar, el anuncio volverá a pasar por moderación antes de publicarse.</p>
@@ -216,4 +244,8 @@ export default function EditListingPage() {
       </form>
     </div>
   );
+}
+
+export default function EditListingPage() {
+  return <Suspense fallback={<div className="mx-auto max-w-2xl px-5 py-16 text-slate-400">Cargando anuncio…</div>}><EditListingContent /></Suspense>;
 }
