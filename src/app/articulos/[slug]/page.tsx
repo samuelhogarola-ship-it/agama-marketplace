@@ -11,7 +11,13 @@ export function generateStaticParams() { return ARTICLES.map((article) => ({ slu
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const article = articleBySlug((await params).slug);
-  return article ? { title: article.title, description: article.excerpt } : {};
+  return article
+    ? {
+        title: article.title,
+        description: article.excerpt,
+        openGraph: { images: [article.cover] },
+      }
+    : {};
 }
 
 export default async function ArticlePage({ params }: Props) {

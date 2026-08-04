@@ -8,6 +8,7 @@ import ProductCard from "@/components/ProductCard";
 import type { Product } from "@/lib/types";
 import { safeJsonLd } from "@/lib/jsonld";
 import CategoryFilters from "@/components/CategoryFilters";
+import SortSelect from "@/components/SortSelect";
 
 export const revalidate = 300;
 
@@ -47,6 +48,9 @@ export default async function CategoryPage({ params, searchParams }: Props) {
   const cat = categoryBySlug(categoria);
   if (!cat) notFound();
 
+  const PAGE_SIZE = 24;
+  const page = Math.max(1, Number(first(filters.page) ?? 1));
+  const offset = (page - 1) * PAGE_SIZE;
   const location = first(filters.location)?.trim().slice(0, 80) || "";
   const subcategory = first(filters.subcategory)?.trim().slice(0, 50) || "";
   const date = first(filters.date) || "";
@@ -59,7 +63,7 @@ export default async function CategoryPage({ params, searchParams }: Props) {
   const supabase = await createClient();
   let request = supabase
     .from("mkt_listings")
-    .select("*, photos:mkt_listing_photos(*), company:mkt_companies(name, slug, location)")
+    .select("*, photos:mkt_listing_photos(*), company:mkt_companies(name, slug, location)", { count: "exact" })
     .eq("status", "published")
     .eq("category", cat.slug);
   if (location) request = request.ilike("location", `%${location.replace(/[,()%_\\]/g, " ")}%`);
@@ -80,9 +84,11 @@ export default async function CategoryPage({ params, searchParams }: Props) {
   if (sort === "price-asc") request = request.order("price_mxn", { ascending: true, nullsFirst: false });
   else if (sort === "price-desc") request = request.order("price_mxn", { ascending: false, nullsFirst: false });
   else request = request.order("created_at", { ascending: false });
-  const { data: products } = await request.limit(48);
+  const { data: products, count: totalCount } = await request.range(offset, offset + PAGE_SIZE - 1);
+  const totalPages = Math.ceil((totalCount ?? 0) / PAGE_SIZE);
 
-  const jsonLd = {
+  const base = process.env.NEXT_PUBLIC_SITE_URL ?? "https://todoplastico.mx";
+  const collectionJsonLd = {
     "@context": "https://schema.org",
     "@type": "CollectionPage",
     name: `${cat.name} para la industria plástica en México`,
@@ -91,16 +97,26 @@ export default async function CategoryPage({ params, searchParams }: Props) {
       "@type": "ItemList",
       itemListElement: (products ?? []).slice(0, 20).map((p, i) => ({
         "@type": "ListItem",
-        position: i + 1,
+        position: offset + i + 1,
         name: p.title,
-        url: `${process.env.NEXT_PUBLIC_SITE_URL ?? ""}/p/${p.slug}-${p.id}`,
+        url: `${base}/p/${p.slug}-${p.id}`,
       })),
     },
+  };
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Inicio", item: base },
+      { "@type": "ListItem", position: 2, name: "Categorías", item: `${base}/categorias` },
+      { "@type": "ListItem", position: 3, name: cat.name, item: `${base}/c/${cat.slug}` },
+    ],
   };
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-12">
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: safeJsonLd(jsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: safeJsonLd(collectionJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: safeJsonLd(breadcrumbJsonLd) }} />
       <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-sm text-slate-500">
         <Link href="/" className="text-brand-sky underline-offset-4 hover:underline">Inicio</Link>
         <span aria-hidden="true">/</span>
@@ -135,23 +151,8 @@ export default async function CategoryPage({ params, searchParams }: Props) {
         <CategoryFilters category={cat.slug} subcategory={subcategory} location={location} date={date} type={type} minPrice={minPrice} maxPrice={maxPrice} sort={sort} />
         <section>
           <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 pb-4">
-            <p className="text-sm text-slate-500"><strong className="text-brand-dark">{products?.length ?? 0}</strong> anuncios encontrados</p>
-            <form action={`/c/${cat.slug}`}>
-              {location && <input type="hidden" name="location" value={location} />}
-              {date && <input type="hidden" name="date" value={date} />}
-              {type && <input type="hidden" name="type" value={type} />}
-              {subcategory && <input type="hidden" name="subcategory" value={subcategory} />}
-              {minPrice && <input type="hidden" name="minPrice" value={minPrice} />}
-              {maxPrice && <input type="hidden" name="maxPrice" value={maxPrice} />}
-              <label className="flex items-center gap-2 text-sm text-slate-500">Ordenar
-                <select name="sort" defaultValue={sort} className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-brand-dark outline-none focus:border-brand">
-                  <option value="newest">Más recientes</option>
-                  <option value="price-asc">Precio menor</option>
-                  <option value="price-desc">Precio mayor</option>
-                </select>
-              </label>
-              <button className="mt-2 rounded-lg border border-slate-300 px-3 py-2 text-xs font-semibold text-brand-dark hover:border-brand hover:text-brand">Aplicar orden</button>
-            </form>
+            <p className="text-sm text-slate-500"><strong className="text-brand-dark">{totalCount ?? 0}</strong> anuncios encontrados</p>
+            <SortSelect category={cat.slug} />
           </div>
           {products && products.length > 0 ? (
             <div className="mt-6 grid grid-cols-2 gap-4 md:grid-cols-3">
@@ -162,6 +163,27 @@ export default async function CategoryPage({ params, searchParams }: Props) {
               <p className="font-medium">No hay anuncios con estos filtros.</p>
               <p className="mt-1 text-sm">Prueba a quitar algún filtro o publica el primero en esta categoría.</p>
             </div>
+          )}
+          {totalPages > 1 && (
+            <nav aria-label="Paginación" className="mt-10 flex items-center justify-between gap-4 border-t border-slate-200 pt-6">
+              {page > 1 ? (
+                <Link
+                  href={`/c/${cat.slug}?${new URLSearchParams(Object.entries({ location, subcategory, date, type, minPrice, maxPrice, sort, page: String(page - 1) }).filter(([, v]) => v) as [string, string][]).toString()}`}
+                  className="rounded-full border border-slate-200 px-5 py-2.5 text-sm font-semibold text-brand-dark hover:border-brand"
+                >
+                  ← Anterior
+                </Link>
+              ) : <span />}
+              <span className="text-sm text-slate-500">Página {page} de {totalPages}</span>
+              {page < totalPages ? (
+                <Link
+                  href={`/c/${cat.slug}?${new URLSearchParams(Object.entries({ location, subcategory, date, type, minPrice, maxPrice, sort, page: String(page + 1) }).filter(([, v]) => v) as [string, string][]).toString()}`}
+                  className="rounded-full border border-slate-200 px-5 py-2.5 text-sm font-semibold text-brand-dark hover:border-brand"
+                >
+                  Siguiente →
+                </Link>
+              ) : <span />}
+            </nav>
           )}
         </section>
       </div>

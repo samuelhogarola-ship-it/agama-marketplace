@@ -1,0 +1,22 @@
+#!/bin/sh
+
+# ── Gitleaks: escaneo de secretos ─────────────────────────────────────────────
+if command -v gitleaks > /dev/null 2>&1; then
+  gitleaks detect --source . --no-banner --redact
+  if [ $? -ne 0 ]; then
+    echo ""
+    echo "❌  Gitleaks encontró un posible secreto."
+    echo "    Rota la clave comprometida antes de continuar."
+    echo "    (No solo la borres del diff — rótala en el proveedor.)"
+    exit 1
+  fi
+else
+  echo "⚠️  gitleaks no encontrado — instálalo para escaneo local:"
+  echo "    brew install gitleaks"
+fi
+
+# ── ESLint en archivos staged ──────────────────────────────────────────────────
+npx lint-staged
+
+# ── TypeScript: chequeo completo (necesita todos los archivos) ─────────────────
+npm run typecheck

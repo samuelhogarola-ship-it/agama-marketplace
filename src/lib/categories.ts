@@ -13,6 +13,15 @@ export const CATEGORIES: Category[] = [
 
 export const categoryBySlug = (slug: string) => CATEGORIES.find((c) => c.slug === slug);
 
+export const CATEGORY_SUBCATEGORIES: Record<string, readonly (readonly [string, string])[]> = {
+  "envases-y-botellas": [["botellas", "Botellas"], ["frascos", "Frascos"], ["tapas", "Tapas"], ["contenedores", "Contenedores"]],
+  "bolsas-y-pelicula": [["bolsas", "Bolsas"], ["pelicula-stretch", "Película stretch"], ["playo", "Playo"], ["sacos", "Sacos"]],
+  "tarimas-y-contenedores": [["tarimas", "Tarimas"], ["cajas-industriales", "Cajas industriales"], ["contenedores-apilables", "Contenedores apilables"]],
+  "cubetas-y-bidones": [["cubetas", "Cubetas"], ["bidones", "Bidones"], ["tambos", "Tambos"], ["garrafones", "Garrafones"]],
+  "perfiles-y-laminas": [["perfiles", "Perfiles"], ["laminas", "Láminas"], ["placas", "Placas"], ["planchas", "Planchas"]],
+  "tuberia-y-conexiones": [["pvc", "PVC"], ["pead", "PEAD"], ["cpvc", "CPVC"], ["conexiones", "Conexiones"]],
+};
+
 export function slugify(text: string): string {
   return text
     .toLowerCase()

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient, isAdminUser } from "@/lib/supabase/admin";
 import AdminQueue from "@/components/AdminQueue";
+import AdminCompaniesList from "@/components/AdminCompaniesList";
 import { DEMO_COMPANY, DEMO_LISTINGS } from "@/lib/demo-data";
 
 const dateFormatter = new Intl.DateTimeFormat("es-MX", { day: "2-digit", month: "short", year: "numeric" });
@@ -37,7 +38,7 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
     return <div className="mx-auto max-w-xl px-5 py-20"><h1 className="text-3xl font-semibold text-brand-dark">Configuración pendiente</h1><p className="mt-4 text-slate-600">Añade `SUPABASE_SERVICE_ROLE_KEY` y `TODO_PLASTICO_ADMIN_EMAILS` al entorno local para activar el panel operativo.</p></div>;
   }
 
-  let queue: Array<{ id: number; title: string; slug: string; description: string; category: string; location: string | null; status: string; rejection_reason: string | null; created_at: string; company?: { name?: string } | null; photos?: unknown[] }> = [];
+  let queue: Array<{ id: number; title: string; slug: string; description: string; category: string; location: string | null; status: string; rejection_reason: string | null; created_at: string; company?: { name?: string } | null; photos?: { storage_path: string }[] }> = [];
   let publishedCount = 0;
   let rejectedCount = 0;
   let reviewedCount = 0;
@@ -76,7 +77,7 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
       rejection_reason: pending.rejection_reason,
       created_at: pending.created_at,
       company: { name: DEMO_COMPANY.name },
-      photos: [],
+      photos: [] as { storage_path: string }[],
     }];
     publishedCount = 1;
     rejectedCount = 0;
@@ -89,7 +90,7 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
     <div className="mx-auto max-w-7xl px-5 py-10 sm:px-8 lg:px-12 lg:py-14">
       <div className="flex flex-wrap items-end justify-between gap-5">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-brand-sky">Fuengirola · Operación</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-brand-sky">TodoPlástico · Operación</p>
           <h1 className="mt-3 text-4xl font-semibold tracking-[-0.05em] text-brand-dark sm:text-5xl">Panel de control.</h1>
           <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-600">Usuarios, registros de empresas y revisión de anuncios en un mismo espacio operativo.</p>
         </div>
@@ -128,7 +129,7 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
               <table className="w-full min-w-[560px] text-left text-sm">
                 <thead className="bg-slate-50 text-xs uppercase tracking-[0.12em] text-slate-400"><tr><th className="px-4 py-3 font-semibold">Usuario</th><th className="px-4 py-3 font-semibold">Registro</th><th className="px-4 py-3 font-semibold">Último acceso</th><th className="px-4 py-3 font-semibold">Estado</th></tr></thead>
                 <tbody className="divide-y divide-slate-100">
-                  {users.slice(0, 12).map((registeredUser) => (
+                  {users.map((registeredUser) => (
                     <tr key={registeredUser.id} className="text-slate-600">
                       <td className="px-4 py-3"><p className="font-semibold text-brand-dark">{registeredUser.email ?? "Sin email"}</p><p className="mt-0.5 text-xs text-slate-400">{registeredUser.user_metadata?.company_name ?? "Sin empresa indicada"}</p></td>
                       <td className="whitespace-nowrap px-4 py-3 text-xs">{formatDate(registeredUser.created_at)}</td>
@@ -148,15 +149,7 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
             <div><p className="text-xs font-semibold uppercase tracking-[0.2em] text-brand-sky">Altas</p><h2 className="mt-2 text-2xl font-semibold tracking-[-0.03em] text-brand-dark">Registros de empresas</h2></div>
             <span className="text-sm text-slate-500">Últimas 50</span>
           </div>
-          <div className="mt-4 divide-y divide-slate-200">
-            {companies.map((company) => (
-              <div key={company.id} className="flex items-center justify-between gap-4 py-4">
-                <div className="min-w-0"><p className="truncate text-sm font-semibold text-brand-dark">{company.name}</p><p className="mt-1 truncate text-xs text-slate-500">{company.location ?? "Sin ubicación"} · Alta {formatDate(company.created_at)}</p></div>
-                <div className="flex shrink-0 items-center gap-2">{company.is_verified ? <span className="rounded-full bg-emerald-100 px-2.5 py-1 text-[11px] font-semibold text-emerald-800">Verificada</span> : null}<span className="text-xs capitalize text-slate-400">{company.plan}</span></div>
-              </div>
-            ))}
-            {companies.length === 0 ? <p className="py-10 text-center text-sm text-slate-500">Todavía no hay empresas registradas.</p> : null}
-          </div>
+          <AdminCompaniesList initialCompanies={companies} />
         </section>
       </div>
 

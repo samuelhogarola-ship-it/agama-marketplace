@@ -35,14 +35,20 @@ function LoginForm() {
   return (
     <>
       <form onSubmit={onSubmit} className="mt-6 space-y-4">
-        <input
-          required
-          type="email"
-          placeholder="Email de empresa"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          className="w-full rounded-lg border border-slate-300 px-4 py-2.5 focus:outline-none focus:border-brand"
-        />
+        <div>
+          <label htmlFor="login-email" className="block text-sm font-medium text-slate-700 mb-1">
+            Email de empresa
+          </label>
+          <input
+            id="login-email"
+            required
+            type="email"
+            placeholder="ventas@tuempresa.com"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="w-full rounded-lg border border-slate-300 px-4 py-2.5 focus:outline-none focus:border-brand"
+          />
+        </div>
         {error && <p className="text-sm text-red-600">{error}</p>}
         {info && <p className="text-sm text-brand-dark bg-brand-light rounded-lg p-3">{info}</p>}
         <button

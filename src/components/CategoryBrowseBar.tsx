@@ -1,17 +1,43 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { CATEGORIES } from "@/lib/categories";
 
 export default function CategoryBrowseBar() {
   const [open, setOpen] = useState(false);
+  const drawerRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
     if (!open) return;
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setOpen(false);
-    };
+
+    const el = drawerRef.current;
+    const focusables = el
+      ? Array.from(
+          el.querySelectorAll<HTMLElement>(
+            'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])'
+          )
+        )
+      : [];
+    const first = focusables[0];
+    const last = focusables[focusables.length - 1];
+    first?.focus();
+
+    function onKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        setOpen(false);
+        return;
+      }
+      if (event.key !== "Tab") return;
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last?.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first?.focus();
+      }
+    }
+
     document.addEventListener("keydown", onKeyDown);
     return () => document.removeEventListener("keydown", onKeyDown);
   }, [open]);
@@ -35,7 +61,7 @@ export default function CategoryBrowseBar() {
               </span>
               Todas las categorías
             </button>
-            {CATEGORIES.slice(0, 4).map((category) => (
+            {CATEGORIES.map((category) => (
               <Link key={category.slug} href={`/c/${category.slug}`} className="shrink-0 border-b-2 border-transparent px-1 py-4 text-sm font-medium text-slate-600 transition-colors hover:border-hot hover:text-hot">
                 {category.name}
               </Link>
@@ -48,6 +74,7 @@ export default function CategoryBrowseBar() {
         <div className="fixed inset-0 z-50 bg-black/35" role="presentation" onClick={() => setOpen(false)}>
           <aside
             id="category-drawer"
+            ref={drawerRef}
             aria-label="Todas las categorías"
             className="flex h-full w-[min(90vw,390px)] flex-col bg-white shadow-2xl"
             onClick={(event) => event.stopPropagation()}
