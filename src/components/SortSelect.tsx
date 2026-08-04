@@ -11,6 +11,7 @@ function SortSelectInner({ category }: { category: string }) {
   function onChange(value: string) {
     const params = new URLSearchParams(searchParams.toString());
     params.set("sort", value);
+    params.delete("page");
     router.push(`/c/${category}?${params.toString()}`);
   }
 

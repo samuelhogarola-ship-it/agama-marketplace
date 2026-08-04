@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { photoUrl, productPath, type Company, type Product } from "@/lib/types";
 import { formatPrice } from "@/components/ProductCard";
+import { categoryBySlug } from "@/lib/categories";
 import { DEMO_COMPANY, DEMO_LISTINGS } from "@/lib/demo-data";
 
 const STATUS_LABEL: Record<string, { text: string; cls: string }> = {
@@ -440,7 +441,7 @@ export default function PanelPage() {
                             {status.text}
                           </span>
                           <span className="text-xs uppercase tracking-[0.12em] text-slate-400">
-                            {product.category}
+                            {categoryBySlug(product.category)?.name ?? product.category}
                           </span>
                         </div>
                         <h3 className="mt-1.5 truncate text-base font-semibold text-brand-dark">

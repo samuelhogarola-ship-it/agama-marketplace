@@ -8,7 +8,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const supabase = await createClient();
 
   const [{ data: products }, { data: profiles }] = await Promise.all([
-    supabase.from("mkt_listings").select("id, slug, created_at").eq("status", "published").limit(5000),
+    supabase.from("mkt_listings").select("id, slug, created_at, updated_at").eq("status", "published").limit(5000),
     supabase.from("mkt_companies").select("slug, created_at").eq("status", "active").limit(5000),
   ]);
 
@@ -24,7 +24,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     })),
     ...(products ?? []).map((p) => ({
       url: `${base}/p/${p.slug}-${p.id}`,
-      lastModified: p.created_at,
+      lastModified: p.updated_at ?? p.created_at,
       priority: 0.6,
     })),
     ...(profiles ?? []).map((e) => ({

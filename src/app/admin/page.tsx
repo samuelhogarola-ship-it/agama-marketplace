@@ -90,7 +90,7 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
     <div className="mx-auto max-w-7xl px-5 py-10 sm:px-8 lg:px-12 lg:py-14">
       <div className="flex flex-wrap items-end justify-between gap-5">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-brand-sky">Fuengirola · Operación</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-brand-sky">TodoPlástico · Operación</p>
           <h1 className="mt-3 text-4xl font-semibold tracking-[-0.05em] text-brand-dark sm:text-5xl">Panel de control.</h1>
           <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-600">Usuarios, registros de empresas y revisión de anuncios en un mismo espacio operativo.</p>
         </div>

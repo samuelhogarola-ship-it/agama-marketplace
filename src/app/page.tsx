@@ -4,6 +4,7 @@ import { CATEGORIES } from "@/lib/categories";
 import { createClient } from "@/lib/supabase/server";
 import ProductCard from "@/components/ProductCard";
 import HeroCarousel from "@/components/HeroCarousel";
+import { safeJsonLd } from "@/lib/jsonld";
 import type { Product } from "@/lib/types";
 
 export const revalidate = 300;
@@ -35,8 +36,31 @@ export default async function Home() {
       .limit(8),
   ]);
 
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://todoplastico.mx";
+  const orgJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: "TodoPlástico",
+    url: siteUrl,
+    logo: `${siteUrl}/todoplastico-symbol.png`,
+    description: "Directorio B2B gratuito de la industria plástica en México. Impulsado por AGAMA.",
+  };
+  const siteJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: "TodoPlástico",
+    url: siteUrl,
+    potentialAction: {
+      "@type": "SearchAction",
+      target: { "@type": "EntryPoint", urlTemplate: `${siteUrl}/buscar?q={search_term_string}` },
+      "query-input": "required name=search_term_string",
+    },
+  };
+
   return (
     <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: safeJsonLd(orgJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: safeJsonLd(siteJsonLd) }} />
       <section className="relative isolate min-h-[620px] overflow-hidden bg-brand-dark text-white">
         <HeroCarousel />
         <div className="absolute inset-0 bg-black/30" aria-hidden="true" />

@@ -19,6 +19,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: `${data.name} — empresa de la industria plástica`,
     description: data.description?.slice(0, 160) ?? `Perfil de ${data.name} en TodoPlástico.`,
+    alternates: { canonical: `/e/${slug}` },
     openGraph: data.logo_url ? { images: [data.logo_url] } : undefined,
   };
 }
@@ -34,7 +35,8 @@ export default async function CompanyPage({ params }: Props) {
     .select("*, photos:mkt_listing_photos(*), company:mkt_companies(name, slug, location)")
     .eq("status", "published")
     .eq("company_id", profile.id)
-    .order("created_at", { ascending: false });
+    .order("created_at", { ascending: false })
+    .limit(20);
 
   const activeCategories = profile.categories
     ? CATEGORIES.filter((c) => (profile.categories as string[]).includes(c.slug))

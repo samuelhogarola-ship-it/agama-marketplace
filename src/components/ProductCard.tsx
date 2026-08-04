@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { photoUrl, productPath, type Product } from "@/lib/types";
 import { categoryBySlug } from "@/lib/categories";
 
@@ -14,17 +15,17 @@ export default function ProductCard({ product }: { product: Product }) {
       href={productPath(product)}
       className="group rounded-xl border border-slate-200 overflow-hidden bg-white hover:shadow-md transition-shadow"
     >
-      <div className="aspect-[4/3] bg-slate-100 overflow-hidden">
+      <div className="relative aspect-[4/3] bg-slate-100 overflow-hidden">
         {photo ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
+          <Image
             src={photoUrl(photo.storage_path)}
             alt={product.title}
-            loading="lazy"
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+            fill
+            sizes="(min-width: 768px) 25vw, 50vw"
+            className="object-cover group-hover:scale-105 transition-transform"
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center text-slate-300 text-4xl">◇</div>
+          <div className="w-full h-full flex items-center justify-center text-slate-300 text-4xl" aria-hidden="true">◇</div>
         )}
       </div>
       <div className="p-4">
