@@ -14,7 +14,7 @@ Estado: **completa en código**.
 - [x] CI en pull requests: instalación limpia, typecheck, build y smoke Playwright.
 - [x] Smoke Playwright en Chromium desktop.
 
-Pendientes operativos antes de producción: proyecto Supabase propio, SMTP de Supabase/Resend, dominio `todo-plastico.com`, claves de Anthropic y carga inicial de datos.
+Pendientes operativos antes de producción: proyecto Supabase propio, dominio `todo-plastico.com`, claves de Anthropic y carga inicial de datos. SMTP activo con mailer interno Supabase.
 
 ## Fase 1 — Directorio y catálogo B2B
 
@@ -55,7 +55,7 @@ Estado: **operativa en demo; pendiente de hardening y configuración de producci
 - [x] Bloquear escritura de eventos de moderación por anunciantes y cerrar la moderación si falla IA.
 - [x] Validar callback de magic link y URLs de empresa en servidor.
 - [x] Preparar Docker, healthcheck y configuración base para el VPS de AGAMA.
-- [ ] Configurar SMTP Resend en Supabase Auth siguiendo `docs/resend-magic-link.md`.
+- [x] Configurar SMTP en Supabase Auth — usar mailer propio de Supabase (free, 2/h) hasta tener Resend/Brevo verificado.
 - [ ] Añadir `ANTHROPIC_API_KEY`, `SUPABASE_SERVICE_ROLE_KEY` y `TODO_PLASTICO_ADMIN_EMAILS` en el entorno seguro.
 - [ ] Crear usuario admin real y conectar las variables del nuevo Supabase en WF Studio.
 - [ ] Instalar Plausible o GA4 con consentimiento y definir eventos de búsqueda/contacto.

@@ -40,6 +40,7 @@ export default function PublicarPage() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [savingDraft, setSavingDraft] = useState(false);
+  const [showAuthModal, setShowAuthModal] = useState(false);
 
   const subcategories = CATEGORY_SUBCATEGORIES[form.category] ?? [];
 
@@ -172,7 +173,8 @@ export default function PublicarPage() {
       data: { user },
     } = await supabase.auth.getUser();
     if (!user) {
-      router.push("/ingresar");
+      setSavingDraft(false);
+      setShowAuthModal(true);
       return;
     }
     const result = await buildListing(user.id, "draft");
@@ -193,7 +195,8 @@ export default function PublicarPage() {
       data: { user },
     } = await supabase.auth.getUser();
     if (!user) {
-      router.push("/ingresar");
+      setLoading(false);
+      setShowAuthModal(true);
       return;
     }
 
@@ -237,11 +240,11 @@ export default function PublicarPage() {
         Mi panel
       </p>
       <h1 className="mt-3 text-3xl font-semibold tracking-[-0.04em] text-brand-dark">
-        Publicar anuncio
+        Publicar producto
       </h1>
       <p className="mt-2 text-sm text-slate-500">
-        Productos, servicios y anuncios B2B de la industria plástica. No se
-        permiten pigmentos, masterbatch ni aditivos.
+        Productos y servicios de la industria plástica. No se permiten
+        pigmentos, masterbatch ni aditivos.
       </p>
 
       <form onSubmit={onSubmit} className="mt-8 space-y-6">
@@ -279,7 +282,6 @@ export default function PublicarPage() {
             >
               <option value="product">Producto</option>
               <option value="service">Servicio</option>
-              <option value="ad">Anuncio B2B</option>
             </select>
           </div>
           <div>
@@ -557,6 +559,34 @@ export default function PublicarPage() {
           </button>
         </div>
       </form>
+
+      {showAuthModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
+          <div className="w-full max-w-sm rounded-2xl bg-white p-8 shadow-xl">
+            <h2 className="text-xl font-semibold text-brand-dark">
+              Crea tu cuenta gratis
+            </h2>
+            <p className="mt-2 text-sm text-slate-600">
+              Para publicar tu producto necesitas registrar tu empresa. Es gratis y tarda menos de un minuto.
+            </p>
+            <div className="mt-6 flex flex-col gap-3">
+              <a
+                href="/registro"
+                className="block rounded-full bg-brand px-6 py-3 text-center text-sm font-semibold text-white hover:bg-brand-dark"
+              >
+                Crear cuenta — es gratis
+              </a>
+              <button
+                type="button"
+                onClick={() => setShowAuthModal(false)}
+                className="text-sm text-slate-500 hover:text-slate-700"
+              >
+                Seguir explorando
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -32,7 +32,6 @@ const dateOptions = [
 const typeOptions = [
   ["product", "Producto"],
   ["service", "Servicio"],
-  ["ad", "Anuncio B2B"],
 ] as const;
 
 function withParam(category: string, current: URLSearchParams, key: string, value?: string) {

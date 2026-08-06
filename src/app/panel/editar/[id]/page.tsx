@@ -351,7 +351,6 @@ function EditListingContent() {
             >
               <option value="product">Producto</option>
               <option value="service">Servicio</option>
-              <option value="ad">Anuncio B2B</option>
             </select>
           </div>
           <div>

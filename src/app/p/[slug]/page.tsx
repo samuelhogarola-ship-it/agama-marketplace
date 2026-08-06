@@ -127,7 +127,7 @@ function SummaryPanel({
   return (
     <aside className="rounded-[8px] border border-slate-200 bg-white p-5 shadow-sm">
       <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-sky">
-        {categoryName ?? "Anuncio B2B"}
+        {categoryName ?? "Producto"}
       </p>
       <h1 className="mt-3 text-2xl font-semibold leading-tight tracking-[-0.03em] text-brand-dark">
         {product.title}
@@ -283,9 +283,7 @@ export default async function ProductPage({ params }: Props) {
                   "Tipo",
                   product.type === "product"
                     ? "Producto"
-                    : product.type === "service"
-                    ? "Servicio"
-                    : "Anuncio B2B",
+                    : "Servicio",
                 ],
                 ["Cómo se vende", product.unit ?? "unidad"],
                 ["Compra mínima", String(product.min_purchase_qty ?? 1)],

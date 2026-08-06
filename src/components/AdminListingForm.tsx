@@ -67,7 +67,7 @@ export default function AdminListingForm({ companies, previewMode }: { companies
             </label>
             <div className="grid gap-5 sm:grid-cols-2">
               <label className="block text-sm font-semibold text-brand-dark">Tipo
-                <select value={form.type} onChange={(event) => update("type", event.target.value)} className="mt-2 w-full rounded-xl border border-slate-300 bg-white px-4 py-3 font-normal text-slate-700 outline-none focus:border-brand"><option value="product">Producto</option><option value="service">Servicio</option><option value="ad">Anuncio B2B</option></select>
+                <select value={form.type} onChange={(event) => update("type", event.target.value)} className="mt-2 w-full rounded-xl border border-slate-300 bg-white px-4 py-3 font-normal text-slate-700 outline-none focus:border-brand"><option value="product">Producto</option><option value="service">Servicio</option></select>
               </label>
               <label className="block text-sm font-semibold text-brand-dark">Categoría
                 <select value={form.category} onChange={(event) => update("category", event.target.value)} className="mt-2 w-full rounded-xl border border-slate-300 bg-white px-4 py-3 font-normal text-slate-700 outline-none focus:border-brand">{CATEGORIES.map((category) => <option key={category.slug} value={category.slug}>{category.name}</option>)}</select>

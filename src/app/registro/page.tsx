@@ -33,11 +33,30 @@ export default function RegistroPage() {
     setLoading(false);
   }
 
+  if (info) {
+    return (
+      <div className="mx-auto max-w-md px-4 py-16 text-center">
+        <div className="text-5xl mb-4">📬</div>
+        <h1 className="text-2xl font-bold text-slate-800">Revisa tu correo</h1>
+        <p className="mt-3 text-slate-600">
+          Enviamos un enlace de acceso a <strong>{form.email}</strong>. Ábrelo desde este mismo navegador para activar tu cuenta.
+        </p>
+        <p className="mt-3 text-sm text-slate-400">¿No lo ves? Revisa la carpeta de spam.</p>
+        <button
+          onClick={() => setInfo(null)}
+          className="mt-8 text-sm text-brand font-medium hover:underline"
+        >
+          Volver a intentarlo
+        </button>
+      </div>
+    );
+  }
+
   return (
     <div className="mx-auto max-w-md px-4 py-16">
       <h1 className="text-2xl font-bold text-slate-800">Crea tu perfil profesional</h1>
       <p className="mt-2 text-sm text-slate-500">
-        Solo para empresas y proveedores del sector plástico. Publica gratis hasta 5 anuncios.
+        Solo para empresas y proveedores del sector plástico. Publica gratis hasta 5 productos.
       </p>
       <form onSubmit={onSubmit} className="mt-8 space-y-4">
         <div>
@@ -69,7 +88,6 @@ export default function RegistroPage() {
           />
         </div>
         {error && <p className="text-sm text-red-600">{error}</p>}
-        {info && <p className="text-sm text-brand-dark bg-brand-light rounded-lg p-3">{info}</p>}
         <button
           disabled={loading}
           className="w-full rounded-full bg-brand text-white py-3 font-medium hover:bg-brand-dark disabled:opacity-50"
