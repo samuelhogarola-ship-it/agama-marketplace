@@ -393,7 +393,7 @@ export default function PanelPage() {
                 Tu catálogo empieza aquí.
               </h3>
               <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-slate-500">
-                Publica tu primer producto o anuncio B2B y aparecerá en la
+                Publica tu primer producto o servicio y aparecerá en la
                 categoría correspondiente después de la moderación.
               </p>
               <Link
