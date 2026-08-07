@@ -211,7 +211,7 @@ export default function PanelPage() {
             }
             className="rounded-lg px-3 py-2.5 text-slate-600 hover:bg-slate-50 hover:text-brand-dark"
           >
-            Publicar anuncio
+            Publicar producto
           </Link>
           {profile?.slug && (
             <Link
@@ -239,7 +239,7 @@ export default function PanelPage() {
             {profile?.plan === "pro" ? "Pro" : "Gratuito"}
           </p>
           <p className="mt-1 text-xs leading-5 text-slate-500">
-            {activeCount}/{limit === Infinity ? "∞" : limit} anuncios activos
+            {activeCount}/{limit === Infinity ? "5" : limit} anuncios activos
           </p>
           <button
             onClick={signOut}
@@ -280,7 +280,7 @@ export default function PanelPage() {
               }
               className="rounded-full bg-brand px-5 py-3 text-sm font-semibold text-white hover:bg-brand-dark"
             >
-              Publicar anuncio
+              Publicar producto
             </Link>
           ) : null}
         </div>
@@ -296,7 +296,7 @@ export default function PanelPage() {
               [
                 "Total anuncios",
                 counts.total,
-                `${limit === Infinity ? "Sin límite" : `${limit} incluidos en tu plan`}`,
+                `${limit === Infinity ? "máx. 5 en plan gratuito" : `${limit} incluidos en tu plan`}`,
               ],
             ] as const
           ).map(([label, value, detail]) => (
@@ -393,7 +393,7 @@ export default function PanelPage() {
                 Tu catálogo empieza aquí.
               </h3>
               <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-slate-500">
-                Publica tu primer producto o anuncio B2B y aparecerá en la
+                Publica tu primer producto o servicio y aparecerá en la
                 categoría correspondiente después de la moderación.
               </p>
               <Link

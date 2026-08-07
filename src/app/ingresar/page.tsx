@@ -8,14 +8,17 @@ import { createClient } from "@/lib/supabase/client";
 function LoginForm() {
   const params = useSearchParams();
   const [email, setEmail] = useState("");
-  const [error, setError] = useState<string | null>(null);
-  const [info, setInfo] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(
+    params.get("error") === "enlace-invalido"
+      ? "El enlace expiró o ya fue usado. Solicita uno nuevo."
+      : null
+  );
+  const [sent, setSent] = useState(false);
   const [loading, setLoading] = useState(false);
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
-    setInfo(null);
     setLoading(true);
     const supabase = createClient();
     const { error } = await supabase.auth.signInWithOtp({
@@ -29,7 +32,23 @@ function LoginForm() {
       setError("No se pudo enviar el enlace. Verifica el email e inténtalo de nuevo.");
       return;
     }
-    setInfo("Te enviamos un enlace de acceso. Revisa tu correo y ábrelo desde este dispositivo.");
+    setSent(true);
+  }
+
+  if (sent) {
+    return (
+      <div className="mt-8 text-center">
+        <div className="text-5xl mb-4">📬</div>
+        <p className="text-slate-700 font-medium">Revisa tu correo</p>
+        <p className="mt-2 text-sm text-slate-500">
+          Enviamos un enlace a <strong>{email}</strong>. Ábrelo desde este mismo navegador.
+        </p>
+        <p className="mt-2 text-xs text-slate-400">¿No lo ves? Revisa la carpeta de spam.</p>
+        <button onClick={() => setSent(false)} className="mt-6 text-sm text-brand font-medium hover:underline">
+          Volver a intentarlo
+        </button>
+      </div>
+    );
   }
 
   return (
@@ -50,7 +69,6 @@ function LoginForm() {
           />
         </div>
         {error && <p className="text-sm text-red-600">{error}</p>}
-        {info && <p className="text-sm text-brand-dark bg-brand-light rounded-lg p-3">{info}</p>}
         <button
           disabled={loading}
           className="w-full rounded-full bg-brand text-white py-3 font-medium hover:bg-brand-dark disabled:opacity-50"
