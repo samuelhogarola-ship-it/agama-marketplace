@@ -87,7 +87,7 @@ export default async function CategoryPage({ params, searchParams }: Props) {
   const { data: products, count: totalCount } = await request.range(offset, offset + PAGE_SIZE - 1);
   const totalPages = Math.ceil((totalCount ?? 0) / PAGE_SIZE);
 
-  const base = process.env.NEXT_PUBLIC_SITE_URL ?? "https://todoplastico.mx";
+  const base = process.env.NEXT_PUBLIC_SITE_URL ?? "https://todo-plastico.com";
   const collectionJsonLd = {
     "@context": "https://schema.org",
     "@type": "CollectionPage",

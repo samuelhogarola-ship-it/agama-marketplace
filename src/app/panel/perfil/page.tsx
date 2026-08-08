@@ -127,7 +127,7 @@ function PerfilContent() {
       data: { user },
     } = await supabase.auth.getUser();
     if (!user) return;
-    await supabase
+    const { error: saveError } = await supabase
       .from("mkt_companies")
       .update({
         name: form.name,
@@ -140,6 +140,10 @@ function PerfilContent() {
         categories: form.categories.length > 0 ? form.categories : null,
       })
       .eq("id", user.id);
+    if (saveError) {
+      setSaved(false);
+      return;
+    }
     setSaved(true);
     setTimeout(() => router.push("/panel"), 800);
   }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { Suspense, useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
@@ -30,7 +30,7 @@ function getInitials(name: string) {
   );
 }
 
-export default function PanelPage() {
+function PanelContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const previewMode = searchParams.get("preview") === "1";
@@ -541,5 +541,13 @@ export default function PanelPage() {
         </section>
       </main>
     </div>
+  );
+}
+
+export default function PanelPage() {
+  return (
+    <Suspense fallback={<div className="mx-auto max-w-7xl px-5 py-16 text-sm text-slate-400 sm:px-8 lg:px-12">Cargando tu panel…</div>}>
+      <PanelContent />
+    </Suspense>
   );
 }

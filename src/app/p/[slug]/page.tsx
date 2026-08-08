@@ -191,7 +191,7 @@ export default async function ProductPage({ params }: Props) {
 
   const cat = categoryBySlug(product.category);
   const photos = (product.photos ?? []).sort((a, b) => a.position - b.position);
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://todoplastico.mx";
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://todo-plastico.com";
 
   // Related: same company + same category (parallel)
   const supabase = await createClient();

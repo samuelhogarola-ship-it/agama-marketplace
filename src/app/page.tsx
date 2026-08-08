@@ -36,7 +36,7 @@ export default async function Home() {
       .limit(8),
   ]);
 
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://todoplastico.mx";
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://todo-plastico.com";
   const orgJsonLd = {
     "@context": "https://schema.org",
     "@type": "Organization",

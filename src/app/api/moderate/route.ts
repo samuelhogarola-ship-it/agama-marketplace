@@ -4,6 +4,21 @@ import { createAdminClient } from "@/lib/supabase/admin";
 
 const MODEL = "claude-haiku-4-5-20251001";
 
+const rateMap = new Map<string, { count: number; resetAt: number }>();
+const RATE_WINDOW_MS = 60_000;
+const RATE_MAX = 5;
+
+function isRateLimited(userId: string): boolean {
+  const now = Date.now();
+  const entry = rateMap.get(userId);
+  if (!entry || now > entry.resetAt) {
+    rateMap.set(userId, { count: 1, resetAt: now + RATE_WINDOW_MS });
+    return false;
+  }
+  entry.count++;
+  return entry.count > RATE_MAX;
+}
+
 const BANNED_RE =
   /\b(pigmentos?|masterbatch|master[\s-]*batch|aditivos?|colorantes?|concentrados?\s+de\s+color|color\s*concentrate|additives?)\b/i;
 const CONTACT_RE =
@@ -85,6 +100,7 @@ export async function POST(req: NextRequest) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "No autenticado" }, { status: 401 });
+  if (isRateLimited(user.id)) return NextResponse.json({ error: "Demasiadas solicitudes. Espera un minuto." }, { status: 429 });
   const admin = createAdminClient();
   if (!admin) return NextResponse.json({ error: "Moderación no configurada" }, { status: 503 });
 

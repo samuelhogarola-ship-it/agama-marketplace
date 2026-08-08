@@ -2,12 +2,17 @@
 
 import { Suspense, useState } from "react";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+
+type AuthMethod = "password" | "magic-link";
 
 function LoginForm() {
   const params = useSearchParams();
+  const router = useRouter();
   const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [method, setMethod] = useState<AuthMethod>("password");
   const [error, setError] = useState<string | null>(
     params.get("error") === "enlace-invalido"
       ? "El enlace expiró o ya fue usado. Solicita uno nuevo."
@@ -16,23 +21,43 @@ function LoginForm() {
   const [sent, setSent] = useState(false);
   const [loading, setLoading] = useState(false);
 
+  const next = params.get("next") ?? "/panel";
+
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
     setLoading(true);
     const supabase = createClient();
-    const { error } = await supabase.auth.signInWithOtp({
-      email,
-      options: {
-        emailRedirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(params.get("next") ?? "/panel")}`,
-      },
-    });
-    setLoading(false);
-    if (error) {
-      setError("No se pudo enviar el enlace. Verifica el email e inténtalo de nuevo.");
+
+    if (method === "magic-link") {
+      const { error } = await supabase.auth.signInWithOtp({
+        email,
+        options: {
+          emailRedirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}`,
+        },
+      });
+      setLoading(false);
+      if (error) {
+        setError("No se pudo enviar el enlace. Verifica el email e inténtalo de nuevo.");
+        return;
+      }
+      setSent(true);
       return;
     }
-    setSent(true);
+
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    setLoading(false);
+    if (error) {
+      if (error.message.includes("Invalid login"))
+        setError("Email o contraseña incorrectos.");
+      else if (error.message.includes("Email not confirmed"))
+        setError("Tu email no ha sido confirmado. Revisa tu correo.");
+      else
+        setError("No se pudo iniciar sesión. Inténtalo de nuevo.");
+      return;
+    }
+    router.push(next);
+    router.refresh();
   }
 
   if (sent) {
@@ -68,14 +93,48 @@ function LoginForm() {
             className="w-full rounded-lg border border-slate-300 px-4 py-2.5 focus:outline-none focus:border-brand"
           />
         </div>
+        {method === "password" && (
+          <div>
+            <div className="flex items-baseline justify-between mb-1">
+              <label htmlFor="login-password" className="text-sm font-medium text-slate-700">
+                Contraseña
+              </label>
+              <Link href="/ingresar/recuperar" className="text-xs text-brand hover:underline">
+                ¿Olvidaste tu contraseña?
+              </Link>
+            </div>
+            <input
+              id="login-password"
+              required
+              type="password"
+              placeholder="Tu contraseña"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full rounded-lg border border-slate-300 px-4 py-2.5 focus:outline-none focus:border-brand"
+            />
+          </div>
+        )}
         {error && <p className="text-sm text-red-600">{error}</p>}
         <button
           disabled={loading}
           className="w-full rounded-full bg-brand text-white py-3 font-medium hover:bg-brand-dark disabled:opacity-50"
         >
-          {loading ? "Enviando..." : "Enviarme enlace de acceso"}
+          {loading
+            ? method === "password" ? "Ingresando..." : "Enviando..."
+            : method === "password" ? "Ingresar" : "Enviarme enlace de acceso"}
         </button>
       </form>
+      <div className="mt-4 text-center">
+        <button
+          type="button"
+          onClick={() => setMethod(method === "password" ? "magic-link" : "password")}
+          className="text-sm text-slate-500 hover:text-brand"
+        >
+          {method === "password"
+            ? "Prefiero ingresar sin contraseña (enlace mágico)"
+            : "Prefiero ingresar con contraseña"}
+        </button>
+      </div>
     </>
   );
 }
@@ -85,7 +144,7 @@ export default function IngresarPage() {
     <div className="mx-auto max-w-md px-4 py-16">
       <h1 className="text-2xl font-bold text-slate-800">Ingresar</h1>
       <p className="mt-2 text-sm text-slate-500">
-        Acceso sin contraseña. La sesión queda recordada en este navegador.
+        Accede con tu contraseña o solicita un enlace mágico.
       </p>
       <Suspense>
         <LoginForm />
@@ -93,7 +152,6 @@ export default function IngresarPage() {
       <p className="mt-6 text-sm text-slate-500">
         ¿Aún no tienes cuenta? <Link href="/registro" className="text-brand font-medium">Crea tu perfil profesional</Link>
       </p>
-      {process.env.NODE_ENV !== "production" ? <Link href="/panel?preview=1" className="mt-8 block rounded-full border border-brand/30 px-4 py-3 text-center text-sm font-semibold text-brand-dark hover:bg-brand-light">Entrar como usuario demo</Link> : null}
     </div>
   );
 }
