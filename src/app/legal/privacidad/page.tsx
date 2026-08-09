@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-export const metadata: Metadata = { title: "Aviso de privacidad" };
+export const metadata: Metadata = { title: "Aviso de privacidad", description: "Aviso de privacidad de TodoPlástico conforme a la LFPDPPP. Cómo protegemos tus datos personales.", alternates: { canonical: "/legal/privacidad" } };
 
 export default function PrivacidadPage() {
   return (

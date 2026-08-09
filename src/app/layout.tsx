@@ -11,14 +11,23 @@ import MobileNav from "@/components/MobileNav";
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"),
   title: {
-    default: "TodoPlástico — Directorio B2B de la industria plástica en México",
+    default: "TodoPlástico — Mercado para comprar productos plásticos en México",
     template: "%s | TodoPlástico",
   },
   description:
-    "Directorio B2B gratuito de empresas, productos, servicios y anuncios de la industria del plástico en México. Impulsado por AGAMA.",
+    "Mercado B2B gratuito para comprar productos plásticos en México: envases, bolsas, sillas, maquinaria, resinas y más. Impulsado por AGAMA.",
   icons: {
     icon: [{ url: "/todoplastico-symbol.png", type: "image/png" }],
     apple: "/todoplastico-symbol.png",
+  },
+  openGraph: {
+    type: "website",
+    locale: "es_MX",
+    siteName: "TodoPlástico",
+    images: [{ url: "/todoplastico-symbol.png", width: 512, height: 512 }],
+  },
+  twitter: {
+    card: "summary_large_image",
   },
 };
 
@@ -77,8 +86,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
               <p className="mt-3 text-slate-300">
                 Directorio B2B gratuito para la industria del plástico en México.
               </p>
-              <p className="mt-5 text-xs uppercase tracking-[0.16em] text-white/60">Esponsor</p>
-              <p className="mt-1 font-semibold text-white">AGAMA Pigmentos y Masterbatch</p>
+              <p className="mt-5 text-xs uppercase tracking-[0.16em] text-white/60">Patrocinador</p>
+              <Link href="/sponsor/agama" className="mt-1 block font-semibold text-white hover:text-brand-sky">AGAMA Pigmentos y Masterbatch</Link>
             </div>
             <div>
               <p className="font-semibold text-white/90">TodoPlástico</p>

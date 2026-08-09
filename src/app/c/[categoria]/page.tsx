@@ -21,6 +21,14 @@ const CATEGORY_SUGGESTIONS: Record<string, readonly (readonly [string, string])[
   "cubetas-y-bidones": [["Cubetas blancas", "cubetas"], ["Bidones", "bidones"], ["Tambos", "tambos"], ["Garrafones", "garrafones"]],
   "perfiles-y-laminas": [["Perfiles plásticos", "perfiles"], ["Láminas", "laminas"], ["Placas", "placas"], ["Planchas", "planchas"]],
   "tuberia-y-conexiones": [["Tubería PVC", "pvc"], ["Tubería PEAD", "pead"], ["Conexiones", "conexiones"], ["CPVC", "cpvc"]],
+  "muebles-y-sillas": [["Sillas apilables", "sillas"], ["Mesas de plástico", "mesas"], ["Bancos", "bancos"], ["Mobiliario exterior", "mobiliario-exterior"]],
+  "maquinaria-y-equipo": [["Inyectoras", "inyectoras"], ["Extrusoras", "extrusoras"], ["Sopladoras", "sopladoras"], ["Equipo auxiliar", "equipo-auxiliar"]],
+  "resinas-y-materias-primas": [["Polietileno", "polietileno"], ["Polipropileno", "polipropileno"], ["PVC", "pvc-resina"], ["PET", "pet"]],
+  "reciclado-y-sustentabilidad": [["Plástico reciclado", "plastico-reciclado"], ["Molienda", "molienda"], ["Peletizado", "peletizado"], ["Scrap", "scrap"]],
+  "moldes-y-troqueles": [["Moldes de inyección", "inyeccion"], ["Moldes de soplado", "soplado"], ["Extrusión", "extrusion"], ["Herramentales", "herramentales"]],
+  "empaques-y-embalaje": [["Charolas", "charolas"], ["Blister", "blister"], ["Clamshell", "clamshell"], ["Termoformado", "termoformado"]],
+  "productos-terminados": [["Cajas", "cajas"], ["Cestas", "cestas"], ["Botes", "botes"], ["Accesorios", "accesorios"]],
+  "servicios-plasticos": [["Maquila de inyección", "inyeccion-maquila"], ["Diseño de producto", "diseno"], ["Consultoría", "consultoria"], ["Mantenimiento", "mantenimiento"]],
 };
 
 function first(value: string | string[] | undefined) {
@@ -36,8 +44,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const cat = categoryBySlug(categoria);
   if (!cat) return {};
   return {
-    title: `${cat.name} para la industria plástica en México`,
-    description: `${cat.description} Contacta directo a empresas y proveedores del sector plástico en México.`,
+    title: `Comprar ${cat.name} de plástico en México — Proveedores B2B`,
+    description: `${cat.description} Contacta directo a empresas y proveedores del sector plástico en México. ${cat.keywords.slice(0, 3).join(", ")}.`,
     alternates: { canonical: `/c/${cat.slug}` },
   };
 }
@@ -91,7 +99,7 @@ export default async function CategoryPage({ params, searchParams }: Props) {
   const collectionJsonLd = {
     "@context": "https://schema.org",
     "@type": "CollectionPage",
-    name: `${cat.name} para la industria plástica en México`,
+    name: `Comprar ${cat.name} de plástico en México`,
     description: cat.description,
     mainEntity: {
       "@type": "ItemList",
@@ -126,7 +134,7 @@ export default async function CategoryPage({ params, searchParams }: Props) {
       </nav>
       <div className="mt-8 flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between sm:gap-8">
         <div>
-          <h1 className="text-3xl font-bold text-slate-800">{cat.name} para la industria plástica en México</h1>
+          <h1 className="text-3xl font-bold text-slate-800">Comprar {cat.name} de plástico en México</h1>
           <p className="mt-2 max-w-2xl text-slate-600">
             {cat.description} Contacta directamente a empresas profesionales por sus canales públicos.
           </p>

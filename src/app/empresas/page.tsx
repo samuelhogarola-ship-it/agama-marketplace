@@ -5,8 +5,9 @@ import { createClient } from "@/lib/supabase/server";
 import type { Company } from "@/lib/types";
 
 export const metadata: Metadata = {
-  title: "Empresas de la industria plástica",
-  description: "Encuentra fabricantes, distribuidores y servicios profesionales de la industria plástica en México.",
+  title: "Directorio de empresas de plástico en México — Proveedores B2B",
+  description: "Directorio de fabricantes, distribuidores y servicios profesionales de la industria plástica en México. Contacta directo con cada empresa.",
+  alternates: { canonical: "/empresas" },
 };
 
 const PAGE_SIZE = 30;

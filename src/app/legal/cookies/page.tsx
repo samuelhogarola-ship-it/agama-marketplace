@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-export const metadata: Metadata = { title: "Política de cookies" };
+export const metadata: Metadata = { title: "Política de cookies", description: "Política de cookies de TodoPlástico. Solo usamos cookies esenciales para la sesión de usuario.", alternates: { canonical: "/legal/cookies" } };
 
 export default function CookiesPage() {
   return (

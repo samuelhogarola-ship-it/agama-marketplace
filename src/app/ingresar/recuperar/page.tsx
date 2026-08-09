@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 
@@ -9,21 +9,29 @@ export default function RecuperarPage() {
   const [error, setError] = useState<string | null>(null);
   const [sent, setSent] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [origin, setOrigin] = useState("");
+
+  useEffect(() => setOrigin(window.location.origin), []);
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
     setLoading(true);
-    const supabase = createClient();
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent("/panel/perfil")}`,
-    });
-    setLoading(false);
-    if (error) {
-      setError("No se pudo enviar el correo. Verifica el email e inténtalo de nuevo.");
-      return;
+    try {
+      const supabase = createClient();
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${origin}/auth/callback?next=${encodeURIComponent("/panel/perfil")}`,
+      });
+      setLoading(false);
+      if (error) {
+        setError("No se pudo enviar el correo. Verifica el email e inténtalo de nuevo.");
+        return;
+      }
+      setSent(true);
+    } catch {
+      setLoading(false);
+      setError("Error de conexión. Inténtalo de nuevo.");
     }
-    setSent(true);
   }
 
   if (sent) {

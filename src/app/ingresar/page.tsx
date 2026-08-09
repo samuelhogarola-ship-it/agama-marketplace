@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useState } from "react";
+import { Suspense, useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
@@ -20,6 +20,9 @@ function LoginForm() {
   );
   const [sent, setSent] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [origin, setOrigin] = useState("");
+
+  useEffect(() => setOrigin(window.location.origin), []);
 
   const next = params.get("next") ?? "/panel";
 
@@ -27,37 +30,43 @@ function LoginForm() {
     e.preventDefault();
     setError(null);
     setLoading(true);
-    const supabase = createClient();
 
-    if (method === "magic-link") {
-      const { error } = await supabase.auth.signInWithOtp({
-        email,
-        options: {
-          emailRedirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}`,
-        },
-      });
-      setLoading(false);
-      if (error) {
-        setError("No se pudo enviar el enlace. Verifica el email e inténtalo de nuevo.");
+    try {
+      const supabase = createClient();
+
+      if (method === "magic-link") {
+        const { error } = await supabase.auth.signInWithOtp({
+          email,
+          options: {
+            emailRedirectTo: `${origin}/auth/callback?next=${encodeURIComponent(next)}`,
+          },
+        });
+        setLoading(false);
+        if (error) {
+          setError("No se pudo enviar el enlace. Verifica el email e inténtalo de nuevo.");
+          return;
+        }
+        setSent(true);
         return;
       }
-      setSent(true);
-      return;
-    }
 
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    setLoading(false);
-    if (error) {
-      if (error.message.includes("Invalid login"))
-        setError("Email o contraseña incorrectos.");
-      else if (error.message.includes("Email not confirmed"))
-        setError("Tu email no ha sido confirmado. Revisa tu correo.");
-      else
-        setError("No se pudo iniciar sesión. Inténtalo de nuevo.");
-      return;
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      setLoading(false);
+      if (error) {
+        if (error.message.includes("Invalid login"))
+          setError("Email o contraseña incorrectos.");
+        else if (error.message.includes("Email not confirmed"))
+          setError("Tu email no ha sido confirmado. Revisa tu correo.");
+        else
+          setError("No se pudo iniciar sesión. Inténtalo de nuevo.");
+        return;
+      }
+      router.push(next);
+      router.refresh();
+    } catch {
+      setLoading(false);
+      setError("Error de conexión. Inténtalo de nuevo.");
     }
-    router.push(next);
-    router.refresh();
   }
 
   if (sent) {

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 
@@ -12,63 +12,64 @@ export default function RegistroPage() {
   const [error, setError] = useState<string | null>(null);
   const [info, setInfo] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [origin, setOrigin] = useState("");
 
-  function translateError(msg: string): string {
-    if (msg.includes("rate")) return "Demasiados intentos. Espera un momento antes de reintentar.";
-    if (msg.includes("already registered") || msg.includes("already been registered"))
-      return "Este email ya está registrado. Intenta ingresar.";
-    if (msg.includes("password") && msg.includes("least"))
-      return "La contraseña debe tener al menos 8 caracteres.";
-    return "No se pudo crear la cuenta. Verifica los datos e inténtalo de nuevo.";
-  }
+  useEffect(() => setOrigin(window.location.origin), []);
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
     setInfo(null);
     setLoading(true);
-    const supabase = createClient();
 
-    if (method === "magic-link") {
-      const { error } = await supabase.auth.signInWithOtp({
-        email: form.email,
-        options: {
-          shouldCreateUser: true,
-          emailRedirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent("/panel")}`,
-          data: { company_name: form.company },
-        },
-      });
-      if (error) {
-        setError(translateError(error.message));
+    try {
+      const supabase = createClient();
+
+      if (method === "magic-link") {
+        const { error } = await supabase.auth.signInWithOtp({
+          email: form.email,
+          options: {
+            shouldCreateUser: true,
+            emailRedirectTo: `${origin}/auth/callback?next=${encodeURIComponent("/panel")}`,
+            data: { company_name: form.company },
+          },
+        });
+        setLoading(false);
+        if (error) {
+          setError("No se pudo enviar el enlace. Verifica el email e inténtalo de nuevo.");
+          return;
+        }
+        setInfo("Te enviamos un enlace de acceso. Al abrirlo se creará tu panel de empresa.");
+        return;
+      }
+
+      if (form.password.length < 8) {
+        setError("La contraseña debe tener al menos 8 caracteres.");
         setLoading(false);
         return;
       }
-      setInfo("Te enviamos un enlace de acceso. Al abrirlo se creará tu panel de empresa.");
-      setLoading(false);
-      return;
-    }
 
-    if (form.password.length < 8) {
-      setError("La contraseña debe tener al menos 8 caracteres.");
+      const { error } = await supabase.auth.signUp({
+        email: form.email,
+        password: form.password,
+        options: {
+          emailRedirectTo: `${origin}/auth/callback?next=${encodeURIComponent("/panel")}`,
+          data: { company_name: form.company },
+        },
+      });
       setLoading(false);
-      return;
-    }
-
-    const { error } = await supabase.auth.signUp({
-      email: form.email,
-      password: form.password,
-      options: {
-        emailRedirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent("/panel")}`,
-        data: { company_name: form.company },
-      },
-    });
-    if (error) {
-      setError(translateError(error.message));
+      if (error) {
+        if (error.message.includes("already registered"))
+          setError("Este email ya tiene una cuenta. Intenta ingresar.");
+        else
+          setError("No se pudo crear la cuenta. Inténtalo de nuevo.");
+        return;
+      }
+      setInfo("Te enviamos un correo de confirmación. Ábrelo para activar tu cuenta.");
+    } catch {
       setLoading(false);
-      return;
+      setError("Error de conexión. Inténtalo de nuevo.");
     }
-    setInfo("Te enviamos un correo de confirmación. Ábrelo para activar tu cuenta.");
-    setLoading(false);
   }
 
   if (info) {
@@ -77,7 +78,7 @@ export default function RegistroPage() {
         <div className="text-5xl mb-4">📬</div>
         <h1 className="text-2xl font-bold text-slate-800">Revisa tu correo</h1>
         <p className="mt-3 text-slate-600">
-          Enviamos {method === "magic-link" ? "un enlace de acceso" : "un correo de confirmación"} a <strong>{form.email}</strong>. Ábrelo desde este mismo navegador para activar tu cuenta.
+          Enviamos {method === "magic-link" ? "un enlace de acceso" : "un correo de confirmación"} a <strong>{form.email}</strong>.
         </p>
         <p className="mt-3 text-sm text-slate-400">¿No lo ves? Revisa la carpeta de spam.</p>
         <button

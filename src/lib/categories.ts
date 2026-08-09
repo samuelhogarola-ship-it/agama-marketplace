@@ -1,14 +1,97 @@
-export type Category = { slug: string; name: string; description: string };
+export type Category = {
+  slug: string;
+  name: string;
+  description: string;
+  keywords: string[];
+};
 
-// Fuente canónica de la taxonomía v1 (ver docs/vision.md).
+// Fuente canónica de la taxonomía v2 (ver docs/vision.md).
 // Pigmentos, masterbatch y aditivos NO existen como categoría: contenido prohibido.
 export const CATEGORIES: Category[] = [
-  { slug: "envases-y-botellas", name: "Envases y botellas", description: "Envases, botellas, frascos y tapas de plástico para industria y comercio." },
-  { slug: "bolsas-y-pelicula", name: "Bolsas y película", description: "Bolsas de plástico, película stretch, playo y empaques flexibles." },
-  { slug: "tarimas-y-contenedores", name: "Tarimas y contenedores", description: "Tarimas de plástico, cajas industriales y contenedores apilables." },
-  { slug: "cubetas-y-bidones", name: "Cubetas y bidones", description: "Cubetas, bidones, tambos y garrafones de plástico." },
-  { slug: "perfiles-y-laminas", name: "Perfiles y láminas", description: "Perfiles, láminas, placas y planchas de plástico." },
-  { slug: "tuberia-y-conexiones", name: "Tubería y conexiones", description: "Tubería de PVC, PEAD, CPVC y conexiones plásticas." },
+  {
+    slug: "envases-y-botellas",
+    name: "Envases y botellas",
+    description: "Envases, botellas, frascos y tapas de plástico para industria y comercio.",
+    keywords: ["comprar envases de plástico", "botellas PET", "frascos plásticos", "tapas de plástico", "envases industriales"],
+  },
+  {
+    slug: "bolsas-y-pelicula",
+    name: "Bolsas y película",
+    description: "Bolsas de plástico, película stretch, playo y empaques flexibles.",
+    keywords: ["comprar bolsas de plástico", "película stretch", "playo industrial", "empaques flexibles", "bolsas industriales"],
+  },
+  {
+    slug: "tarimas-y-contenedores",
+    name: "Tarimas y contenedores",
+    description: "Tarimas de plástico, cajas industriales y contenedores apilables.",
+    keywords: ["comprar tarimas de plástico", "contenedores apilables", "cajas industriales", "tarimas plásticas", "pallets de plástico"],
+  },
+  {
+    slug: "cubetas-y-bidones",
+    name: "Cubetas y bidones",
+    description: "Cubetas, bidones, tambos y garrafones de plástico.",
+    keywords: ["comprar cubetas de plástico", "bidones industriales", "tambos de plástico", "garrafones", "cubetas industriales"],
+  },
+  {
+    slug: "perfiles-y-laminas",
+    name: "Perfiles y láminas",
+    description: "Perfiles, láminas, placas y planchas de plástico para construcción e industria.",
+    keywords: ["comprar perfiles de plástico", "láminas plásticas", "placas de plástico", "planchas de acrílico", "policarbonato"],
+  },
+  {
+    slug: "tuberia-y-conexiones",
+    name: "Tubería y conexiones",
+    description: "Tubería de PVC, PEAD, CPVC y conexiones plásticas.",
+    keywords: ["comprar tubería de PVC", "tubería PEAD", "conexiones plásticas", "tubería CPVC", "tubería de plástico"],
+  },
+  {
+    slug: "muebles-y-sillas",
+    name: "Muebles y sillas",
+    description: "Sillas, mesas, bancos y mobiliario de plástico para interior y exterior.",
+    keywords: ["comprar sillas de plástico", "mesas de plástico", "muebles de plástico", "mobiliario plástico", "sillas apilables"],
+  },
+  {
+    slug: "maquinaria-y-equipo",
+    name: "Maquinaria y equipo",
+    description: "Inyectoras, extrusoras, sopladoras y equipo auxiliar para transformación de plásticos.",
+    keywords: ["comprar maquinaria para plástico", "inyectoras de plástico", "extrusoras", "sopladoras", "equipo para plásticos"],
+  },
+  {
+    slug: "resinas-y-materias-primas",
+    name: "Resinas y materias primas",
+    description: "Polietileno, polipropileno, PVC, PET y otras resinas para transformación.",
+    keywords: ["comprar resinas plásticas", "polietileno", "polipropileno", "PVC resina", "PET", "materias primas plásticas"],
+  },
+  {
+    slug: "reciclado-y-sustentabilidad",
+    name: "Reciclado y sustentabilidad",
+    description: "Plástico reciclado, molienda, peletizado y soluciones sustentables.",
+    keywords: ["plástico reciclado", "reciclaje de plástico", "peletizado", "molienda de plástico", "sustentabilidad plástica"],
+  },
+  {
+    slug: "moldes-y-troqueles",
+    name: "Moldes y troqueles",
+    description: "Moldes de inyección, soplado y extrusión para la industria plástica.",
+    keywords: ["comprar moldes de inyección", "moldes para plástico", "troqueles", "moldes de soplado", "herramentales"],
+  },
+  {
+    slug: "empaques-y-embalaje",
+    name: "Empaques y embalaje",
+    description: "Empaques plásticos, charolas, blister, clamshell y soluciones de embalaje.",
+    keywords: ["comprar empaques de plástico", "charolas plásticas", "blister", "clamshell", "embalaje plástico"],
+  },
+  {
+    slug: "productos-terminados",
+    name: "Productos terminados",
+    description: "Artículos plásticos terminados: cajas, cestas, botes, accesorios y más.",
+    keywords: ["productos de plástico", "artículos plásticos", "cajas de plástico", "cestas plásticas", "botes de plástico"],
+  },
+  {
+    slug: "servicios-plasticos",
+    name: "Servicios plásticos",
+    description: "Servicios de inyección, maquila, diseño de producto y consultoría para la industria.",
+    keywords: ["servicios de inyección de plástico", "maquila de plástico", "diseño de producto plástico", "consultoría plásticos"],
+  },
 ];
 
 export const categoryBySlug = (slug: string) => CATEGORIES.find((c) => c.slug === slug);
@@ -20,6 +103,14 @@ export const CATEGORY_SUBCATEGORIES: Record<string, readonly (readonly [string, 
   "cubetas-y-bidones": [["cubetas", "Cubetas"], ["bidones", "Bidones"], ["tambos", "Tambos"], ["garrafones", "Garrafones"]],
   "perfiles-y-laminas": [["perfiles", "Perfiles"], ["laminas", "Láminas"], ["placas", "Placas"], ["planchas", "Planchas"]],
   "tuberia-y-conexiones": [["pvc", "PVC"], ["pead", "PEAD"], ["cpvc", "CPVC"], ["conexiones", "Conexiones"]],
+  "muebles-y-sillas": [["sillas", "Sillas"], ["mesas", "Mesas"], ["bancos", "Bancos"], ["mobiliario-exterior", "Mobiliario exterior"]],
+  "maquinaria-y-equipo": [["inyectoras", "Inyectoras"], ["extrusoras", "Extrusoras"], ["sopladoras", "Sopladoras"], ["equipo-auxiliar", "Equipo auxiliar"]],
+  "resinas-y-materias-primas": [["polietileno", "Polietileno"], ["polipropileno", "Polipropileno"], ["pvc-resina", "PVC"], ["pet", "PET"]],
+  "reciclado-y-sustentabilidad": [["plastico-reciclado", "Plástico reciclado"], ["molienda", "Molienda"], ["peletizado", "Peletizado"], ["scrap", "Scrap"]],
+  "moldes-y-troqueles": [["inyeccion", "Moldes de inyección"], ["soplado", "Moldes de soplado"], ["extrusion", "Moldes de extrusión"], ["herramentales", "Herramentales"]],
+  "empaques-y-embalaje": [["charolas", "Charolas"], ["blister", "Blister"], ["clamshell", "Clamshell"], ["termoformado", "Termoformado"]],
+  "productos-terminados": [["cajas", "Cajas"], ["cestas", "Cestas"], ["botes", "Botes"], ["accesorios", "Accesorios"]],
+  "servicios-plasticos": [["inyeccion-maquila", "Maquila de inyección"], ["diseno", "Diseño de producto"], ["consultoria", "Consultoría"], ["mantenimiento", "Mantenimiento"]],
 };
 
 export function slugify(text: string): string {
