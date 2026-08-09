@@ -17,13 +17,10 @@ const categoryImages: Record<string, string> = {
   "perfiles-y-laminas": "/category-perfiles.png",
   "tuberia-y-conexiones": "/category-tuberia.png",
   "muebles-y-sillas": "/category-productos.png",
-  "maquinaria-y-equipo": "/category-maquinaria.png",
-  "resinas-y-materias-primas": "/category-resinas.png",
   "reciclado-y-sustentabilidad": "/category-reciclado.png",
   "moldes-y-troqueles": "/category-maquinaria.png",
   "empaques-y-embalaje": "/category-envases.png",
   "productos-terminados": "/category-productos.png",
-  "servicios-plasticos": "/category-servicios.png",
 };
 
 export default async function Home() {

@@ -51,18 +51,6 @@ export const CATEGORIES: Category[] = [
     keywords: ["comprar sillas de plástico", "mesas de plástico", "muebles de plástico", "mobiliario plástico", "sillas apilables"],
   },
   {
-    slug: "maquinaria-y-equipo",
-    name: "Maquinaria y equipo",
-    description: "Inyectoras, extrusoras, sopladoras y equipo auxiliar para transformación de plásticos.",
-    keywords: ["comprar maquinaria para plástico", "inyectoras de plástico", "extrusoras", "sopladoras", "equipo para plásticos"],
-  },
-  {
-    slug: "resinas-y-materias-primas",
-    name: "Resinas y materias primas",
-    description: "Polietileno, polipropileno, PVC, PET y otras resinas para transformación.",
-    keywords: ["comprar resinas plásticas", "polietileno", "polipropileno", "PVC resina", "PET", "materias primas plásticas"],
-  },
-  {
     slug: "reciclado-y-sustentabilidad",
     name: "Reciclado y sustentabilidad",
     description: "Plástico reciclado, molienda, peletizado y soluciones sustentables.",
@@ -86,12 +74,6 @@ export const CATEGORIES: Category[] = [
     description: "Artículos plásticos terminados: cajas, cestas, botes, accesorios y más.",
     keywords: ["productos de plástico", "artículos plásticos", "cajas de plástico", "cestas plásticas", "botes de plástico"],
   },
-  {
-    slug: "servicios-plasticos",
-    name: "Servicios plásticos",
-    description: "Servicios de inyección, maquila, diseño de producto y consultoría para la industria.",
-    keywords: ["servicios de inyección de plástico", "maquila de plástico", "diseño de producto plástico", "consultoría plásticos"],
-  },
 ];
 
 export const categoryBySlug = (slug: string) => CATEGORIES.find((c) => c.slug === slug);
@@ -104,13 +86,10 @@ export const CATEGORY_SUBCATEGORIES: Record<string, readonly (readonly [string, 
   "perfiles-y-laminas": [["perfiles", "Perfiles"], ["laminas", "Láminas"], ["placas", "Placas"], ["planchas", "Planchas"]],
   "tuberia-y-conexiones": [["pvc", "PVC"], ["pead", "PEAD"], ["cpvc", "CPVC"], ["conexiones", "Conexiones"]],
   "muebles-y-sillas": [["sillas", "Sillas"], ["mesas", "Mesas"], ["bancos", "Bancos"], ["mobiliario-exterior", "Mobiliario exterior"]],
-  "maquinaria-y-equipo": [["inyectoras", "Inyectoras"], ["extrusoras", "Extrusoras"], ["sopladoras", "Sopladoras"], ["equipo-auxiliar", "Equipo auxiliar"]],
-  "resinas-y-materias-primas": [["polietileno", "Polietileno"], ["polipropileno", "Polipropileno"], ["pvc-resina", "PVC"], ["pet", "PET"]],
   "reciclado-y-sustentabilidad": [["plastico-reciclado", "Plástico reciclado"], ["molienda", "Molienda"], ["peletizado", "Peletizado"], ["scrap", "Scrap"]],
   "moldes-y-troqueles": [["inyeccion", "Moldes de inyección"], ["soplado", "Moldes de soplado"], ["extrusion", "Moldes de extrusión"], ["herramentales", "Herramentales"]],
   "empaques-y-embalaje": [["charolas", "Charolas"], ["blister", "Blister"], ["clamshell", "Clamshell"], ["termoformado", "Termoformado"]],
   "productos-terminados": [["cajas", "Cajas"], ["cestas", "Cestas"], ["botes", "Botes"], ["accesorios", "Accesorios"]],
-  "servicios-plasticos": [["inyeccion-maquila", "Maquila de inyección"], ["diseno", "Diseño de producto"], ["consultoria", "Consultoría"], ["mantenimiento", "Mantenimiento"]],
 };
 
 export function slugify(text: string): string {

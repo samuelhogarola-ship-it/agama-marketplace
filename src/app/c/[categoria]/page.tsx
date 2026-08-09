@@ -22,13 +22,10 @@ const CATEGORY_SUGGESTIONS: Record<string, readonly (readonly [string, string])[
   "perfiles-y-laminas": [["Perfiles plásticos", "perfiles"], ["Láminas", "laminas"], ["Placas", "placas"], ["Planchas", "planchas"]],
   "tuberia-y-conexiones": [["Tubería PVC", "pvc"], ["Tubería PEAD", "pead"], ["Conexiones", "conexiones"], ["CPVC", "cpvc"]],
   "muebles-y-sillas": [["Sillas apilables", "sillas"], ["Mesas de plástico", "mesas"], ["Bancos", "bancos"], ["Mobiliario exterior", "mobiliario-exterior"]],
-  "maquinaria-y-equipo": [["Inyectoras", "inyectoras"], ["Extrusoras", "extrusoras"], ["Sopladoras", "sopladoras"], ["Equipo auxiliar", "equipo-auxiliar"]],
-  "resinas-y-materias-primas": [["Polietileno", "polietileno"], ["Polipropileno", "polipropileno"], ["PVC", "pvc-resina"], ["PET", "pet"]],
   "reciclado-y-sustentabilidad": [["Plástico reciclado", "plastico-reciclado"], ["Molienda", "molienda"], ["Peletizado", "peletizado"], ["Scrap", "scrap"]],
   "moldes-y-troqueles": [["Moldes de inyección", "inyeccion"], ["Moldes de soplado", "soplado"], ["Extrusión", "extrusion"], ["Herramentales", "herramentales"]],
   "empaques-y-embalaje": [["Charolas", "charolas"], ["Blister", "blister"], ["Clamshell", "clamshell"], ["Termoformado", "termoformado"]],
   "productos-terminados": [["Cajas", "cajas"], ["Cestas", "cestas"], ["Botes", "botes"], ["Accesorios", "accesorios"]],
-  "servicios-plasticos": [["Maquila de inyección", "inyeccion-maquila"], ["Diseño de producto", "diseno"], ["Consultoría", "consultoria"], ["Mantenimiento", "mantenimiento"]],
 };
 
 function first(value: string | string[] | undefined) {

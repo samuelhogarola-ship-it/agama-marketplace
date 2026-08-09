@@ -8,7 +8,7 @@ export const revalidate = 300;
 
 export const metadata: Metadata = {
   title: "Comprar productos plásticos por categoría — Proveedores B2B México",
-  description: "Todas las categorías de TodoPlástico: envases, bolsas, muebles, maquinaria, resinas, reciclado y más. Encuentra proveedores de la industria plástica en México.",
+  description: "Todas las categorías de TodoPlástico: envases, bolsas, tarimas, cubetas, muebles, moldes, empaques, reciclado y más. Encuentra proveedores de la industria plástica en México.",
   alternates: { canonical: "/categorias" },
 };
 
@@ -20,13 +20,10 @@ const categoryImages: Record<string, string> = {
   "perfiles-y-laminas": "/category-perfiles.png",
   "tuberia-y-conexiones": "/category-tuberia.png",
   "muebles-y-sillas": "/category-productos.png",
-  "maquinaria-y-equipo": "/category-maquinaria.png",
-  "resinas-y-materias-primas": "/category-resinas.png",
   "reciclado-y-sustentabilidad": "/category-reciclado.png",
   "moldes-y-troqueles": "/category-maquinaria.png",
   "empaques-y-embalaje": "/category-envases.png",
   "productos-terminados": "/category-productos.png",
-  "servicios-plasticos": "/category-servicios.png",
 };
 
 export default async function CategoriasPage() {
