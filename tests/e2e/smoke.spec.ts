@@ -39,6 +39,8 @@ test.describe("smoke — páginas públicas", () => {
 
   test("login ofrece enlace mágico", async ({ page }) => {
     await page.goto("/ingresar");
+    await expect(page.getByRole("button", { name: /Ingresar/ })).toBeVisible();
+    await page.getByText("enlace mágico").click();
     await expect(page.getByRole("button", { name: /Enviarme enlace de acceso/ })).toBeVisible();
   });
 
