@@ -129,9 +129,9 @@ function SummaryPanel({
       <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-sky">
         {categoryName ?? "Producto"}
       </p>
-      <h1 className="mt-3 text-2xl font-semibold leading-tight tracking-[-0.03em] text-brand-dark">
+      <p className="mt-3 text-2xl font-semibold leading-tight tracking-[-0.03em] text-brand-dark">
         {product.title}
-      </h1>
+      </p>
       <p className="mt-4 text-3xl font-semibold tracking-[-0.03em] text-brand-dark">
         {formatPrice(product.price_mxn)}
         {product.unit && product.price_mxn !== null ? (
@@ -250,6 +250,8 @@ export default async function ProductPage({ params }: Props) {
           "Anuncio"
         )}
       </nav>
+
+      <h1 className="sr-only">{product.title}</h1>
 
       <div className="mt-6 grid gap-8 lg:grid-cols-[minmax(0,1fr)_360px] lg:items-start">
         <section className="min-w-0">

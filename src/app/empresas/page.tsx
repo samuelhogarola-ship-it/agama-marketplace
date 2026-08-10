@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import Image from "next/image";
 import { CATEGORIES } from "@/lib/categories";
 import { createClient } from "@/lib/supabase/server";
 import type { Company } from "@/lib/types";
@@ -63,8 +64,7 @@ export default async function EmpresasPage({ searchParams }: Props) {
                 <div className="flex items-center gap-3">
                   <div className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-full bg-brand-light">
                     {company.logo_url ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img src={company.logo_url} alt={`Logo de ${company.name}`} className="h-full w-full object-contain p-1.5" />
+                      <Image src={company.logo_url} alt={`Logo de ${company.name}`} width={48} height={48} className="h-full w-full object-contain p-1.5" />
                     ) : (
                       <span className="text-lg font-semibold text-brand-dark">{company.name.charAt(0)}</span>
                     )}
