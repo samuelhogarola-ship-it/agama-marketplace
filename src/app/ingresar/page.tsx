@@ -24,7 +24,8 @@ function LoginForm() {
 
   useEffect(() => setOrigin(window.location.origin), []);
 
-  const next = params.get("next") ?? "/panel";
+  const rawNext = params.get("next") ?? "/panel";
+  const next = rawNext.startsWith("/") && !rawNext.startsWith("//") ? rawNext : "/panel";
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();

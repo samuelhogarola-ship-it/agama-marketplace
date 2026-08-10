@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { photoUrl, type ListingPhoto } from "@/lib/types";
 
 export default function ListingGallery({
@@ -63,81 +63,124 @@ export default function ListingGallery({
       )}
 
       {lightbox && current && (
-        <div
-          role="dialog"
-          aria-modal="true"
-          aria-label="Visor de imagen"
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/92 p-4"
-          onClick={() => setLightbox(false)}
-        >
-          <button
-            type="button"
-            aria-label="Cerrar visor"
-            onClick={() => setLightbox(false)}
-            className="absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-full bg-white/15 text-2xl font-light text-white hover:bg-white/30"
-          >
-            ×
-          </button>
-
-          <div
-            className="relative max-h-full max-w-5xl"
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={photoUrl(current.storage_path)}
-              alt={title}
-              className="max-h-[88vh] max-w-full rounded-lg object-contain"
-            />
-
-            {photos.length > 1 && (
-              <div className="mt-4 flex justify-center gap-2">
-                {photos.map((_, i) => (
-                  <button
-                    key={i}
-                    type="button"
-                    aria-label={`Foto ${i + 1}`}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setSelected(i);
-                    }}
-                    className={`h-1.5 rounded-full bg-white transition-all ${
-                      i === selected ? "w-6 opacity-100" : "w-1.5 opacity-40"
-                    }`}
-                  />
-                ))}
-              </div>
-            )}
-          </div>
-
-          {photos.length > 1 && (
-            <>
-              <button
-                type="button"
-                aria-label="Foto anterior"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setSelected((s) => (s - 1 + photos.length) % photos.length);
-                }}
-                className="absolute left-4 top-1/2 -translate-y-1/2 flex h-10 w-10 items-center justify-center rounded-full bg-white/15 text-xl text-white hover:bg-white/30"
-              >
-                ‹
-              </button>
-              <button
-                type="button"
-                aria-label="Foto siguiente"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setSelected((s) => (s + 1) % photos.length);
-                }}
-                className="absolute right-4 top-1/2 -translate-y-1/2 flex h-10 w-10 items-center justify-center rounded-full bg-white/15 text-xl text-white hover:bg-white/30"
-              >
-                ›
-              </button>
-            </>
-          )}
-        </div>
+        <LightboxOverlay
+          photos={photos}
+          selected={selected}
+          setSelected={setSelected}
+          title={title}
+          onClose={() => setLightbox(false)}
+        />
       )}
     </>
+  );
+}
+
+function LightboxOverlay({ photos, selected, setSelected, title, onClose }: {
+  photos: ListingPhoto[];
+  selected: number;
+  setSelected: (fn: (s: number) => number) => void;
+  title: string;
+  onClose: () => void;
+}) {
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const current = photos[selected];
+
+  useEffect(() => {
+    const el = dialogRef.current;
+    if (!el) return;
+    const focusables = el.querySelectorAll<HTMLElement>("button");
+    focusables[0]?.focus();
+
+    function onKeyDown(e: KeyboardEvent) {
+      if (e.key === "Escape") { onClose(); return; }
+      if (e.key === "ArrowRight") { setSelected((s) => (s + 1) % photos.length); return; }
+      if (e.key === "ArrowLeft") { setSelected((s) => (s - 1 + photos.length) % photos.length); return; }
+      if (e.key !== "Tab" || !el) return;
+      const nodes = el.querySelectorAll<HTMLElement>("button");
+      const first = nodes[0];
+      const last = nodes[nodes.length - 1];
+      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last?.focus(); }
+      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first?.focus(); }
+    }
+    document.addEventListener("keydown", onKeyDown);
+    return () => document.removeEventListener("keydown", onKeyDown);
+  }, [onClose, photos.length, setSelected]);
+
+  return (
+    <div
+      ref={dialogRef}
+      role="dialog"
+      aria-modal="true"
+      aria-label="Visor de imagen"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/92 p-4"
+      onClick={onClose}
+    >
+      <button
+        type="button"
+        aria-label="Cerrar visor"
+        onClick={onClose}
+        className="absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-full bg-white/15 text-2xl font-light text-white hover:bg-white/30"
+      >
+        ×
+      </button>
+
+      <div
+        className="relative max-h-full max-w-5xl"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={photoUrl(current.storage_path)}
+          alt={title}
+          className="max-h-[88vh] max-w-full rounded-lg object-contain"
+        />
+
+        {photos.length > 1 && (
+          <div className="mt-4 flex justify-center gap-2">
+            {photos.map((_, i) => (
+              <button
+                key={i}
+                type="button"
+                aria-label={`Foto ${i + 1}`}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setSelected(() => i);
+                }}
+                className={`h-1.5 rounded-full bg-white transition-all ${
+                  i === selected ? "w-6 opacity-100" : "w-1.5 opacity-40"
+                }`}
+              />
+            ))}
+          </div>
+        )}
+      </div>
+
+      {photos.length > 1 && (
+        <>
+          <button
+            type="button"
+            aria-label="Foto anterior"
+            onClick={(e) => {
+              e.stopPropagation();
+              setSelected((s) => (s - 1 + photos.length) % photos.length);
+            }}
+            className="absolute left-4 top-1/2 -translate-y-1/2 flex h-10 w-10 items-center justify-center rounded-full bg-white/15 text-xl text-white hover:bg-white/30"
+          >
+            ‹
+          </button>
+          <button
+            type="button"
+            aria-label="Foto siguiente"
+            onClick={(e) => {
+              e.stopPropagation();
+              setSelected((s) => (s + 1) % photos.length);
+            }}
+            className="absolute right-4 top-1/2 -translate-y-1/2 flex h-10 w-10 items-center justify-center rounded-full bg-white/15 text-xl text-white hover:bg-white/30"
+          >
+            ›
+          </button>
+        </>
+      )}
+    </div>
   );
 }

@@ -12,6 +12,7 @@ export default function CookieBanner() {
 
   function decide(value: "accepted" | "essential") {
     localStorage.setItem("mkt-cookie-consent", value);
+    window.dispatchEvent(new CustomEvent("mkt-consent-change"));
     setVisible(false);
   }
 

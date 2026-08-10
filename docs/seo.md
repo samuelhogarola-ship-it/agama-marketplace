@@ -9,7 +9,6 @@ Capturar búsquedas transaccionales del sector plástico en CDMX: "tarimas de pl
 ```
 /                                → home (directorio B2B de plásticos)
 /c/{categoria}                   → landing de categoría (ej. /c/tarimas-y-contenedores)
-/c/{categoria}/{zona}            → categoría + alcaldía/zona (ej. /c/tarimas-y-contenedores/iztapalapa)
 /p/{slug-anuncio}-{id}           → ficha de anuncio
 /e/{slug-empresa}                → ficha de proveedor
 /blog/{slug}                     → contenido editorial (fase 4+)
@@ -37,7 +36,7 @@ El desarrollo/staging vive en `*.vercel.app`, pero ese subdominio **no debe inde
 ## Técnico
 
 - `sitemap.xml` dinámico segmentado (categorías / productos / empresas), ping en publicación.
-- `robots.txt`: bloquear `/admin`, `/mensajes`, parámetros de filtro; permitir el resto.
+- `robots.txt`: bloquear `/admin`, `/panel`, parámetros de filtro; permitir el resto.
 - Canonical en fichas y categorías (los filtros no generan URLs indexables).
 - Imágenes: WebP + `alt` generado desde título/categoría, lazy-load, tamaños fijos (CLS).
 - Core Web Vitals presupuesto: LCP < 2.5s móvil en fichas y categorías.

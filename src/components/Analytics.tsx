@@ -14,10 +14,10 @@ export default function Analytics() {
     }
     check();
     window.addEventListener("storage", check);
-    const interval = setInterval(check, 2000);
+    window.addEventListener("mkt-consent-change", check);
     return () => {
       window.removeEventListener("storage", check);
-      clearInterval(interval);
+      window.removeEventListener("mkt-consent-change", check);
     };
   }, []);
 
