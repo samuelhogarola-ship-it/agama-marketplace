@@ -275,7 +275,7 @@ export const ARTICLES: Article[] = [
     title: "Cómo fotografiar productos plásticos para vender más",
     excerpt: "Tips de iluminación, fondo y ángulo para que tus productos se vean profesionales sin estudio.",
     category: "TodoPlástico",
-    date: "2026-08-11",
+    date: "2026-06-01",
     cover: "/category-productos.png",
     author: "Samuel García",
     authorTitle: "SEO en WF-Studio",
@@ -294,7 +294,7 @@ export const ARTICLES: Article[] = [
     title: "PVC rígido vs PVC flexible: diferencias y aplicaciones",
     excerpt: "Dos materiales del mismo polímero con comportamientos opuestos. Cuándo usar cada uno.",
     category: "Materiales y procesos",
-    date: "2026-08-12",
+    date: "2026-06-03",
     cover: "/category-tuberia.png",
     published: true,
     paragraphs: [
@@ -310,7 +310,7 @@ export const ARTICLES: Article[] = [
     title: "5 errores comunes al comprar maquinaria de plástico usada",
     excerpt: "Lo que no te dicen en la venta y cómo proteger tu inversión antes de cerrar trato.",
     category: "Maquinaria",
-    date: "2026-08-13",
+    date: "2026-06-05",
     cover: "/category-maquinaria.png",
     published: true,
     paragraphs: [
@@ -327,7 +327,7 @@ export const ARTICLES: Article[] = [
     title: "Google Business Profile: la herramienta gratuita que tu empresa ignora",
     excerpt: "Aparece en Google Maps y búsquedas locales sin gastar un peso. Guía paso a paso.",
     category: "Marketing B2B",
-    date: "2026-08-14",
+    date: "2026-06-06",
     cover: "/category-servicios.png",
     author: "Samuel García",
     authorTitle: "SEO en WF-Studio",
@@ -346,7 +346,7 @@ export const ARTICLES: Article[] = [
     title: "Aditivos UV para plásticos de exterior: lo esencial",
     excerpt: "Sin protección UV, el plástico se degrada en meses. Tipos de estabilizadores y cómo elegir.",
     category: "Color y pigmentos",
-    date: "2026-08-15",
+    date: "2026-06-08",
     cover: "/category-resinas.png",
     published: true,
     paragraphs: [
@@ -363,7 +363,7 @@ export const ARTICLES: Article[] = [
     title: "Rotomoldeo: ventajas, limitaciones y aplicaciones industriales",
     excerpt: "Un proceso subestimado que produce piezas huecas de gran tamaño con inversión en molde accesible.",
     category: "Materiales y procesos",
-    date: "2026-08-16",
+    date: "2026-06-10",
     cover: "/category-maquinaria.png",
     published: true,
     paragraphs: [
@@ -380,7 +380,7 @@ export const ARTICLES: Article[] = [
     title: "Cómo escribir la descripción de tu empresa B2B para atraer clientes",
     excerpt: "Tu descripción es tu pitch de ventas permanente. Hazla corta, clara y orientada al cliente.",
     category: "Marketing B2B",
-    date: "2026-08-17",
+    date: "2026-06-12",
     cover: "/category-servicios.png",
     author: "Samuel García",
     authorTitle: "SEO en WF-Studio",
@@ -399,7 +399,7 @@ export const ARTICLES: Article[] = [
     title: "Plástico grado alimenticio: regulaciones en México",
     excerpt: "NOM y COFEPRIS: qué necesitas saber si fabricas o compras envases para alimentos.",
     category: "Guías de compra",
-    date: "2026-08-18",
+    date: "2026-06-13",
     cover: "/category-envases.png",
     published: true,
     paragraphs: [
@@ -416,7 +416,7 @@ export const ARTICLES: Article[] = [
     title: "Termoformado vs inyección: qué conviene para tu producto",
     excerpt: "Dos procesos, dos lógicas de costo. Cuándo cada uno es la mejor opción.",
     category: "Materiales y procesos",
-    date: "2026-08-19",
+    date: "2026-06-15",
     cover: "/category-maquinaria.png",
     published: true,
     paragraphs: [
@@ -432,7 +432,7 @@ export const ARTICLES: Article[] = [
     title: "Tendencias en plásticos para 2026 en México",
     excerpt: "Reciclaje, bioplásticos, automatización y nearshoring: lo que está moviendo al sector.",
     category: "Materiales y procesos",
-    date: "2026-08-20",
+    date: "2026-06-17",
     cover: "/category-reciclado.png",
     published: true,
     paragraphs: [
@@ -449,7 +449,7 @@ export const ARTICLES: Article[] = [
     title: "Cómo cotizar un molde de inyección sin sorpresas",
     excerpt: "Qué información dar al moldero, qué preguntar y qué debe incluir una cotización seria.",
     category: "Maquinaria",
-    date: "2026-08-21",
+    date: "2026-06-19",
     cover: "/category-maquinaria.png",
     published: true,
     paragraphs: [
@@ -466,7 +466,7 @@ export const ARTICLES: Article[] = [
     title: "LinkedIn para ventas B2B en el sector plástico",
     excerpt: "Cómo usar LinkedIn para conectar con compradores industriales sin parecer spam.",
     category: "Marketing B2B",
-    date: "2026-08-22",
+    date: "2026-06-20",
     cover: "/category-servicios.png",
     author: "Samuel García",
     authorTitle: "SEO en WF-Studio",
@@ -485,7 +485,7 @@ export const ARTICLES: Article[] = [
     title: "Bolsas biodegradables vs oxodegradables: diferencias reales",
     excerpt: "No todo lo 'verde' es igual. Lo que realmente dice la ciencia sobre cada tecnología.",
     category: "Sustentabilidad",
-    date: "2026-08-23",
+    date: "2026-06-22",
     cover: "/category-bolsas.png",
     published: true,
     paragraphs: [
@@ -502,7 +502,7 @@ export const ARTICLES: Article[] = [
     title: "Mantenimiento preventivo de una inyectora: checklist esencial",
     excerpt: "Un plan de mantenimiento básico que evita paros no programados y extiende la vida del equipo.",
     category: "Maquinaria",
-    date: "2026-08-24",
+    date: "2026-06-24",
     cover: "/category-maquinaria.png",
     published: true,
     paragraphs: [
@@ -519,7 +519,7 @@ export const ARTICLES: Article[] = [
     title: "Dispersión de color en plásticos: problemas comunes y soluciones",
     excerpt: "Puntos, rayas y variación de tono: causas técnicas y cómo resolverlas en producción.",
     category: "Color y pigmentos",
-    date: "2026-08-25",
+    date: "2026-06-26",
     cover: "/category-resinas.png",
     published: true,
     paragraphs: [
@@ -536,7 +536,7 @@ export const ARTICLES: Article[] = [
     title: "Packaging sustentable sin perder funcionalidad",
     excerpt: "Reducir material, cambiar diseño o usar reciclado: estrategias que funcionan en la práctica.",
     category: "Sustentabilidad",
-    date: "2026-08-26",
+    date: "2026-06-28",
     cover: "/category-envases.png",
     published: true,
     paragraphs: [
@@ -553,7 +553,7 @@ export const ARTICLES: Article[] = [
     title: "Ferias industriales de plásticos en México 2026",
     excerpt: "Calendario de eventos clave para networking, compra de maquinaria y tendencias del sector.",
     category: "Operación industrial",
-    date: "2026-08-27",
+    date: "2026-06-29",
     cover: "/category-servicios.png",
     published: true,
     paragraphs: [
@@ -570,7 +570,7 @@ export const ARTICLES: Article[] = [
     title: "Cómo calcular el costo de una pieza inyectada",
     excerpt: "Material, ciclo, amortización de molde y overhead: la fórmula práctica paso a paso.",
     category: "Operación industrial",
-    date: "2026-08-28",
+    date: "2026-07-01",
     cover: "/category-maquinaria.png",
     published: true,
     paragraphs: [
@@ -587,7 +587,7 @@ export const ARTICLES: Article[] = [
     title: "Email marketing B2B para el sector industrial: lo que sí funciona",
     excerpt: "Newsletters cortas, técnicas y regulares. Así se mantiene la presencia sin molestar.",
     category: "Marketing B2B",
-    date: "2026-08-29",
+    date: "2026-07-03",
     cover: "/category-servicios.png",
     author: "Samuel García",
     authorTitle: "SEO en WF-Studio",
@@ -606,7 +606,7 @@ export const ARTICLES: Article[] = [
     title: "PET reciclado (rPET): aplicaciones y oportunidades en México",
     excerpt: "El rPET crece en demanda. Dónde encontrarlo, qué calidades existen y cómo validar proveedores.",
     category: "Sustentabilidad",
-    date: "2026-08-30",
+    date: "2026-07-05",
     cover: "/category-reciclado.png",
     published: true,
     paragraphs: [
@@ -623,7 +623,7 @@ export const ARTICLES: Article[] = [
     title: "Soplado de envases: parámetros clave del proceso",
     excerpt: "Temperatura, presión de aire, tiempo de enfriamiento y distribución de material.",
     category: "Operación industrial",
-    date: "2026-08-31",
+    date: "2026-07-06",
     cover: "/category-envases.png",
     published: true,
     paragraphs: [
@@ -640,7 +640,7 @@ export const ARTICLES: Article[] = [
     title: "La página web mínima viable para una empresa industrial",
     excerpt: "No necesitas un sitio complejo. Con estas 5 secciones ya estás compitiendo online.",
     category: "Marketing B2B",
-    date: "2026-09-01",
+    date: "2026-07-08",
     cover: "/category-servicios.png",
     author: "Samuel García",
     authorTitle: "SEO en WF-Studio",
@@ -659,7 +659,7 @@ export const ARTICLES: Article[] = [
     title: "Polipropileno: usos, ventajas y consideraciones de proceso",
     excerpt: "El PP es una de las resinas más versátiles. Conoce sus variantes y aplicaciones industriales.",
     category: "Materiales y procesos",
-    date: "2026-09-02",
+    date: "2026-07-10",
     cover: "/category-resinas.png",
     published: true,
     paragraphs: [
@@ -676,7 +676,7 @@ export const ARTICLES: Article[] = [
     title: "Cubetas industriales: guía de compra por capacidad y uso",
     excerpt: "Desde 4 hasta 25 litros, grado alimenticio o químico. Cómo elegir la cubeta correcta.",
     category: "Guías de compra",
-    date: "2026-09-03",
+    date: "2026-07-12",
     cover: "/category-cubetas.png",
     published: true,
     paragraphs: [
@@ -693,7 +693,7 @@ export const ARTICLES: Article[] = [
     title: "Nearshoring: oportunidades para la industria del plástico en México",
     excerpt: "La relocalización de manufactura abre puertas a proveedores mexicanos. Cómo prepararse.",
     category: "Operación industrial",
-    date: "2026-09-04",
+    date: "2026-07-13",
     cover: "/category-servicios.png",
     published: true,
     paragraphs: [
@@ -710,7 +710,7 @@ export const ARTICLES: Article[] = [
     title: "Colorimetría básica para transformadores de plástico",
     excerpt: "DeltaE, espacio CIELAB y tolerancias: lo que necesitas saber para hablar de color con propiedad.",
     category: "Color y pigmentos",
-    date: "2026-09-05",
+    date: "2026-07-15",
     cover: "/category-resinas.png",
     published: true,
     paragraphs: [
@@ -727,7 +727,7 @@ export const ARTICLES: Article[] = [
     title: "Cómo elegir un proveedor de bolsas plásticas",
     excerpt: "Calibre, material, impresión y cantidades: los criterios que definen una buena compra.",
     category: "Guías de compra",
-    date: "2026-09-06",
+    date: "2026-07-17",
     cover: "/category-bolsas.png",
     published: true,
     paragraphs: [
@@ -744,7 +744,7 @@ export const ARTICLES: Article[] = [
     title: "Automatización en planta de plásticos: por dónde empezar",
     excerpt: "No todo se automatiza a la vez. Identifica los puntos de mayor impacto con menor inversión.",
     category: "Operación industrial",
-    date: "2026-09-07",
+    date: "2026-07-19",
     cover: "/category-maquinaria.png",
     published: true,
     paragraphs: [
@@ -761,7 +761,7 @@ export const ARTICLES: Article[] = [
     title: "Redes sociales para empresas industriales: lo que vale la pena",
     excerpt: "No todas las redes sirven para B2B industrial. Enfócate en las que generan contactos reales.",
     category: "Marketing B2B",
-    date: "2026-09-08",
+    date: "2026-07-21",
     cover: "/category-servicios.png",
     author: "Samuel García",
     authorTitle: "SEO en WF-Studio",
@@ -780,7 +780,7 @@ export const ARTICLES: Article[] = [
     title: "Tubería PEAD vs PVC: cuándo usar cada material",
     excerpt: "Flexibilidad vs rigidez, costo vs durabilidad. Comparación técnica para proyectos reales.",
     category: "Materiales y procesos",
-    date: "2026-09-09",
+    date: "2026-07-22",
     cover: "/category-tuberia.png",
     published: true,
     paragraphs: [
@@ -797,7 +797,7 @@ export const ARTICLES: Article[] = [
     title: "Control de calidad en piezas plásticas: lo esencial",
     excerpt: "Dimensiones, peso, color y pruebas funcionales: un sistema básico que funciona.",
     category: "Operación industrial",
-    date: "2026-09-10",
+    date: "2026-07-24",
     cover: "/category-productos.png",
     published: true,
     paragraphs: [
@@ -814,7 +814,7 @@ export const ARTICLES: Article[] = [
     title: "Economía circular en plásticos: de la teoría a la práctica",
     excerpt: "Cómo implementar circularidad en tu operación: recolección, reproceso y diseño para reciclaje.",
     category: "Sustentabilidad",
-    date: "2026-09-11",
+    date: "2026-07-26",
     cover: "/category-reciclado.png",
     published: true,
     paragraphs: [
@@ -831,7 +831,7 @@ export const ARTICLES: Article[] = [
     title: "Cómo crear un catálogo digital para tu empresa plástica",
     excerpt: "PDF interactivo, página web o marketplace: opciones para digitalizar tu oferta sin gastar de más.",
     category: "Marketing B2B",
-    date: "2026-09-12",
+    date: "2026-07-28",
     cover: "/category-servicios.png",
     author: "Samuel García",
     authorTitle: "SEO en WF-Studio",
@@ -850,7 +850,7 @@ export const ARTICLES: Article[] = [
     title: "Defectos en inyección: rechupe, rebaba y líneas de unión",
     excerpt: "Diagnóstico visual rápido y ajustes de proceso para los defectos más frecuentes.",
     category: "Operación industrial",
-    date: "2026-09-13",
+    date: "2026-07-29",
     cover: "/category-maquinaria.png",
     published: true,
     paragraphs: [
@@ -867,7 +867,7 @@ export const ARTICLES: Article[] = [
     title: "Materiales barrera en envases plásticos: EVOH, nylon y multicapa",
     excerpt: "Cuando el producto necesita protección contra oxígeno, humedad o aromas.",
     category: "Materiales y procesos",
-    date: "2026-09-14",
+    date: "2026-07-31",
     cover: "/category-envases.png",
     published: true,
     paragraphs: [
@@ -884,7 +884,7 @@ export const ARTICLES: Article[] = [
     title: "Certificaciones ISO para la industria plástica: cuáles importan",
     excerpt: "ISO 9001, 14001 y 22000: qué certificar según tu mercado y cómo prepararte.",
     category: "Operación industrial",
-    date: "2026-09-15",
+    date: "2026-08-02",
     cover: "/category-servicios.png",
     published: true,
     paragraphs: [
@@ -901,7 +901,7 @@ export const ARTICLES: Article[] = [
     title: "Precios de resinas plásticas: cómo se determinan y cómo negociar",
     excerpt: "Petróleo, oferta-demanda y logística: los factores que mueven los precios de tu materia prima.",
     category: "Materiales y procesos",
-    date: "2026-09-16",
+    date: "2026-08-04",
     cover: "/category-resinas.png",
     published: true,
     paragraphs: [
@@ -918,7 +918,7 @@ export const ARTICLES: Article[] = [
     title: "Maquila de inyección de plástico en México: cómo encontrar el socio correcto",
     excerpt: "Capacidad, calidad, ubicación y comunicación: los criterios para elegir maquilador.",
     category: "Guías de compra",
-    date: "2026-09-17",
+    date: "2026-08-05",
     cover: "/category-maquinaria.png",
     published: true,
     paragraphs: [
@@ -935,7 +935,7 @@ export const ARTICLES: Article[] = [
     title: "Sillas de plástico para negocio: guía de compra",
     excerpt: "Apilables, con brazos, para exterior o interior. Cómo elegir según uso y volumen.",
     category: "Guías de compra",
-    date: "2026-09-18",
+    date: "2026-08-07",
     cover: "/category-productos.png",
     published: true,
     paragraphs: [
@@ -952,7 +952,7 @@ export const ARTICLES: Article[] = [
     title: "Impresión sobre plástico: serigrafía, tampografía, hot stamping e IML",
     excerpt: "Cada método tiene su rango de costo y calidad. Elige el correcto según tu volumen y producto.",
     category: "Materiales y procesos",
-    date: "2026-09-19",
+    date: "2026-08-09",
     cover: "/category-productos.png",
     published: true,
     paragraphs: [

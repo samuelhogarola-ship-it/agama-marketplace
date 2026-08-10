@@ -15,7 +15,7 @@ export const metadata: Metadata = {
     template: "%s | TodoPlástico",
   },
   description:
-    "Mercado B2B gratuito para comprar productos plásticos en México: envases, bolsas, sillas, maquinaria, resinas y más. Impulsado por AGAMA.",
+    "Mercado B2B gratuito para comprar productos plásticos en México: envases, bolsas, tarimas, cubetas, muebles, empaques y más. Impulsado por AGAMA.",
   icons: {
     icon: [{ url: "/todoplastico-symbol.png", type: "image/png" }],
     apple: "/todoplastico-symbol.png",
