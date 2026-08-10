@@ -1,7 +1,7 @@
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
+import { NextResponse, type NextRequest } from "next/server";
 
 type CookieToSet = { name: string; value: string; options?: CookieOptions };
-import { NextResponse, type NextRequest } from "next/server";
 
 export async function middleware(request: NextRequest) {
   let response = NextResponse.next({ request });
@@ -11,8 +11,10 @@ export async function middleware(request: NextRequest) {
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
       cookies: {
-        getAll: () => request.cookies.getAll(),
-        setAll: (cookiesToSet: CookieToSet[]) => {
+        getAll() {
+          return request.cookies.getAll();
+        },
+        setAll(cookiesToSet: CookieToSet[]) {
           cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
           response = NextResponse.next({ request });
           cookiesToSet.forEach(({ name, value, options }) => response.cookies.set(name, value, options));
@@ -21,17 +23,14 @@ export async function middleware(request: NextRequest) {
     }
   );
 
-  let user = null;
-  try {
-    const result = await supabase.auth.getUser();
-    user = result.data.user;
-  } catch {
-    // Public pages remain available when the auth backend is unavailable.
-  }
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
-  const protectedPaths = ["/panel", "/mensajes"];
-  const previewMode = process.env.NODE_ENV !== "production" && request.nextUrl.searchParams.get("preview") === "1";
-  if (!user && !previewMode && protectedPaths.some((p) => request.nextUrl.pathname.startsWith(p))) {
+  const protectedPaths = ["/panel", "/mensajes", "/admin"];
+  const isProtected = protectedPaths.some((p) => request.nextUrl.pathname.startsWith(p));
+
+  if (isProtected && !user) {
     const url = request.nextUrl.clone();
     url.pathname = "/ingresar";
     url.searchParams.set("next", request.nextUrl.pathname);

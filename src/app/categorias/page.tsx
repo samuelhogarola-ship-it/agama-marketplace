@@ -7,8 +7,9 @@ import { createClient } from "@/lib/supabase/server";
 export const revalidate = 300;
 
 export const metadata: Metadata = {
-  title: "Categorías de la industria plástica",
-  description: "Todas las categorías de TodoPlástico para encontrar productos y proveedores de la industria plástica en México.",
+  title: "Comprar productos plásticos por categoría — Proveedores B2B México",
+  description: "Todas las categorías de TodoPlástico: envases, bolsas, tarimas, cubetas, muebles, moldes, empaques, reciclado y más. Encuentra proveedores de la industria plástica en México.",
+  alternates: { canonical: "/categorias" },
 };
 
 const categoryImages: Record<string, string> = {
@@ -18,6 +19,11 @@ const categoryImages: Record<string, string> = {
   "cubetas-y-bidones": "/category-cubetas.png",
   "perfiles-y-laminas": "/category-perfiles.png",
   "tuberia-y-conexiones": "/category-tuberia.png",
+  "muebles-y-sillas": "/category-productos.png",
+  "reciclado-y-sustentabilidad": "/category-reciclado.png",
+  "moldes-y-troqueles": "/category-maquinaria.png",
+  "empaques-y-embalaje": "/category-envases.png",
+  "productos-terminados": "/category-productos.png",
 };
 
 export default async function CategoriasPage() {

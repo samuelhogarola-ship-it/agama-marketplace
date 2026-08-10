@@ -4,20 +4,30 @@ import Image from "next/image";
 import "./globals.css";
 import { createClient } from "@/lib/supabase/server";
 import CookieBanner from "@/components/CookieBanner";
+import Analytics from "@/components/Analytics";
 import CategoryBrowseBar from "@/components/CategoryBrowseBar";
 import MobileNav from "@/components/MobileNav";
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"),
   title: {
-    default: "TodoPlástico — Directorio B2B de la industria plástica en México",
+    default: "TodoPlástico — Mercado para comprar productos plásticos en México",
     template: "%s | TodoPlástico",
   },
   description:
-    "Directorio B2B gratuito de empresas, productos, servicios y anuncios de la industria del plástico en México. Impulsado por AGAMA.",
+    "Mercado B2B gratuito para comprar productos plásticos en México: envases, bolsas, sillas, maquinaria, resinas y más. Impulsado por AGAMA.",
   icons: {
     icon: [{ url: "/todoplastico-symbol.png", type: "image/png" }],
     apple: "/todoplastico-symbol.png",
+  },
+  openGraph: {
+    type: "website",
+    locale: "es_MX",
+    siteName: "TodoPlástico",
+    images: [{ url: "/todoplastico-symbol.png", width: 512, height: 512 }],
+  },
+  twitter: {
+    card: "summary_large_image",
   },
 };
 
@@ -37,13 +47,16 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                 <span className="mt-1 block text-[9px] font-medium uppercase tracking-[0.14em] text-brand-sky sm:text-[10px]">Mercado para la industria plástica</span>
               </span>
             </Link>
-            <form action="/buscar" className="hidden md:block flex-1 max-w-md">
+            <form action="/buscar" className="hidden md:flex flex-1 max-w-md items-center gap-0">
               <input
                 type="search"
                 name="q"
                 placeholder="Buscar empresas, productos o servicios…"
-                className="w-full rounded-full border border-slate-300 px-4 py-2 text-sm focus:outline-none focus:border-brand"
+                className="w-full rounded-l-full border border-r-0 border-slate-300 px-4 py-2 text-sm focus:outline-none focus:border-brand"
               />
+              <button type="submit" aria-label="Buscar" className="flex h-[38px] items-center rounded-r-full border border-slate-300 bg-slate-50 px-3 text-slate-500 hover:bg-brand hover:text-white hover:border-brand">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              </button>
             </form>
             <nav aria-label="Navegación principal" className="flex items-center gap-4 text-sm font-medium">
               <Link href="/empresas" className="hidden text-slate-700 hover:text-brand lg:block">Empresas</Link>
@@ -73,8 +86,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
               <p className="mt-3 text-slate-300">
                 Directorio B2B gratuito para la industria del plástico en México.
               </p>
-              <p className="mt-5 text-xs uppercase tracking-[0.16em] text-white/60">Esponsor</p>
-              <p className="mt-1 font-semibold text-white">AGAMA Pigmentos y Masterbatch</p>
+              <p className="mt-5 text-xs uppercase tracking-[0.16em] text-white/60">Patrocinador</p>
+              <Link href="/sponsor/agama" className="mt-1 block font-semibold text-white hover:text-brand-sky">AGAMA Pigmentos y Masterbatch</Link>
             </div>
             <div>
               <p className="font-semibold text-white/90">TodoPlástico</p>
@@ -104,6 +117,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           </div>
         </footer>
         <CookieBanner />
+        <Analytics />
       </body>
     </html>
   );

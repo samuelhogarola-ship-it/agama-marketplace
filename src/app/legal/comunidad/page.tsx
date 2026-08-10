@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-export const metadata: Metadata = { title: "Normas de la comunidad" };
+export const metadata: Metadata = { title: "Normas de la comunidad", description: "Normas de publicación y convivencia en TodoPlástico. Contenido permitido y prohibido en la plataforma.", alternates: { canonical: "/legal/comunidad" } };
 
 export default function ComunidadPage() {
   return (

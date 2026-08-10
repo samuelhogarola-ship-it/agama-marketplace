@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
-export const metadata: Metadata = { title: "Términos de uso" };
+export const metadata: Metadata = { title: "Términos de uso", description: "Términos y condiciones de uso de TodoPlástico, directorio B2B de la industria plástica en México.", alternates: { canonical: "/legal/terminos" } };
 
 export default function TerminosPage() {
   return (

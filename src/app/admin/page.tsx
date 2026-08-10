@@ -3,7 +3,6 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient, isAdminUser } from "@/lib/supabase/admin";
 import AdminQueue from "@/components/AdminQueue";
 import AdminCompaniesList from "@/components/AdminCompaniesList";
-import { DEMO_COMPANY, DEMO_LISTINGS } from "@/lib/demo-data";
 
 const dateFormatter = new Intl.DateTimeFormat("es-MX", { day: "2-digit", month: "short", year: "numeric" });
 
@@ -11,15 +10,11 @@ function formatDate(value?: string | null) {
   return value ? dateFormatter.format(new Date(value)) : "Sin actividad";
 }
 
-type AdminPageProps = { searchParams: Promise<{ preview?: string }> };
-
-export default async function AdminPage({ searchParams }: AdminPageProps) {
-  const params = await searchParams;
-  const previewMode = process.env.NODE_ENV !== "production" && params.preview === "1";
+export default async function AdminPage() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
-  if (!user && !previewMode) {
+  if (!user) {
     return (
       <div className="mx-auto max-w-xl px-5 py-20">
         <h1 className="text-3xl font-semibold text-brand-dark">Panel de administración</h1>
@@ -29,12 +24,12 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
     );
   }
 
-  if (user && !isAdminUser(user) && !previewMode) {
+  if (!isAdminUser(user)) {
     return <div className="mx-auto max-w-xl px-5 py-20"><h1 className="text-3xl font-semibold text-brand-dark">Área privada</h1><p className="mt-4 text-slate-600">Esta sección está reservada para el equipo de TodoPlástico.</p></div>;
   }
 
   const admin = createAdminClient();
-  if (!admin && !previewMode) {
+  if (!admin) {
     return <div className="mx-auto max-w-xl px-5 py-20"><h1 className="text-3xl font-semibold text-brand-dark">Configuración pendiente</h1><p className="mt-4 text-slate-600">Añade `SUPABASE_SERVICE_ROLE_KEY` y `TODO_PLASTICO_ADMIN_EMAILS` al entorno local para activar el panel operativo.</p></div>;
   }
 
@@ -46,45 +41,21 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
   let users: Array<{ id: string; email?: string; created_at: string; last_sign_in_at?: string | null; email_confirmed_at?: string | null; user_metadata?: { company_name?: string } }> = [];
   let companies: Array<{ id: string; name: string; slug: string; location: string | null; plan: string; is_verified: boolean; status: string; created_at: string }> = [];
 
-  if (admin) {
-    const [queueResult, publishedResult, rejectedResult, reviewedResult, usersResult, companiesResult] = await Promise.all([
-      admin.from("mkt_listings").select("id, title, slug, description, category, location, status, rejection_reason, created_at, company:mkt_companies(name, slug), photos:mkt_listing_photos(*)").eq("status", "pending_review").order("created_at", { ascending: true }).limit(50),
-      admin.from("mkt_listings").select("id", { count: "exact", head: true }).eq("status", "published"),
-      admin.from("mkt_listings").select("id", { count: "exact", head: true }).eq("status", "rejected"),
-      admin.from("mkt_moderation_events").select("id", { count: "exact", head: true }),
-      admin.auth.admin.listUsers({ page: 1, perPage: 100 }),
-      admin.from("mkt_companies").select("id, name, slug, location, plan, is_verified, status, created_at").order("created_at", { ascending: false }).limit(50),
-    ]);
-    queue = (queueResult.data ?? []).map((item) => ({ ...item, company: Array.isArray(item.company) ? item.company[0] : item.company })) as typeof queue;
-    publishedCount = publishedResult.count ?? 0;
-    rejectedCount = rejectedResult.count ?? 0;
-    reviewedCount = reviewedResult.count ?? 0;
-    users = (usersResult.data?.users ?? []) as typeof users;
-    usersError = Boolean(usersResult.error);
-    companies = (companiesResult.data ?? []) as typeof companies;
-  }
-
-  if (previewMode) {
-    const pending = DEMO_LISTINGS.find((listing) => listing.status === "pending_review") ?? DEMO_LISTINGS[1];
-    queue = [{
-      id: pending.id,
-      title: pending.title,
-      slug: pending.slug,
-      description: pending.description,
-      category: pending.category,
-      location: pending.location,
-      status: pending.status,
-      rejection_reason: pending.rejection_reason,
-      created_at: pending.created_at,
-      company: { name: DEMO_COMPANY.name },
-      photos: [] as { storage_path: string }[],
-    }];
-    publishedCount = 1;
-    rejectedCount = 0;
-    reviewedCount = 2;
-    users = [{ id: "agama-admin-preview", email: DEMO_COMPANY.email ?? undefined, created_at: DEMO_COMPANY.created_at, last_sign_in_at: new Date().toISOString(), email_confirmed_at: DEMO_COMPANY.created_at, user_metadata: { company_name: DEMO_COMPANY.name } }];
-    companies = [{ id: DEMO_COMPANY.id, name: DEMO_COMPANY.name, slug: DEMO_COMPANY.slug, location: DEMO_COMPANY.location, plan: DEMO_COMPANY.plan, is_verified: DEMO_COMPANY.is_verified, status: DEMO_COMPANY.status, created_at: DEMO_COMPANY.created_at }];
-  }
+  const [queueResult, publishedResult, rejectedResult, reviewedResult, usersResult, companiesResult] = await Promise.all([
+    admin.from("mkt_listings").select("id, title, slug, description, category, location, status, rejection_reason, created_at, company:mkt_companies(name, slug), photos:mkt_listing_photos(*)").eq("status", "pending_review").order("created_at", { ascending: true }).limit(50),
+    admin.from("mkt_listings").select("id", { count: "exact", head: true }).eq("status", "published"),
+    admin.from("mkt_listings").select("id", { count: "exact", head: true }).eq("status", "rejected"),
+    admin.from("mkt_moderation_events").select("id", { count: "exact", head: true }),
+    admin.auth.admin.listUsers({ page: 1, perPage: 100 }),
+    admin.from("mkt_companies").select("id, name, slug, location, plan, is_verified, status, created_at").order("created_at", { ascending: false }).limit(50),
+  ]);
+  queue = (queueResult.data ?? []).map((item) => ({ ...item, company: Array.isArray(item.company) ? item.company[0] : item.company })) as typeof queue;
+  publishedCount = publishedResult.count ?? 0;
+  rejectedCount = rejectedResult.count ?? 0;
+  reviewedCount = reviewedResult.count ?? 0;
+  users = (usersResult.data?.users ?? []) as typeof users;
+  usersError = Boolean(usersResult.error);
+  companies = (companiesResult.data ?? []) as typeof companies;
 
   return (
     <div className="mx-auto max-w-7xl px-5 py-10 sm:px-8 lg:px-12 lg:py-14">
@@ -95,7 +66,7 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
           <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-600">Usuarios, registros de empresas y revisión de anuncios en un mismo espacio operativo.</p>
         </div>
         <nav aria-label="Secciones del panel" className="flex flex-wrap gap-2 text-sm font-semibold">
-          <Link href={previewMode ? "/admin/nuevo-anuncio?preview=1" : "/admin/nuevo-anuncio"} className="rounded-full bg-brand px-4 py-2 text-white hover:bg-brand-dark">Nuevo anuncio</Link>
+          <Link href="/admin/nuevo-anuncio" className="rounded-full bg-brand px-4 py-2 text-white hover:bg-brand-dark">Nuevo anuncio</Link>
           <a href="#usuarios" className="rounded-full border border-slate-200 px-4 py-2 text-slate-600 hover:border-brand hover:text-brand">Usuarios</a>
           <a href="#empresas" className="rounded-full border border-slate-200 px-4 py-2 text-slate-600 hover:border-brand hover:text-brand">Registros</a>
           <a href="#anuncios" className="rounded-full bg-brand-dark px-4 py-2 text-white hover:bg-brand">Revisar anuncios</a>
@@ -155,7 +126,7 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
 
       <section id="anuncios" className="mt-14 scroll-mt-24">
         <div className="border-b border-slate-200 pb-4"><p className="text-xs font-semibold uppercase tracking-[0.2em] text-brand-sky">Moderación</p><h2 className="mt-2 text-2xl font-semibold tracking-[-0.03em] text-brand-dark">Revisión de anuncios</h2><p className="mt-2 text-sm text-slate-500">Aprueba o rechaza las publicaciones que esperan revisión humana.</p></div>
-        <AdminQueue initialItems={queue} readOnly={previewMode} />
+        <AdminQueue initialItems={queue} readOnly={false} />
       </section>
     </div>
   );

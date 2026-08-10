@@ -16,6 +16,11 @@ const categoryImages: Record<string, string> = {
   "cubetas-y-bidones": "/category-cubetas.png",
   "perfiles-y-laminas": "/category-perfiles.png",
   "tuberia-y-conexiones": "/category-tuberia.png",
+  "muebles-y-sillas": "/category-productos.png",
+  "reciclado-y-sustentabilidad": "/category-reciclado.png",
+  "moldes-y-troqueles": "/category-maquinaria.png",
+  "empaques-y-embalaje": "/category-envases.png",
+  "productos-terminados": "/category-productos.png",
 };
 
 export default async function Home() {
@@ -36,7 +41,7 @@ export default async function Home() {
       .limit(8),
   ]);
 
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://todoplastico.mx";
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://todo-plastico.com";
   const orgJsonLd = {
     "@context": "https://schema.org",
     "@type": "Organization",
@@ -118,14 +123,15 @@ export default async function Home() {
               href={`/c/${category.slug}`}
               className="group block"
             >
-              <div className="aspect-[4/3] overflow-hidden rounded-[4px] bg-slate-100">
+              <div className="relative aspect-[4/3] overflow-hidden rounded-[4px] bg-slate-100">
                 {categoryImages[category.slug] && (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
+                  <Image
                     src={categoryImages[category.slug]}
                     alt={category.name}
+                    fill
                     loading="lazy"
-                    className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.03]"
+                    sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+                    className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.03]"
                   />
                 )}
               </div>
