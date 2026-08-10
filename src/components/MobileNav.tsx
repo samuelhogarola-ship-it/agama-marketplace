@@ -84,7 +84,7 @@ export default function MobileNav({ isLoggedIn }: { isLoggedIn: boolean }) {
             <label htmlFor="mobile-search" className="sr-only">Buscar en TodoPlástico</label>
             <input
               id="mobile-search"
-              autoFocus // eslint-disable-line jsx-a11y/no-autofocus
+              autoFocus
               type="search"
               name="q"
               placeholder="Buscar empresas, productos o servicios…"

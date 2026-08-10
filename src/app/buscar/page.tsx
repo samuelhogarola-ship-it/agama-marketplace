@@ -3,7 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import ProductCard from "@/components/ProductCard";
 import type { Product } from "@/lib/types";
 import Link from "next/link";
-import { ARTICLES } from "@/lib/articles";
+import { PUBLISHED_ARTICLES } from "@/lib/articles";
 import { CATEGORIES } from "@/lib/categories";
 
 export const metadata: Metadata = { title: "Buscar", robots: { index: false } };
@@ -48,11 +48,11 @@ export default async function SearchPage({ searchParams }: Props) {
     products = (listingData as Product[]) ?? [];
     companies = companyData ?? [];
 
-    void supabase.from("mkt_search_queries").insert({ query, results_count: products.length });
+    supabase.from("mkt_search_queries").insert({ query, results_count: products.length }).then(() => {}, () => {});
   }
 
   const matchingArticles = query
-    ? ARTICLES.filter((a) => `${a.title} ${a.excerpt}`.toLowerCase().includes(safeQuery.toLowerCase()))
+    ? PUBLISHED_ARTICLES.filter((a) => `${a.title} ${a.excerpt}`.toLowerCase().includes(safeQuery.toLowerCase()))
     : [];
 
   return (

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
-import { CATEGORIES } from "@/lib/categories";
+import { CATEGORIES, CATEGORY_IMAGES } from "@/lib/categories";
 import { createClient } from "@/lib/supabase/server";
 
 export const revalidate = 300;
@@ -12,32 +12,19 @@ export const metadata: Metadata = {
   alternates: { canonical: "/categorias" },
 };
 
-const categoryImages: Record<string, string> = {
-  "envases-y-botellas": "/category-envases.png",
-  "bolsas-y-pelicula": "/category-bolsas.png",
-  "tarimas-y-contenedores": "/category-tarimas.png",
-  "cubetas-y-bidones": "/category-cubetas.png",
-  "perfiles-y-laminas": "/category-perfiles.png",
-  "tuberia-y-conexiones": "/category-tuberia.png",
-  "muebles-y-sillas": "/category-productos.png",
-  "reciclado-y-sustentabilidad": "/category-reciclado.png",
-  "moldes-y-troqueles": "/category-maquinaria.png",
-  "empaques-y-embalaje": "/category-envases.png",
-  "productos-terminados": "/category-productos.png",
-};
+const categoryImages = CATEGORY_IMAGES;
 
 export default async function CategoriasPage() {
   const supabase = await createClient();
-  const counts = await Promise.all(
-    CATEGORIES.map((cat) =>
-      supabase
-        .from("mkt_listings")
-        .select("id", { count: "exact", head: true })
-        .eq("status", "published")
-        .eq("category", cat.slug)
-        .then(({ count }) => count ?? 0)
-    )
-  );
+  const { data: rows } = await supabase
+    .from("mkt_listings")
+    .select("category")
+    .eq("status", "published");
+  const countMap: Record<string, number> = {};
+  for (const row of rows ?? []) {
+    countMap[row.category] = (countMap[row.category] ?? 0) + 1;
+  }
+  const counts = CATEGORIES.map((cat) => countMap[cat.slug] ?? 0);
 
   return (
     <div className="mx-auto max-w-7xl px-5 py-14 sm:px-8 lg:px-12 lg:py-20">

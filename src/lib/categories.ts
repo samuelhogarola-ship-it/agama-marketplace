@@ -92,6 +92,20 @@ export const CATEGORY_SUBCATEGORIES: Record<string, readonly (readonly [string, 
   "productos-terminados": [["cajas", "Cajas"], ["cestas", "Cestas"], ["botes", "Botes"], ["accesorios", "Accesorios"]],
 };
 
+export const CATEGORY_IMAGES: Record<string, string> = {
+  "envases-y-botellas": "/category-envases.png",
+  "bolsas-y-pelicula": "/category-bolsas.png",
+  "tarimas-y-contenedores": "/category-tarimas.png",
+  "cubetas-y-bidones": "/category-cubetas.png",
+  "perfiles-y-laminas": "/category-perfiles.png",
+  "tuberia-y-conexiones": "/category-tuberia.png",
+  "muebles-y-sillas": "/category-productos.png",
+  "reciclado-y-sustentabilidad": "/category-reciclado.png",
+  "moldes-y-troqueles": "/category-maquinaria.png",
+  "empaques-y-embalaje": "/category-envases.png",
+  "productos-terminados": "/category-productos.png",
+};
+
 export function slugify(text: string): string {
   return text
     .toLowerCase()

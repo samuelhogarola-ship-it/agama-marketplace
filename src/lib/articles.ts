@@ -101,7 +101,7 @@ export const ARTICLES: Article[] = [
     category: "Color y pigmentos",
     date: "2026-08-01",
     cover: "/category-resinas.png",
-    published: true,
+    published: false,
     paragraphs: [
       "El color es la primera variable que un comprador percibe en un producto plástico. Antes de evaluar resistencia o funcionalidad, el ojo ya decidió si el producto luce profesional o genérico.",
       "Los pigmentos y masterbatch permiten reproducir colores exactos con consistencia lote a lote. Un proveedor con laboratorio de igualación, como los que usan espectrofotómetros, puede garantizar un deltaE mínimo entre entregas.",
@@ -174,7 +174,7 @@ export const ARTICLES: Article[] = [
     category: "Color y pigmentos",
     date: "2026-08-05",
     cover: "/category-resinas.png",
-    published: true,
+    published: false,
     paragraphs: [
       "El masterbatch es pigmento concentrado en un carrier de resina, listo para dosificar. El pigmento en polvo es la materia prima pura. Cada formato tiene su lugar en la cadena de transformación.",
       "El masterbatch es la opción más limpia y fácil de manejar. Se dosifica con equipo gravimétrico o volumétrico, no genera polvo en la planta y ofrece una dispersión consistente. Es ideal para inyección, soplado y extrusión de película.",
@@ -348,7 +348,7 @@ export const ARTICLES: Article[] = [
     category: "Color y pigmentos",
     date: "2026-06-08",
     cover: "/category-resinas.png",
-    published: true,
+    published: false,
     paragraphs: [
       "La radiación ultravioleta rompe las cadenas moleculares del plástico, causando decoloración, pérdida de brillo y fragilidad. Un producto de exterior sin protección UV puede volverse quebradizo en menos de un año.",
       "Los estabilizadores HALS (aminas estéricas impedidas) son de los más efectivos: capturan los radicales libres generados por la luz solar y frenan la degradación desde el interior del material.",
@@ -521,7 +521,7 @@ export const ARTICLES: Article[] = [
     category: "Color y pigmentos",
     date: "2026-06-26",
     cover: "/category-resinas.png",
-    published: true,
+    published: false,
     paragraphs: [
       "Los puntos de color no dispersados, conocidos como 'specks', suelen originarse por una mala dispersión del pigmento en el carrier del masterbatch o por temperatura insuficiente para fundir por completo el concentrado.",
       "Las rayas o vetas de color aparecen cuando el masterbatch no se mezcla homogéneamente con la resina base. Revisar el sistema de dosificación y aumentar el tiempo o la eficiencia de mezclado en el husillo suele resolver el problema.",
@@ -712,7 +712,7 @@ export const ARTICLES: Article[] = [
     category: "Color y pigmentos",
     date: "2026-07-15",
     cover: "/category-resinas.png",
-    published: true,
+    published: false,
     paragraphs: [
       "El espacio de color CIELAB describe cualquier color con tres valores: L para luminosidad, a para el eje verde-rojo y b para el eje azul-amarillo. Es el sistema estándar que usan los espectrofotómetros para medir color de forma objetiva.",
       "El deltaE es la diferencia numérica entre dos colores medidos en CIELAB. Cuanto más bajo el deltaE, más parecidos son los colores; un deltaE por debajo de 1 es prácticamente imperceptible al ojo humano.",

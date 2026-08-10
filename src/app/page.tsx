@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { CATEGORIES } from "@/lib/categories";
+import { CATEGORIES, CATEGORY_IMAGES } from "@/lib/categories";
 import { createClient } from "@/lib/supabase/server";
 import ProductCard from "@/components/ProductCard";
 import HeroCarousel from "@/components/HeroCarousel";
@@ -9,19 +9,11 @@ import type { Product } from "@/lib/types";
 
 export const revalidate = 300;
 
-const categoryImages: Record<string, string> = {
-  "envases-y-botellas": "/category-envases.png",
-  "bolsas-y-pelicula": "/category-bolsas.png",
-  "tarimas-y-contenedores": "/category-tarimas.png",
-  "cubetas-y-bidones": "/category-cubetas.png",
-  "perfiles-y-laminas": "/category-perfiles.png",
-  "tuberia-y-conexiones": "/category-tuberia.png",
-  "muebles-y-sillas": "/category-productos.png",
-  "reciclado-y-sustentabilidad": "/category-reciclado.png",
-  "moldes-y-troqueles": "/category-maquinaria.png",
-  "empaques-y-embalaje": "/category-envases.png",
-  "productos-terminados": "/category-productos.png",
+export const metadata = {
+  alternates: { canonical: "/" },
 };
+
+const categoryImages = CATEGORY_IMAGES;
 
 export default async function Home() {
   const supabase = await createClient();

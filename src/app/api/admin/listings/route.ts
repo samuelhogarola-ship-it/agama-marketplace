@@ -4,10 +4,13 @@ import { createAdminClient, isAdminUser } from "@/lib/supabase/admin";
 import { CATEGORIES, slugify } from "@/lib/categories";
 import { isSaleUnit, parseMinimumPurchase } from "@/lib/listing-options";
 import { buildContactOverride, isOwnAdvertiserUrl } from "@/lib/listing-policy";
+import { checkOrigin } from "@/lib/csrf";
 
 const TYPES = new Set(["product", "service", "ad"]);
 
 export async function POST(request: Request) {
+  const originError = checkOrigin(request);
+  if (originError) return originError;
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!isAdminUser(user)) return NextResponse.json({ error: "No autorizado" }, { status: 403 });

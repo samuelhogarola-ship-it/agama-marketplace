@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { photoUrl } from "@/lib/types";
 
 type Photo = { storage_path: string };
@@ -40,34 +40,47 @@ export default function AdminQueue({
   const [rejectId, setRejectId] = useState<number | null>(null);
   const [rejectReason, setRejectReason] = useState("");
 
+  const [error, setError] = useState<string | null>(null);
+
   async function approve(id: number) {
     setBusy(id);
-    const res = await fetch("/api/admin/moderation", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id, action: "approve" }),
-    });
-    if (res.ok) setItems((cur) => cur.filter((item) => item.id !== id));
+    setError(null);
+    try {
+      const res = await fetch("/api/admin/moderation", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id, action: "approve" }),
+      });
+      if (res.ok) setItems((cur) => cur.filter((item) => item.id !== id));
+      else setError(`Error al aprobar (${res.status})`);
+    } catch {
+      setError("Error de conexión al aprobar");
+    }
     setBusy(null);
   }
 
   async function submitReject() {
     if (!rejectId || !rejectReason.trim()) return;
     setBusy(rejectId);
-    const res = await fetch("/api/admin/moderation", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id: rejectId, action: "reject", reason: rejectReason.trim() }),
-    });
-    if (res.ok) {
-      setItems((cur) => cur.filter((item) => item.id !== rejectId));
-      setRejectId(null);
-      setRejectReason("");
+    setError(null);
+    try {
+      const res = await fetch("/api/admin/moderation", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: rejectId, action: "reject", reason: rejectReason.trim() }),
+      });
+      if (res.ok) {
+        setItems((cur) => cur.filter((item) => item.id !== rejectId));
+        setRejectId(null);
+        setRejectReason("");
+      } else setError(`Error al rechazar (${res.status})`);
+    } catch {
+      setError("Error de conexión al rechazar");
     }
     setBusy(null);
   }
 
-  if (items.length === 0) {
+  if (items.length === 0 && !error) {
     return (
       <div className="mt-10 border-t border-slate-200 py-16 text-center text-slate-500">
         La cola está limpia. 🎉
@@ -77,6 +90,7 @@ export default function AdminQueue({
 
   return (
     <>
+      {error && <p className="mt-4 rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700">{error}</p>}
       <div className="mt-10 space-y-8">
         {items.map((item) => {
           const photos = (item.photos ?? []) as Photo[];
@@ -156,13 +170,58 @@ export default function AdminQueue({
       </div>
 
       {rejectId !== null && (
+        <RejectDialog
+          rejectId={rejectId}
+          rejectReason={rejectReason}
+          setRejectReason={setRejectReason}
+          busy={busy}
+          onClose={() => setRejectId(null)}
+          onSubmit={submitReject}
+        />
+      )}
+    </>
+  );
+}
+
+function RejectDialog({ rejectId, rejectReason, setRejectReason, busy, onClose, onSubmit }: {
+  rejectId: number;
+  rejectReason: string;
+  setRejectReason: (v: string) => void;
+  busy: number | null;
+  onClose: () => void;
+  onSubmit: () => void;
+}) {
+  const dialogRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const el = dialogRef.current;
+    if (!el) return;
+    const textarea = el.querySelector("textarea");
+    textarea?.focus();
+
+    function onKeyDown(e: KeyboardEvent) {
+      if (e.key === "Escape") { onClose(); return; }
+      if (e.key !== "Tab") return;
+      const focusables = el!.querySelectorAll<HTMLElement>("button:not([disabled]), textarea, [tabindex]:not([tabindex='-1'])");
+      const first = focusables[0];
+      const last = focusables[focusables.length - 1];
+      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last?.focus(); }
+      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first?.focus(); }
+    }
+    document.addEventListener("keydown", onKeyDown);
+    return () => document.removeEventListener("keydown", onKeyDown);
+  }, [onClose]);
+
+  return (
         <div
           role="dialog"
           aria-modal="true"
           aria-labelledby="reject-title"
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+          onClick={onClose}
         >
           <div
+            ref={dialogRef}
             className="w-full max-w-lg rounded-2xl bg-white p-6 shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
@@ -207,7 +266,7 @@ export default function AdminQueue({
             <div className="mt-5 flex justify-end gap-3">
               <button
                 type="button"
-                onClick={() => setRejectId(null)}
+                onClick={onClose}
                 className="rounded-full border border-slate-200 px-5 py-2.5 text-sm font-semibold text-slate-600 hover:bg-slate-50"
               >
                 Cancelar
@@ -215,7 +274,7 @@ export default function AdminQueue({
               <button
                 type="button"
                 disabled={rejectReason.trim().length < 20 || busy === rejectId}
-                onClick={submitReject}
+                onClick={onSubmit}
                 className="rounded-full bg-red-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-red-700 disabled:opacity-50"
               >
                 {busy === rejectId ? "Rechazando…" : "Confirmar rechazo"}
@@ -223,7 +282,5 @@ export default function AdminQueue({
             </div>
           </div>
         </div>
-      )}
-    </>
   );
 }

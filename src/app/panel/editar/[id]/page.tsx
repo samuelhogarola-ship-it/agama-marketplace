@@ -260,12 +260,15 @@ function EditListingContent() {
         const { error: uploadError } = await supabase.storage
           .from("mkt-photos")
           .upload(path, file, { upsert: true });
-        if (!uploadError)
-          await supabase.from("mkt_listing_photos").insert({
-            listing_id: Number(params.id),
-            storage_path: path,
-            position: start + index,
-          });
+        if (uploadError) {
+          setError(`Error al subir foto ${index + 1}: ${uploadError.message}`);
+          continue;
+        }
+        await supabase.from("mkt_listing_photos").insert({
+          listing_id: Number(params.id),
+          storage_path: path,
+          position: start + index,
+        });
       }
     }
 

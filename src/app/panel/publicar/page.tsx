@@ -83,11 +83,13 @@ export default function PublicarPage() {
       const { error: upErr } = await supabase.storage
         .from("mkt-photos")
         .upload(path, file, { upsert: true });
-      if (!upErr) {
-        await supabase
-          .from("mkt_listing_photos")
-          .insert({ listing_id: listingId, storage_path: path, position: i });
+      if (upErr) {
+        setError(`Error al subir foto ${i + 1}: ${upErr.message}`);
+        continue;
       }
+      await supabase
+        .from("mkt_listing_photos")
+        .insert({ listing_id: listingId, storage_path: path, position: i });
     }
   }
 

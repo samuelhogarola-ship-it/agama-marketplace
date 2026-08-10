@@ -37,6 +37,7 @@ export default async function AdminPage() {
   let publishedCount = 0;
   let rejectedCount = 0;
   let reviewedCount = 0;
+  let queryErrors: string[] = [];
   let usersError = false;
   let users: Array<{ id: string; email?: string; created_at: string; last_sign_in_at?: string | null; email_confirmed_at?: string | null; user_metadata?: { company_name?: string } }> = [];
   let companies: Array<{ id: string; name: string; slug: string; location: string | null; plan: string; is_verified: boolean; status: string; created_at: string }> = [];
@@ -50,12 +51,17 @@ export default async function AdminPage() {
     admin.from("mkt_companies").select("id, name, slug, location, plan, is_verified, status, created_at").order("created_at", { ascending: false }).limit(50),
   ]);
   queue = (queueResult.data ?? []).map((item) => ({ ...item, company: Array.isArray(item.company) ? item.company[0] : item.company })) as typeof queue;
+  if (queueResult.error) queryErrors.push("cola de revisión");
   publishedCount = publishedResult.count ?? 0;
+  if (publishedResult.error) queryErrors.push("publicados");
   rejectedCount = rejectedResult.count ?? 0;
+  if (rejectedResult.error) queryErrors.push("rechazados");
   reviewedCount = reviewedResult.count ?? 0;
+  if (reviewedResult.error) queryErrors.push("eventos IA");
   users = (usersResult.data?.users ?? []) as typeof users;
   usersError = Boolean(usersResult.error);
   companies = (companiesResult.data ?? []) as typeof companies;
+  if (companiesResult.error) queryErrors.push("empresas");
 
   return (
     <div className="mx-auto max-w-7xl px-5 py-10 sm:px-8 lg:px-12 lg:py-14">
@@ -73,6 +79,7 @@ export default async function AdminPage() {
         </nav>
       </div>
 
+      {queryErrors.length > 0 && <p className="mt-6 rounded-xl bg-amber-50 px-4 py-3 text-sm text-amber-800">Error al cargar: {queryErrors.join(", ")}. Los datos mostrados pueden estar incompletos.</p>}
       <section className="mt-10 grid grid-cols-2 gap-x-5 gap-y-7 border-y border-slate-200 py-6 sm:grid-cols-3 lg:grid-cols-6" aria-label="Métricas operativas">
         {[
           ["En revisión", queue.length],

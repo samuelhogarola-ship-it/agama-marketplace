@@ -33,7 +33,7 @@ El marketplace **no compite** con el negocio principal: pigmentos, masterbatch y
 
 ## Taxonomía de categorías (borrador)
 
-Envases y botellas · Bolsas y película · Tarimas y contenedores industriales · Cubetas y bidones · Perfiles y láminas · Tubería y conexiones · Plástico reciclado / molido / paca · Resinas vírgenes y reprocesadas · Maquinaria y refacciones para plástico · Productos terminados (hogar, jardín, construcción) · Servicios (inyección, soplado, rotomoldeo, peletizado a maquila)
+Envases y botellas · Bolsas y película · Tarimas y contenedores · Cubetas y bidones · Perfiles y láminas · Tubería y conexiones · Muebles y sillas · Reciclado y sustentabilidad · Moldes y troqueles · Empaques y embalaje · Productos terminados
 
 > Prohibidos como categoría o producto: **pigmentos, masterbatch, aditivos** (concentrados de color, estabilizantes UV, antioxidantes, retardantes de flama como producto en venta, etc.).
 
