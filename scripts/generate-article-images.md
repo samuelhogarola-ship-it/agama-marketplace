@@ -5,7 +5,8 @@ Genera una imagen por cada artículo listado abajo. Cada imagen debe guardarse e
 ## Instrucciones
 
 - **Formato**: PNG, 1200x630px (ratio 1.91:1, ideal para Open Graph y tarjetas)
-- **Estilo**: Fotografía industrial profesional, limpia, bien iluminada. Sin texto superpuesto. Sin logos. Sin personas reconocibles.
+- **Estilo**: Fotografía industrial profesional, limpia, bien iluminada. Sin personas reconocibles.
+- **Logo**: Todas las imágenes deben llevar el logo de TodoPlástico (`public/todoplastico-symbol.png`) en la esquina inferior derecha, con opacidad ~70%, tamaño pequeño (~80px), como marca de agua sutil. El logo es el archivo `todoplastico-symbol.png` del proyecto.
 - **Paleta**: Tonos neutros industriales (blancos, grises, azul acero) con acentos del color AGAMA (verde #4CAF50 o azul claro #0EA5E9) donde encaje naturalmente
 - **Contexto**: Ambiente de fábrica, almacén, línea de producción o laboratorio mexicano. Aspecto profesional B2B, no stock genérico.
 
