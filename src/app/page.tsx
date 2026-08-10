@@ -123,14 +123,15 @@ export default async function Home() {
               href={`/c/${category.slug}`}
               className="group block"
             >
-              <div className="aspect-[4/3] overflow-hidden rounded-[4px] bg-slate-100">
+              <div className="relative aspect-[4/3] overflow-hidden rounded-[4px] bg-slate-100">
                 {categoryImages[category.slug] && (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
+                  <Image
                     src={categoryImages[category.slug]}
                     alt={category.name}
+                    fill
                     loading="lazy"
-                    className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.03]"
+                    sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+                    className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.03]"
                   />
                 )}
               </div>

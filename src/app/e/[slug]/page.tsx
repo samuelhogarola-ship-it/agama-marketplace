@@ -56,12 +56,26 @@ export default async function CompanyPage({ params }: Props) {
     email: profile.email ?? undefined,
     logo: profile.logo_url ?? undefined,
   };
+  const base = process.env.NEXT_PUBLIC_SITE_URL ?? "https://todo-plastico.com";
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Inicio", item: base },
+      { "@type": "ListItem", position: 2, name: "Directorio de empresas", item: `${base}/empresas` },
+      { "@type": "ListItem", position: 3, name: profile.name, item: `${base}/e/${slug}` },
+    ],
+  };
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-12">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: safeJsonLd(jsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: safeJsonLd(breadcrumbJsonLd) }}
       />
       <nav className="text-sm text-slate-500">
         <Link href="/empresas" className="hover:text-brand">

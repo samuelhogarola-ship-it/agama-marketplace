@@ -27,9 +27,20 @@ export default async function ArticlePage({ params }: Props) {
     ? { "@type": "Person", name: article.author, jobTitle: article.authorTitle }
     : { "@type": "Organization", name: "TodoPlástico" };
   const jsonLd = { "@context": "https://schema.org", "@type": "Article", headline: article.title, description: article.excerpt, datePublished: article.date, image: article.cover, author: authorSchema };
+  const base = process.env.NEXT_PUBLIC_SITE_URL ?? "https://todo-plastico.com";
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Inicio", item: base },
+      { "@type": "ListItem", position: 2, name: "Artículos", item: `${base}/articulos` },
+      { "@type": "ListItem", position: 3, name: article.title, item: `${base}/articulos/${article.slug}` },
+    ],
+  };
   return (
     <article className="mx-auto max-w-4xl px-5 py-14 sm:px-8 lg:py-20">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: safeJsonLd(jsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: safeJsonLd(breadcrumbJsonLd) }} />
       <Link href="/articulos" className="text-sm font-semibold text-brand-dark underline decoration-slate-300 underline-offset-8 hover:decoration-brand">← Todo el contenido</Link>
       <header className="mt-10 max-w-3xl">
         <p className="text-xs font-semibold uppercase tracking-[0.24em] text-brand-sky">{article.category}</p>
