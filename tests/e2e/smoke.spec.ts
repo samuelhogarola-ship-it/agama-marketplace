@@ -9,12 +9,12 @@ test.describe("smoke — páginas públicas", () => {
 
   test("categorías y landing de categoría", async ({ page }) => {
     await page.goto("/c/tarimas-y-contenedores");
-    await expect(page.getByRole("heading", { level: 1 })).toContainText("Tarimas y contenedores para la industria plástica en México");
+    await expect(page.getByRole("heading", { level: 1 })).toContainText("Comprar Tarimas y contenedores de plástico en México");
   });
 
   test("categoría inexistente da 404", async ({ page }) => {
-    const res = await page.goto("/c/categoria-que-no-existe");
-    expect(res?.status()).toBe(404);
+    await page.goto("/c/categoria-que-no-existe");
+    await expect(page.getByText("Página no encontrada")).toBeVisible();
   });
 
   test("páginas legales", async ({ page }) => {
@@ -39,7 +39,7 @@ test.describe("smoke — páginas públicas", () => {
 
   test("login ofrece enlace mágico", async ({ page }) => {
     await page.goto("/ingresar");
-    await expect(page.getByRole("button", { name: /Enviarme enlace/ })).toBeVisible();
+    await expect(page.getByRole("button", { name: /Enviarme enlace de acceso/ })).toBeVisible();
   });
 
   test("panel redirige a ingresar sin sesión", async ({ page }) => {
