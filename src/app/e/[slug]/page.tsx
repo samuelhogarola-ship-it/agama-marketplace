@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import ProductCard from "@/components/ProductCard";
+import TrackedContactLink from "@/components/TrackedContactLink";
 import type { Company, Product } from "@/lib/types";
 import { safeJsonLd } from "@/lib/jsonld";
 import { CATEGORIES } from "@/lib/categories";
@@ -137,40 +138,48 @@ export default async function CompanyPage({ params }: Props) {
 
       <div className="mt-6 flex flex-wrap gap-2 text-sm">
         {profile.website && (
-          <a
+          <TrackedContactLink
             href={profile.website}
+            contactType="company_website"
+            companySlug={profile.slug}
             target="_blank"
             rel="noreferrer"
             className="rounded-full border border-slate-200 px-4 py-2 hover:border-brand hover:text-brand-dark"
           >
             Sitio web ↗
-          </a>
+          </TrackedContactLink>
         )}
         {profile.phone && (
-          <a
+          <TrackedContactLink
             href={`tel:${profile.phone}`}
+            contactType="phone"
+            companySlug={profile.slug}
             className="rounded-full border border-slate-200 px-4 py-2 hover:border-brand hover:text-brand-dark"
           >
             {profile.phone}
-          </a>
+          </TrackedContactLink>
         )}
         {profile.email && (
-          <a
+          <TrackedContactLink
             href={`mailto:${profile.email}`}
+            contactType="email"
+            companySlug={profile.slug}
             className="rounded-full border border-slate-200 px-4 py-2 hover:border-brand hover:text-brand-dark"
           >
             {profile.email}
-          </a>
+          </TrackedContactLink>
         )}
         {profile.whatsapp && (
-          <a
+          <TrackedContactLink
             href={`https://wa.me/${profile.whatsapp.replace(/\D/g, "")}`}
+            contactType="whatsapp"
+            companySlug={profile.slug}
             target="_blank"
             rel="noreferrer"
             className="rounded-full border border-slate-200 px-4 py-2 hover:border-brand hover:text-brand-dark"
           >
             WhatsApp
-          </a>
+          </TrackedContactLink>
         )}
       </div>
 

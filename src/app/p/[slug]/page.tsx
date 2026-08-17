@@ -8,6 +8,7 @@ import { formatPrice } from "@/components/ProductCard";
 import ListingGallery from "@/components/ListingGallery";
 import ShareButton from "@/components/ShareButton";
 import ProductCard from "@/components/ProductCard";
+import TrackedContactLink from "@/components/TrackedContactLink";
 import { safeJsonLd } from "@/lib/jsonld";
 import { photoUrl } from "@/lib/types";
 
@@ -71,8 +72,11 @@ function ContactActions({
   return (
     <div className={primary ? "mt-5 space-y-3" : "mt-4 flex flex-wrap gap-2 text-sm"}>
       {listingContactHref ? (
-        <a
+        <TrackedContactLink
           href={listingContactHref}
+          contactType={product.contact_override?.method ?? "listing_contact"}
+          listingId={product.id}
+          companySlug={product.company?.slug}
           target={
             product.contact_override?.method === "whatsapp" ? "_blank" : undefined
           }
@@ -84,11 +88,14 @@ function ContactActions({
           }
         >
           {contactLabel(product.contact_override?.method)}
-        </a>
+        </TrackedContactLink>
       ) : null}
       {product.external_url ? (
-        <a
+        <TrackedContactLink
           href={product.external_url}
+          contactType="listing_external_url"
+          listingId={product.id}
+          companySlug={product.company?.slug}
           target="_blank"
           rel="noreferrer"
           className={
@@ -98,17 +105,20 @@ function ContactActions({
           }
         >
           Ver en la web del anunciante
-        </a>
+        </TrackedContactLink>
       ) : null}
       {!primary && product.company?.website ? (
-        <a
+        <TrackedContactLink
           href={product.company.website}
+          contactType="company_website"
+          listingId={product.id}
+          companySlug={product.company.slug}
           target="_blank"
           rel="noreferrer"
           className="rounded-full border border-slate-200 px-3 py-1.5 hover:border-brand"
         >
           Web empresa
-        </a>
+        </TrackedContactLink>
       ) : null}
     </div>
   );
