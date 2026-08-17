@@ -6,8 +6,17 @@ import { createClient } from "@/lib/supabase/client";
 
 type AuthMethod = "password" | "magic-link";
 
+const RFC_RE = /^[A-ZÑ&]{3,4}\d{6}[A-Z0-9]{3}$/i;
+
+function validateRfc(rfc: string): string | null {
+  if (!rfc) return null;
+  if (!RFC_RE.test(rfc.trim())) return "RFC inválido. Formato: 3-4 letras + fecha (AAMMDD) + 3 caracteres.";
+  return null;
+}
+
 export default function RegistroPage() {
-  const [form, setForm] = useState({ company: "", email: "", password: "" });
+  const [form, setForm] = useState({ company: "", email: "", password: "", rfc: "" });
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [method, setMethod] = useState<AuthMethod>("password");
   const [error, setError] = useState<string | null>(null);
   const [info, setInfo] = useState<string | null>(null);
@@ -20,7 +29,25 @@ export default function RegistroPage() {
     e.preventDefault();
     setError(null);
     setInfo(null);
+
+    if (!acceptedTerms) {
+      setError("Debes aceptar los términos y condiciones para continuar.");
+      return;
+    }
+
+    const rfcError = validateRfc(form.rfc);
+    if (rfcError) {
+      setError(rfcError);
+      return;
+    }
+
     setLoading(true);
+
+    const metadata = {
+      company_name: form.company,
+      ...(form.rfc.trim() ? { rfc: form.rfc.trim().toUpperCase() } : {}),
+      accepted_terms_at: new Date().toISOString(),
+    };
 
     try {
       const supabase = createClient();
@@ -31,7 +58,7 @@ export default function RegistroPage() {
           options: {
             shouldCreateUser: true,
             emailRedirectTo: `${origin}/auth/callback?next=${encodeURIComponent("/panel")}`,
-            data: { company_name: form.company },
+            data: metadata,
           },
         });
         setLoading(false);
@@ -54,7 +81,7 @@ export default function RegistroPage() {
         password: form.password,
         options: {
           emailRedirectTo: `${origin}/auth/callback?next=${encodeURIComponent("/panel")}`,
-          data: { company_name: form.company },
+          data: metadata,
         },
       });
       setLoading(false);
@@ -100,7 +127,7 @@ export default function RegistroPage() {
       <form onSubmit={onSubmit} className="mt-8 space-y-4">
         <div>
           <label htmlFor="reg-company" className="block text-sm font-medium text-slate-700 mb-1">
-            Nombre de la empresa
+            Nombre de la empresa <span className="text-red-500">*</span>
           </label>
           <input
             id="reg-company"
@@ -113,8 +140,23 @@ export default function RegistroPage() {
           />
         </div>
         <div>
+          <label htmlFor="reg-rfc" className="block text-sm font-medium text-slate-700 mb-1">
+            RFC <span className="text-slate-400 font-normal">(México)</span> / CIF <span className="text-slate-400 font-normal">(España)</span>
+            <span className="ml-1 text-xs text-slate-400 font-normal">— recomendado, evita cuentas duplicadas</span>
+          </label>
+          <input
+            id="reg-rfc"
+            type="text"
+            placeholder="RFC o CIF de tu empresa"
+            maxLength={13}
+            value={form.rfc}
+            onChange={(e) => setForm({ ...form, rfc: e.target.value.toUpperCase() })}
+            className="w-full rounded-lg border border-slate-300 px-4 py-2.5 focus:outline-none focus:border-brand font-mono tracking-wide uppercase"
+          />
+        </div>
+        <div>
           <label htmlFor="reg-email" className="block text-sm font-medium text-slate-700 mb-1">
-            Email de empresa
+            Email de empresa <span className="text-red-500">*</span>
           </label>
           <input
             id="reg-email"
@@ -129,7 +171,7 @@ export default function RegistroPage() {
         {method === "password" && (
           <div>
             <label htmlFor="reg-password" className="block text-sm font-medium text-slate-700 mb-1">
-              Contraseña
+              Contraseña <span className="text-red-500">*</span>
             </label>
             <input
               id="reg-password"
@@ -143,6 +185,27 @@ export default function RegistroPage() {
             />
           </div>
         )}
+        <div className="flex items-start gap-3 pt-1">
+          <input
+            id="reg-terms"
+            type="checkbox"
+            required
+            checked={acceptedTerms}
+            onChange={(e) => setAcceptedTerms(e.target.checked)}
+            className="mt-0.5 h-4 w-4 rounded border-slate-300 text-brand focus:ring-brand"
+          />
+          <label htmlFor="reg-terms" className="text-sm text-slate-600 leading-snug">
+            He leído y acepto los{" "}
+            <Link href="/legal/terminos" target="_blank" className="text-brand hover:underline">
+              Términos y Condiciones
+            </Link>{" "}
+            y la{" "}
+            <Link href="/legal/privacidad" target="_blank" className="text-brand hover:underline">
+              Política de Privacidad
+            </Link>
+            . Confirmo que represento a una empresa del sector plástico.
+          </label>
+        </div>
         {error && <p className="text-sm text-red-600">{error}</p>}
         <button
           disabled={loading}

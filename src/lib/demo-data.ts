@@ -2,6 +2,8 @@ import type { Company, Product } from "@/lib/types";
 
 export const DEMO_COMPANY: Company = {
   id: "agama-preview",
+  ref_code: "TP-0001",
+  rfc: null,
   name: "AGAMA Pigmentos y Masterbatch",
   slug: "agama-pigmentos-masterbatch",
   description: "Empresa especializada en soluciones para la industria plástica.",
@@ -16,6 +18,7 @@ export const DEMO_COMPANY: Company = {
   is_verified: true,
   is_featured: true,
   status: "active",
+  accepted_terms_at: null,
   created_at: "2026-08-01T09:00:00.000Z",
 };
 
@@ -37,6 +40,7 @@ export const DEMO_LISTINGS: Product[] = [
     external_url: "https://agama.es",
     status: "published",
     rejection_reason: null,
+    expires_at: null,
     created_at: "2026-08-02T09:00:00.000Z",
     updated_at: "2026-08-02T09:00:00.000Z",
     photos: [],
@@ -59,6 +63,7 @@ export const DEMO_LISTINGS: Product[] = [
     external_url: "https://agama.es",
     status: "pending_review",
     rejection_reason: null,
+    expires_at: null,
     created_at: "2026-08-02T12:00:00.000Z",
     updated_at: "2026-08-02T12:00:00.000Z",
     photos: [],

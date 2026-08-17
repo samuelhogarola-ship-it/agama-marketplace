@@ -8,6 +8,7 @@ import { photoUrl, productPath, type Company, type Product } from "@/lib/types";
 import { formatPrice } from "@/components/ProductCard";
 import { categoryBySlug } from "@/lib/categories";
 import { DEMO_COMPANY, DEMO_LISTINGS } from "@/lib/demo-data";
+import PanelTickets from "@/components/PanelTickets";
 
 const STATUS_LABEL: Record<string, { text: string; cls: string }> = {
   pending_review: { text: "En revisión", cls: "bg-amber-100 text-amber-800" },
@@ -78,9 +79,16 @@ function PanelContent() {
         .replace(/[^a-z0-9]+/g, "-")
         .replace(/(^-|-$)/g, "")
         .slice(0, 60)}-${user.id.slice(0, 6)}`;
+      const meta = user.user_metadata ?? {};
       const { data: created } = await supabase
         .from("mkt_companies")
-        .insert({ id: user.id, name: name.slice(0, 120), slug })
+        .insert({
+          id: user.id,
+          name: name.slice(0, 120),
+          slug,
+          ...(meta.rfc ? { rfc: meta.rfc } : {}),
+          ...(meta.accepted_terms_at ? { accepted_terms_at: meta.accepted_terms_at } : {}),
+        })
         .select()
         .single();
       prof = created;
@@ -539,6 +547,10 @@ function PanelContent() {
             </div>
           )}
         </section>
+
+        {!previewMode && profile && (
+          <PanelTickets userId={profile.id} />
+        )}
       </main>
     </div>
   );

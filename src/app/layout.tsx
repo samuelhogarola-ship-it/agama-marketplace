@@ -4,12 +4,12 @@ import Image from "next/image";
 import "./globals.css";
 import { createClient } from "@/lib/supabase/server";
 import CookieBanner from "@/components/CookieBanner";
-import Analytics from "@/components/Analytics";
+import Analytics from "@/components/Analytics"; // server component — no "use client"
 import CategoryBrowseBar from "@/components/CategoryBrowseBar";
 import MobileNav from "@/components/MobileNav";
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "https://todo-plastico.com"),
   title: {
     default: "TodoPlástico — Mercado para comprar productos plásticos en México",
     template: "%s | TodoPlástico",

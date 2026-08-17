@@ -5,6 +5,7 @@ import type { Product } from "@/lib/types";
 import Link from "next/link";
 import { PUBLISHED_ARTICLES } from "@/lib/articles";
 import { CATEGORIES } from "@/lib/categories";
+import SearchAnalytics from "@/components/SearchAnalytics";
 
 export const metadata: Metadata = { title: "Buscar", robots: { index: false } };
 
@@ -54,9 +55,16 @@ export default async function SearchPage({ searchParams }: Props) {
   const matchingArticles = query
     ? PUBLISHED_ARTICLES.filter((a) => `${a.title} ${a.excerpt}`.toLowerCase().includes(safeQuery.toLowerCase()))
     : [];
+  const resultsCount = products.length + companies.length + matchingArticles.length;
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-12">
+      <SearchAnalytics
+        query={query}
+        category={category}
+        location={location}
+        resultsCount={resultsCount}
+      />
       <h1 className="text-2xl font-bold text-slate-800">
         {query ? `Resultados para "${query}"` : "Buscar en TodoPlástico"}
       </h1>
