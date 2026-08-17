@@ -41,13 +41,36 @@ export async function POST(request: Request) {
   if (message.length < 10 || message.length > 5000)
     return NextResponse.json({ error: "El mensaje debe tener entre 10 y 5000 caracteres." }, { status: 400 });
 
+  // Ensure company row exists (created lazily if missing)
+  const { data: existingCompany } = await supabase
+    .from("mkt_companies")
+    .select("id")
+    .eq("id", user.id)
+    .maybeSingle();
+
+  if (!existingCompany) {
+    const rawName = user.email?.split("@")[0] ?? "empresa";
+    const name = rawName.slice(0, 120);
+    const slug = `${rawName.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "").slice(0, 54)}-${user.id.slice(0, 6)}`;
+    const { error: companyErr } = await supabase
+      .from("mkt_companies")
+      .insert({ id: user.id, name, slug });
+    if (companyErr) {
+      console.error("[tickets POST] company create error:", companyErr);
+      return NextResponse.json({ error: "No se pudo crear el perfil de empresa." }, { status: 500 });
+    }
+  }
+
   const { data: ticket, error: ticketError } = await supabase
     .from("mkt_tickets")
     .insert({ company_id: user.id, category, subject, ticket_code: "" })
     .select("id, ticket_code")
     .single();
 
-  if (ticketError) return NextResponse.json({ error: "No se pudo crear el ticket." }, { status: 500 });
+  if (ticketError) {
+    console.error("[tickets POST] insert error:", ticketError);
+    return NextResponse.json({ error: "No se pudo crear el ticket." }, { status: 500 });
+  }
 
   await supabase
     .from("mkt_ticket_messages")

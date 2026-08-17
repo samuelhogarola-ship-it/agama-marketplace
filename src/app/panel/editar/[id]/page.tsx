@@ -47,8 +47,29 @@ function EditListingContent() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [deletePhotoId, setDeletePhotoId] = useState<number | null>(null);
+  const [generatingDesc, setGeneratingDesc] = useState(false);
 
   const subcategories = CATEGORY_SUBCATEGORIES[form.category] ?? [];
+
+  async function generateDescription() {
+    if (!form.title.trim()) { setError("Escribe el título antes de generar la descripción."); return; }
+    setGeneratingDesc(true);
+    setError(null);
+    try {
+      const res = await fetch("/api/generate-description", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ title: form.title, category: form.category, location: form.location }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error ?? "Error");
+      setForm((f) => ({ ...f, description: data.description }));
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "No se pudo generar la descripción.");
+    } finally {
+      setGeneratingDesc(false);
+    }
+  }
 
   useEffect(() => {
     if (previewMode) {
@@ -407,9 +428,19 @@ function EditListingContent() {
             <label className="block text-sm font-medium text-slate-700">
               Descripción
             </label>
-            <span className={`text-xs ${form.description.length > DESC_MAX - 200 ? "text-amber-600" : "text-slate-400"}`}>
-              {form.description.length}/{DESC_MAX}
-            </span>
+            <div className="flex items-center gap-3">
+              <button
+                type="button"
+                onClick={generateDescription}
+                disabled={generatingDesc}
+                className="text-xs font-medium text-brand hover:text-brand-dark disabled:opacity-50"
+              >
+                {generatingDesc ? "Generando…" : "✦ Generar con IA"}
+              </button>
+              <span className={`text-xs ${form.description.length > DESC_MAX - 200 ? "text-amber-600" : "text-slate-400"}`}>
+                {form.description.length}/{DESC_MAX}
+              </span>
+            </div>
           </div>
           <textarea
             required

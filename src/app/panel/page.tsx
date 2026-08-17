@@ -38,6 +38,7 @@ function PanelContent() {
   const [profile, setProfile] = useState<Company | null>(null);
   const [products, setProducts] = useState<Product[]>([]);
   const [email, setEmail] = useState("");
+  const [userId, setUserId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [actionError, setActionError] = useState<string | null>(null);
   const [deleteConfirmId, setDeleteConfirmId] = useState<number | null>(null);
@@ -59,6 +60,7 @@ function PanelContent() {
       return;
     }
     setEmail(user.email ?? "");
+    setUserId(user.id);
     let [{ data: prof }, { data: prods }] = await Promise.all([
       supabase.from("mkt_companies").select("*").eq("id", user.id).maybeSingle(),
       supabase
@@ -238,6 +240,14 @@ function PanelContent() {
           >
             Ver directorio
           </Link>
+          {!previewMode && (
+            <a
+              href="#soporte"
+              className="rounded-lg px-3 py-2.5 text-slate-600 hover:bg-slate-50 hover:text-brand-dark"
+            >
+              Soporte
+            </a>
+          )}
         </nav>
         <div className="mt-8 border-t border-slate-200 pt-5">
           <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-400">
@@ -548,8 +558,10 @@ function PanelContent() {
           )}
         </section>
 
-        {!previewMode && profile && (
-          <PanelTickets userId={profile.id} />
+        {!previewMode && (profile?.id ?? userId) && (
+          <section id="soporte">
+            <PanelTickets userId={(profile?.id ?? userId)!} />
+          </section>
         )}
       </main>
     </div>
