@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { checkOrigin } from "@/lib/csrf";
+import { sendTicketCreatedToAdmin } from "@/lib/email";
 
 const VALID_CATEGORIES = new Set(["facturacion", "tecnico", "contenido", "cuenta", "general"]);
 
@@ -75,6 +76,13 @@ export async function POST(request: Request) {
   await supabase
     .from("mkt_ticket_messages")
     .insert({ ticket_id: ticket.id, author_id: user.id, body: message, is_internal: false });
+
+  sendTicketCreatedToAdmin({
+    ticketCode: ticket.ticket_code,
+    subject,
+    category,
+    userEmail: user.email ?? "desconocido",
+  }).catch(() => {});
 
   return NextResponse.json({ ok: true, ticket });
 }
