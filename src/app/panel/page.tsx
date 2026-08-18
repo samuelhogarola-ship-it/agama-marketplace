@@ -35,6 +35,7 @@ function PanelContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const previewMode = searchParams.get("preview") === "1";
+  const upgradeSuccess = searchParams.get("upgrade") === "success";
   const [profile, setProfile] = useState<Company | null>(null);
   const [products, setProducts] = useState<Product[]>([]);
   const [email, setEmail] = useState("");
@@ -42,6 +43,7 @@ function PanelContent() {
   const [loading, setLoading] = useState(true);
   const [actionError, setActionError] = useState<string | null>(null);
   const [deleteConfirmId, setDeleteConfirmId] = useState<number | null>(null);
+  const [upgrading, setUpgrading] = useState(false);
 
   const load = useCallback(async () => {
     if (previewMode) {
@@ -155,6 +157,20 @@ function PanelContent() {
     window.location.href = "/";
   }
 
+  async function upgradeToPro() {
+    setUpgrading(true);
+    try {
+      const res = await fetch("/api/stripe/checkout", { method: "POST", headers: { "Content-Type": "application/json" } });
+      const data = await res.json();
+      if (data.url) window.location.href = data.url;
+      else setActionError(data.error ?? "No se pudo iniciar el pago.");
+    } catch {
+      setActionError("Error de red. Inténtalo de nuevo.");
+    } finally {
+      setUpgrading(false);
+    }
+  }
+
   const counts = useMemo(
     () => ({
       published: products.filter((p) => p.status === "published").length,
@@ -257,8 +273,17 @@ function PanelContent() {
             {profile?.plan === "pro" ? "Pro" : "Gratuito"}
           </p>
           <p className="mt-1 text-xs leading-5 text-slate-500">
-            {activeCount}/{limit === Infinity ? "5" : limit} anuncios activos
+            {activeCount}/{limit === Infinity ? "∞" : limit} anuncios activos
           </p>
+          {!previewMode && profile?.plan !== "pro" && (
+            <button
+              onClick={upgradeToPro}
+              disabled={upgrading}
+              className="mt-3 w-full rounded-lg bg-brand px-3 py-2 text-xs font-semibold text-white hover:bg-brand-dark disabled:opacity-50 transition-colors"
+            >
+              {upgrading ? "Redirigiendo…" : "Subir a Pro"}
+            </button>
+          )}
           <button
             onClick={signOut}
             className="mt-5 text-xs font-semibold text-slate-500 hover:text-brand-dark"
@@ -269,6 +294,11 @@ function PanelContent() {
       </aside>
 
       <main className="min-w-0">
+        {upgradeSuccess && (
+          <div className="mb-8 rounded-2xl border border-emerald-200 bg-emerald-50 px-5 py-4 text-sm text-emerald-800">
+            <span className="font-semibold">¡Plan Pro activado!</span> Ya puedes publicar anuncios ilimitados. Gracias por tu apoyo.
+          </div>
+        )}
         {previewMode ? (
           <div className="mb-8 rounded-2xl border border-brand/20 bg-brand-light px-5 py-4 text-sm text-slate-700">
             <span className="font-semibold text-brand-dark">
