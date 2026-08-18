@@ -42,6 +42,7 @@ export async function POST(req: NextRequest) {
     customer: customerId,
     mode: "subscription",
     line_items: [{ price: PRICE_ID, quantity: 1 }],
+    subscription_data: { trial_period_days: 30 },
     success_url: `${SITE_URL}/panel?upgrade=success`,
     cancel_url: `${SITE_URL}/panel`,
     metadata: { supabase_user_id: user.id },
