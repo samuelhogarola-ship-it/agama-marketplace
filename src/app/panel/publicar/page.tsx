@@ -41,7 +41,6 @@ export default function PublicarPage() {
   const [loading, setLoading] = useState(false);
   const [savingDraft, setSavingDraft] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
-  const [generatingDesc, setGeneratingDesc] = useState(false);
 
   const subcategories = CATEGORY_SUBCATEGORIES[form.category] ?? [];
 
@@ -50,26 +49,6 @@ export default function PublicarPage() {
     const compressed = await Promise.all(list.map(compressImage));
     setFiles(compressed);
     setPreviews(compressed.map((f) => URL.createObjectURL(f)));
-  }
-
-  async function generateDescription() {
-    if (!form.title.trim()) { setError("Escribe el título antes de generar la descripción."); return; }
-    setGeneratingDesc(true);
-    setError(null);
-    try {
-      const res = await fetch("/api/generate-description", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title: form.title, category: form.category, location: form.location }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error ?? "Error");
-      setForm((f) => ({ ...f, description: data.description }));
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "No se pudo generar la descripción.");
-    } finally {
-      setGeneratingDesc(false);
-    }
   }
 
   function removeFile(index: number) {
@@ -358,19 +337,9 @@ export default function PublicarPage() {
             <label className="block text-sm font-medium text-slate-700">
               Descripción <span className="text-red-400">*</span>
             </label>
-            <div className="flex items-center gap-3">
-              <button
-                type="button"
-                onClick={generateDescription}
-                disabled={generatingDesc}
-                className="text-xs font-medium text-brand hover:text-brand-dark disabled:opacity-50"
-              >
-                {generatingDesc ? "Generando…" : "✦ Generar con IA"}
-              </button>
-              <span className={`text-xs ${form.description.length > DESC_MAX - 200 ? "text-amber-600" : "text-slate-400"}`}>
-                {form.description.length}/{DESC_MAX}
-              </span>
-            </div>
+            <span className={`text-xs ${form.description.length > DESC_MAX - 200 ? "text-amber-600" : "text-slate-400"}`}>
+              {form.description.length}/{DESC_MAX}
+            </span>
           </div>
           <textarea
             required
