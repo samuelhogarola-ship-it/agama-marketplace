@@ -12,6 +12,14 @@ test.describe("smoke — páginas públicas", () => {
     await expect(page.getByRole("heading", { level: 1 })).toContainText("Comprar Tarimas y contenedores de plástico en México");
   });
 
+  test("sponsor AGAMA sigue el formato editorial de TodoPlástico", async ({ page }) => {
+    await page.goto("/sponsor/agama");
+    await expect(page.getByRole("link", { name: "Inicio", exact: true })).toBeVisible();
+    await expect(page.getByText("TodoPlástico", { exact: true }).first()).toBeVisible();
+    await expect(page.getByRole("heading", { level: 1 })).toContainText("AGAMA para la industria plástica");
+    await expect(page.getByRole("heading", { name: "Soluciones destacadas" })).toBeVisible();
+  });
+
   test("categoría inexistente da 404", async ({ page }) => {
     await page.goto("/c/categoria-que-no-existe");
     await expect(page.getByText("Página no encontrada")).toBeVisible();

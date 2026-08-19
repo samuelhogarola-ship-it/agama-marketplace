@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { checkOrigin } from "@/lib/csrf";
 import { createClient } from "@/lib/supabase/server";
-import { stripe } from "@/lib/stripe";
+import { getStripe } from "@/lib/stripe";
 
 const PRICE_ID = process.env.STRIPE_PRO_PRICE_ID;
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://todo-plastico.com";
@@ -27,6 +27,8 @@ export async function POST(req: NextRequest) {
   if (company?.plan === "pro") {
     return NextResponse.json({ error: "Ya tienes el plan Pro." }, { status: 400 });
   }
+
+  const stripe = getStripe();
 
   // Reutilizar customer de Stripe si existe
   let customerId: string | undefined = company?.stripe_customer_id ?? undefined;
