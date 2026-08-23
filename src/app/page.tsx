@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
 import { CATEGORIES, CATEGORY_IMAGES } from "@/lib/categories";
@@ -9,8 +10,20 @@ import type { Product } from "@/lib/types";
 
 export const revalidate = 300;
 
-export const metadata = {
+// Fuente única: la misma descripción alimenta la meta description y el JSON-LD.
+const HOME_DESCRIPTION =
+  "Directorio B2B gratuito de la industria plástica en México. Encuentra tarimas, envases, bolsas, cubetas, resinas, maquinaria y proveedores verificados. Publicar es gratis. Impulsado por AGAMA.";
+
+export const metadata: Metadata = {
+  // `absolute` evita que la plantilla del layout añada "| TodoPlástico" al título de la home.
+  title: { absolute: "TodoPlástico — Comprar y vender productos plásticos en México" },
+  description: HOME_DESCRIPTION,
   alternates: { canonical: "/" },
+  openGraph: {
+    title: "TodoPlástico — Comprar y vender productos plásticos en México",
+    description: HOME_DESCRIPTION,
+    url: "/",
+  },
 };
 
 const categoryImages = CATEGORY_IMAGES;
@@ -40,7 +53,7 @@ export default async function Home() {
     name: "TodoPlástico",
     url: siteUrl,
     logo: `${siteUrl}/todoplastico-symbol.png`,
-    description: "Directorio B2B gratuito de la industria plástica en México. Impulsado por AGAMA.",
+    description: HOME_DESCRIPTION,
   };
   const siteJsonLd = {
     "@context": "https://schema.org",

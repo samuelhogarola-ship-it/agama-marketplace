@@ -2,6 +2,17 @@
 
 ## [Unreleased]
 
+### Security
+- Escapado de HTML en todos los correos salientes (`src/lib/email.ts`): asunto, email y mensaje del usuario se interpolaban sin sanear, lo que permitía inyectar enlaces arbitrarios en un correo enviado desde el dominio propio (vector de phishing hacia el admin y hacia el usuario).
+- Rate limiting en la apertura (5/hora) y respuesta (10/10 min) de tickets, que hasta ahora disparaban un correo por petición sin ningún límite.
+
+### Fixed
+- La home no declaraba `title` ni `description` propios y heredaba los genéricos del layout; además la descripción del JSON-LD no coincidía con la meta description. Ahora ambas salen de una constante única.
+- Formulario de publicación: los 13 controles no tenían etiqueta asociada (`htmlFor`/`id`), por lo que un lector de pantalla los anunciaba sin nombre. Añadido también indicador de foco visible, `aria-pressed` en las subcategorías y `role="alert"` en el mensaje de error.
+
+### Changed
+- Rate limiter extraído a `src/lib/rate-limit.ts` y compartido entre moderación y tickets; ahora purga entradas vencidas en lugar de crecer sin límite.
+
 ### Added — MVP funcional (Fase 1 + parte de F2/F3)
 - App Next.js 15 (App Router, TS, Tailwind 4) con marca AGAMA (logo oficial, paleta navy/azul) arriba y abajo.
 - Catálogo público SSR: home, categorías, landing por categoría, ficha de producto (JSON-LD Product), ficha de empresa (LocalBusiness), búsqueda con log de demanda.

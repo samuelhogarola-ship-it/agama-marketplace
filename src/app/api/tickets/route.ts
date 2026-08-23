@@ -1,9 +1,14 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { checkOrigin } from "@/lib/csrf";
+import { isRateLimited } from "@/lib/rate-limit";
 import { sendTicketCreatedToAdmin } from "@/lib/email";
 
 const VALID_CATEGORIES = new Set(["facturacion", "tecnico", "contenido", "cuenta", "general"]);
+
+// Cada ticket dispara un correo al admin: limitamos la apertura para evitar abuso.
+const TICKET_MAX_PER_HOUR = 5;
+const TICKET_WINDOW_MS = 60 * 60_000;
 
 export async function GET() {
   const supabase = await createClient();
@@ -27,6 +32,12 @@ export async function POST(request: Request) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "No autorizado" }, { status: 401 });
+
+  if (isRateLimited({ key: `ticket-create:${user.id}`, max: TICKET_MAX_PER_HOUR, windowMs: TICKET_WINDOW_MS }))
+    return NextResponse.json(
+      { error: "Has abierto demasiados tickets seguidos. Espera un momento antes de crear otro." },
+      { status: 429 }
+    );
 
   const body = await request.json().catch(() => null);
   if (!body) return NextResponse.json({ error: "Solicitud inválida." }, { status: 400 });

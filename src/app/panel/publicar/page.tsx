@@ -18,6 +18,12 @@ const MAX_PHOTOS = 5;
 const TITLE_MAX = 120;
 const DESC_MAX = 3000;
 
+const LABEL_CLASS = "block text-sm font-medium text-slate-700";
+// El foco no puede depender solo del color de borde: se añade un anillo visible.
+const FIELD_CLASS =
+  "w-full rounded-lg border border-slate-300 px-4 py-2.5 focus:border-brand focus:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-1";
+const SELECT_CLASS = `${FIELD_CLASS} bg-white`;
+
 export default function PublicarPage() {
   const router = useRouter();
   const [form, setForm] = useState({
@@ -253,7 +259,7 @@ export default function PublicarPage() {
         {/* Título */}
         <div>
           <div className="flex items-baseline justify-between">
-            <label className="block text-sm font-medium text-slate-700">
+            <label htmlFor="listing-title" className={LABEL_CLASS}>
               Título <span className="text-red-400">*</span>
             </label>
             <span className={`text-xs ${form.title.length > TITLE_MAX - 20 ? "text-amber-600" : "text-slate-400"}`}>
@@ -261,41 +267,44 @@ export default function PublicarPage() {
             </span>
           </div>
           <input
+            id="listing-title"
             required
             minLength={10}
             maxLength={TITLE_MAX}
             value={form.title}
             onChange={(e) => setForm({ ...form, title: e.target.value })}
             placeholder="Ej. Tarima de plástico 1200×1000 mm, carga 1500 kg"
-            className="mt-1 w-full rounded-lg border border-slate-300 px-4 py-2.5 focus:outline-none focus:border-brand"
+            className={`mt-1 ${FIELD_CLASS}`}
           />
         </div>
 
         {/* Tipo y Categoría */}
         <div className="grid gap-4 sm:grid-cols-2">
           <div>
-            <label className="block text-sm font-medium text-slate-700">
+            <label htmlFor="listing-type" className={LABEL_CLASS}>
               Tipo
             </label>
             <select
+              id="listing-type"
               value={form.type}
               onChange={(e) => setForm({ ...form, type: e.target.value })}
-              className="mt-1 w-full rounded-lg border border-slate-300 bg-white px-4 py-2.5 focus:outline-none focus:border-brand"
+              className={`mt-1 ${SELECT_CLASS}`}
             >
               <option value="product">Producto</option>
               <option value="service">Servicio</option>
             </select>
           </div>
           <div>
-            <label className="block text-sm font-medium text-slate-700">
+            <label htmlFor="listing-category" className={LABEL_CLASS}>
               Categoría
             </label>
             <select
+              id="listing-category"
               value={form.category}
               onChange={(e) =>
                 setForm({ ...form, category: e.target.value, tags: [] })
               }
-              className="mt-1 w-full rounded-lg border border-slate-300 bg-white px-4 py-2.5 focus:outline-none focus:border-brand"
+              className={`mt-1 ${SELECT_CLASS}`}
             >
               {CATEGORIES.map((c) => (
                 <option key={c.slug} value={c.slug}>
@@ -309,16 +318,17 @@ export default function PublicarPage() {
         {/* Subcategorías / Tags */}
         {subcategories.length > 0 && (
           <div>
-            <label className="block text-sm font-medium text-slate-700">
+            <span id="listing-subcats-label" className={LABEL_CLASS}>
               Subcategorías (opcional)
-            </label>
-            <div className="mt-2 flex flex-wrap gap-2">
+            </span>
+            <div role="group" aria-labelledby="listing-subcats-label" className="mt-2 flex flex-wrap gap-2">
               {subcategories.map(([value, label]) => (
                 <button
                   key={value}
                   type="button"
                   onClick={() => toggleTag(value)}
-                  className={`rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
+                  aria-pressed={form.tags.includes(value)}
+                  className={`rounded-full border px-3 py-1.5 text-xs font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand ${
                     form.tags.includes(value)
                       ? "border-brand bg-brand-light text-brand-dark"
                       : "border-slate-200 text-slate-600 hover:border-brand hover:text-brand-dark"
@@ -334,7 +344,7 @@ export default function PublicarPage() {
         {/* Descripción */}
         <div>
           <div className="flex items-baseline justify-between">
-            <label className="block text-sm font-medium text-slate-700">
+            <label htmlFor="listing-description" className={LABEL_CLASS}>
               Descripción <span className="text-red-400">*</span>
             </label>
             <span className={`text-xs ${form.description.length > DESC_MAX - 200 ? "text-amber-600" : "text-slate-400"}`}>
@@ -342,6 +352,7 @@ export default function PublicarPage() {
             </span>
           </div>
           <textarea
+            id="listing-description"
             required
             minLength={30}
             maxLength={DESC_MAX}
@@ -349,7 +360,7 @@ export default function PublicarPage() {
             value={form.description}
             onChange={(e) => setForm({ ...form, description: e.target.value })}
             placeholder="Materiales, medidas, capacidad, cantidades mínimas, condiciones, aplicaciones… Los datos de contacto van en tu perfil."
-            className="mt-1 w-full rounded-lg border border-slate-300 px-4 py-2.5 focus:outline-none focus:border-brand"
+            className={`mt-1 ${FIELD_CLASS}`}
           />
         </div>
 
@@ -373,10 +384,11 @@ export default function PublicarPage() {
 
           <div className="grid gap-4 sm:grid-cols-4">
             <div>
-              <label className="block text-sm font-medium text-slate-700">
+              <label htmlFor="listing-price" className={LABEL_CLASS}>
                 Precio MXN {!form.priceOnRequest && <span className="text-red-400">*</span>}
               </label>
               <input
+                id="listing-price"
                 type="number"
                 min={0}
                 step="0.01"
@@ -384,18 +396,19 @@ export default function PublicarPage() {
                 value={form.price}
                 onChange={(e) => setForm({ ...form, price: e.target.value })}
                 placeholder="0.00"
-                className="mt-1 w-full rounded-lg border border-slate-300 px-4 py-2.5 focus:outline-none focus:border-brand disabled:bg-slate-50 disabled:text-slate-400"
+                className={`mt-1 ${FIELD_CLASS} disabled:bg-slate-50 disabled:text-slate-400`}
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-slate-700">
+              <label htmlFor="listing-unit" className={LABEL_CLASS}>
                 Cómo se vende <span className="text-red-400">*</span>
               </label>
               <select
+                id="listing-unit"
                 required
                 value={form.unit}
                 onChange={(e) => setForm({ ...form, unit: e.target.value })}
-                className="mt-1 w-full rounded-lg border border-slate-300 bg-white px-4 py-2.5 focus:outline-none focus:border-brand"
+                className={`mt-1 ${SELECT_CLASS}`}
               >
                 {SALE_UNITS.map((unit) => (
                   <option key={unit.value} value={unit.value}>
@@ -405,10 +418,11 @@ export default function PublicarPage() {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-slate-700">
+              <label htmlFor="listing-min-qty" className={LABEL_CLASS}>
                 Compra mínima <span className="text-red-400">*</span>
               </label>
               <input
+                id="listing-min-qty"
                 required
                 type="number"
                 min={1}
@@ -419,20 +433,21 @@ export default function PublicarPage() {
                   setForm({ ...form, min_purchase_qty: e.target.value })
                 }
                 placeholder="1"
-                className="mt-1 w-full rounded-lg border border-slate-300 px-4 py-2.5 focus:outline-none focus:border-brand"
+                className={`mt-1 ${FIELD_CLASS}`}
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-slate-700">
+              <label htmlFor="listing-location" className={LABEL_CLASS}>
                 Ubicación <span className="text-red-400">*</span>
               </label>
               <input
+                id="listing-location"
                 required
                 minLength={2}
                 value={form.location}
                 onChange={(e) => setForm({ ...form, location: e.target.value })}
                 placeholder="Iztapalapa, CDMX"
-                className="mt-1 w-full rounded-lg border border-slate-300 px-4 py-2.5 focus:outline-none focus:border-brand"
+                className={`mt-1 ${FIELD_CLASS}`}
               />
             </div>
           </div>
@@ -440,17 +455,18 @@ export default function PublicarPage() {
 
         {/* Contacto */}
         <div>
-          <label className="block text-sm font-medium text-slate-700">
+          <label htmlFor="listing-contact-method" className={LABEL_CLASS}>
             Forma de contacto <span className="text-red-400">*</span>
           </label>
           <div className="mt-1 grid gap-4 sm:grid-cols-[180px_minmax(0,1fr)]">
             <select
+              id="listing-contact-method"
               required
               value={form.contact_method}
               onChange={(e) =>
                 setForm({ ...form, contact_method: e.target.value })
               }
-              className="w-full rounded-lg border border-slate-300 bg-white px-4 py-2.5 focus:outline-none focus:border-brand"
+              className={SELECT_CLASS}
             >
               {CONTACT_METHODS.map((method) => (
                 <option key={method.value} value={method.value}>
@@ -458,40 +474,48 @@ export default function PublicarPage() {
                 </option>
               ))}
             </select>
-            <input
-              required
-              value={form.contact_value}
-              onChange={(e) =>
-                setForm({ ...form, contact_value: e.target.value })
-              }
-              placeholder={contactPlaceholder(form.contact_method)}
-              className="w-full rounded-lg border border-slate-300 px-4 py-2.5 focus:outline-none focus:border-brand"
-            />
+            <div>
+              <label htmlFor="listing-contact-value" className="sr-only">
+                Dato de contacto
+              </label>
+              <input
+                id="listing-contact-value"
+                required
+                value={form.contact_value}
+                onChange={(e) =>
+                  setForm({ ...form, contact_value: e.target.value })
+                }
+                placeholder={contactPlaceholder(form.contact_method)}
+                className={FIELD_CLASS}
+              />
+            </div>
           </div>
         </div>
 
         {/* Enlace externo */}
         <div>
-          <label className="block text-sm font-medium text-slate-700">
+          <label htmlFor="listing-external-url" className={LABEL_CLASS}>
             Enlace externo (opcional)
           </label>
           <input
+            id="listing-external-url"
             type="url"
             value={form.external_url}
             onChange={(e) =>
               setForm({ ...form, external_url: e.target.value })
             }
             placeholder="https://tuempresa.com/producto"
-            className="mt-1 w-full rounded-lg border border-slate-300 px-4 py-2.5 focus:outline-none focus:border-brand"
+            aria-describedby="listing-external-url-help"
+            className={`mt-1 ${FIELD_CLASS}`}
           />
-          <p className="mt-1 text-xs text-slate-500">
+          <p id="listing-external-url-help" className="mt-1 text-xs text-slate-500">
             Solo enlaces de la web propia de tu empresa.
           </p>
         </div>
 
         {/* Fotos */}
         <div>
-          <label className="block text-sm font-medium text-slate-700">
+          <label htmlFor="listing-photos" className={LABEL_CLASS}>
             Fotos (hasta 5)
           </label>
           <label className="mt-2 flex cursor-pointer items-center gap-3 rounded-xl border-2 border-dashed border-slate-200 px-4 py-3 text-sm text-slate-500 hover:border-brand hover:text-brand">
@@ -500,6 +524,7 @@ export default function PublicarPage() {
               ? "Seleccionar fotos (JPG, PNG, WebP)"
               : `${files.length}/${MAX_PHOTOS} foto(s) seleccionada(s) — Cambiar`}
             <input
+              id="listing-photos"
               type="file"
               accept="image/jpeg,image/png,image/webp"
               multiple
@@ -538,7 +563,7 @@ export default function PublicarPage() {
         </div>
 
         {error && (
-          <p className="rounded-lg bg-red-50 p-3 text-sm text-red-600">
+          <p role="alert" className="rounded-lg bg-red-50 p-3 text-sm text-red-600">
             {error}
           </p>
         )}

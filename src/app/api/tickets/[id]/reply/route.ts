@@ -1,7 +1,12 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { checkOrigin } from "@/lib/csrf";
+import { isRateLimited } from "@/lib/rate-limit";
 import { sendTicketReplyToAdmin } from "@/lib/email";
+
+// Cada respuesta notifica al admin por correo: limitamos la frecuencia.
+const REPLY_MAX = 10;
+const REPLY_WINDOW_MS = 10 * 60_000;
 
 export async function POST(request: Request, { params }: { params: Promise<{ id: string }> }) {
   const originError = checkOrigin(request);
@@ -11,6 +16,12 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "No autorizado" }, { status: 401 });
+
+  if (isRateLimited({ key: `ticket-reply:${user.id}`, max: REPLY_MAX, windowMs: REPLY_WINDOW_MS }))
+    return NextResponse.json(
+      { error: "Demasiadas respuestas seguidas. Espera unos minutos." },
+      { status: 429 }
+    );
 
   const body = await request.json().catch(() => null);
   const message = String(body?.message ?? "").trim();
