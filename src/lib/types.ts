@@ -82,8 +82,15 @@ export function photoUrl(path: string): string {
   return `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/mkt-photos/${path}`;
 }
 
+/**
+ * Slug de respaldo para anuncios sin slug (registros antiguos). No puede ser
+ * vacío: `parseId` en /p/[slug] exige un guion antes del id, así que una ruta
+ * como `/p/123` no resolvería.
+ */
+export const FALLBACK_LISTING_SLUG = "anuncio";
+
 export function listingPath(p: Pick<Listing, "slug" | "id">): string {
-  return `/p/${p.slug}-${p.id}`;
+  return `/p/${p.slug || FALLBACK_LISTING_SLUG}-${p.id}`;
 }
 
 export const productPath = listingPath;

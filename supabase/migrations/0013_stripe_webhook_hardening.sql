@@ -134,6 +134,17 @@ begin
   return true;
 end $$;
 
+-- Revocamos de PUBLIC y de los roles de cliente, pero hay que devolverle el
+-- EXECUTE a service_role: el `revoke ... from public` le quita también la
+-- concesión implícita que heredaba, y el webhook dejaría de poder llamarla.
 revoke all on function public.mkt_apply_stripe_event(
   timestamptz, text, uuid, text, text, boolean
 ) from public, anon, authenticated;
+
+grant execute on function public.mkt_apply_stripe_event(
+  timestamptz, text, uuid, text, text, boolean
+) to service_role;
+
+-- Mismo motivo para la tabla de eventos: el webhook inserta, consulta y, si la
+-- aplicación del plan falla, borra la marca para que Stripe reintente.
+grant select, insert, delete on public.mkt_stripe_events to service_role;

@@ -3,7 +3,7 @@ import Link from "next/link";
 import { notFound, permanentRedirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { categoryBySlug } from "@/lib/categories";
-import { type Product } from "@/lib/types";
+import { listingPath, type Product } from "@/lib/types";
 import { formatPrice } from "@/components/ProductCard";
 import ListingGallery from "@/components/ListingGallery";
 import ShareButton from "@/components/ShareButton";
@@ -133,7 +133,7 @@ function SummaryPanel({
   categoryName?: string;
   siteUrl: string;
 }) {
-  const fullUrl = `${siteUrl}/p/${product.slug}-${product.id}`;
+  const fullUrl = `${siteUrl}${listingPath(product)}`;
   return (
     <aside className="rounded-[8px] border border-slate-200 bg-white p-5 shadow-sm">
       <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-sky">
@@ -185,7 +185,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: product.title,
     description: product.description.slice(0, 160),
-    alternates: { canonical: `/p/${product.slug}-${product.id}` },
+    alternates: { canonical: listingPath(product) },
     openGraph: product.photos?.[0]
       ? { images: [photoUrl(product.photos[0].storage_path)] }
       : undefined,
@@ -201,14 +201,10 @@ export default async function ProductPage({ params }: Props) {
 
   // `parseId` solo mira los dígitos finales, así que cualquier slug con el id
   // correcto servía la misma ficha. Redirigimos a la URL canónica para no
-  // multiplicar variantes de la misma página.
-  //
-  // Si el anuncio no tiene slug (registros antiguos) no hay canónico al que
-  // redirigir: servimos la página tal cual en vez de mandar a `/p/null-<id>`.
-  if (product.slug) {
-    const canonicalSlug = `${product.slug}-${product.id}`;
-    if (slug !== canonicalSlug) permanentRedirect(`/p/${canonicalSlug}`);
-  }
+  // multiplicar variantes de la misma página. `listingPath` cubre el caso del
+  // anuncio sin slug, así que el destino siempre resuelve.
+  const canonicalPath = listingPath(product);
+  if (`/p/${slug}` !== canonicalPath) permanentRedirect(canonicalPath);
 
   const cat = categoryBySlug(product.category);
   const photos = (product.photos ?? []).sort((a, b) => a.position - b.position);

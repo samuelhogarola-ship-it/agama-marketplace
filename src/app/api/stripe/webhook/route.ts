@@ -63,22 +63,24 @@ export async function POST(req: NextRequest) {
   const eventAt = new Date(event.created * 1000).toISOString();
 
   // Stripe reintenta la entrega ante cualquier timeout o error, así que el mismo
-  // evento puede llegar varias veces. El id es PK: si el insert no devuelve fila,
-  // ya lo procesamos y salimos sin repetir efectos.
-  const { data: claimed, error: claimError } = await supabase
+  // evento puede llegar varias veces. Comprobamos antes de procesar y sellamos
+  // DESPUÉS: si el handler muere a mitad, el evento no queda marcado y el
+  // reintento de Stripe sí lo procesa.
+  //
+  // Que dos entregas simultáneas pasen las dos la comprobación es inocuo:
+  // `mkt_apply_stripe_event` toma lock de fila, así que se serializan y
+  // escriben el mismo valor. La PK descarta el segundo sellado.
+  const { data: seen, error: seenError } = await supabase
     .from("mkt_stripe_events")
-    .upsert(
-      { id: event.id, type: event.type, event_created_at: eventAt },
-      { onConflict: "id", ignoreDuplicates: true }
-    )
-    .select("id");
+    .select("id")
+    .eq("id", event.id)
+    .maybeSingle();
 
-  if (claimError) {
-    console.error("[stripe/webhook] no se pudo registrar el evento:", claimError);
-    // Devolvemos 500 para que Stripe reintente: es preferible a perder el evento.
-    return NextResponse.json({ error: "Error al registrar el evento" }, { status: 500 });
+  if (seenError) {
+    console.error("[stripe/webhook] no se pudo consultar el evento:", seenError);
+    return NextResponse.json({ error: "Error al consultar el evento" }, { status: 500 });
   }
-  if (!claimed?.length) {
+  if (seen) {
     return NextResponse.json({ received: true, duplicate: true });
   }
 
@@ -129,11 +131,24 @@ export async function POST(req: NextRequest) {
       break;
   }
 
-  // Si el plan no se pudo escribir, soltamos la marca de procesado y pedimos a
-  // Stripe que reintente. Sin esto el evento quedaría registrado pero sin efecto.
+  // Si el plan no se pudo escribir, no sellamos: devolvemos 500 y Stripe
+  // reintenta. Sin esto el evento quedaría dado por procesado y sin efecto.
   if (!result.ok) {
-    await supabase.from("mkt_stripe_events").delete().eq("id", event.id);
     return NextResponse.json({ error: "No se pudo aplicar el evento" }, { status: 500 });
+  }
+
+  const { error: sealError } = await supabase
+    .from("mkt_stripe_events")
+    .upsert(
+      { id: event.id, type: event.type, event_created_at: eventAt },
+      { onConflict: "id", ignoreDuplicates: true }
+    );
+
+  // El sellado es best-effort: el plan ya está aplicado. Si falla, un reintento
+  // de Stripe volvería a aplicarlo, que es idempotente (mismos valores, y la
+  // guarda de orden descarta lo que llegue tarde).
+  if (sealError) {
+    console.error("[stripe/webhook] no se pudo sellar el evento:", sealError);
   }
 
   return NextResponse.json({ received: true });
