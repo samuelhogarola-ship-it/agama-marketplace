@@ -2,6 +2,11 @@
 
 ## [Unreleased]
 
+### Fixed — soft-404 en todas las rutas dinámicas
+- `src/app/loading.tsx` envolvía la aplicación entera en un límite de Suspense. Next volcaba la cabecera con status 200 antes de renderizar el contenido, así que cualquier `notFound()` o `redirect()` posterior pintaba su UI pero **no podía cambiar el código HTTP**: `/c/*`, `/p/*`, `/e/*` y `/articulos/*` inexistentes devolvían 200 en vez de 404, y el redirect canónico de `/p/[slug]` devolvía 200 en vez de 308.
+- Eliminado el `loading.tsx` de la raíz. El spinner vive ahora en `src/components/RouteLoading.tsx` y se reutiliza desde `/buscar`, `/empresas` y `/categorias` — segmentos que no contienen rutas con `notFound()`. `/panel` conserva su propio skeleton.
+- El smoke test de 404 comprobaba el texto de la página, no el status, y por eso el fallo pasó desapercibido. Añadidos dos tests que verifican el código HTTP: 404 real en cinco rutas inexistentes y 308 con `Location` correcto en una ficha con slug incorrecto.
+
 ### Security
 - Escapado de HTML en todos los correos salientes (`src/lib/email.ts`): asunto, email y mensaje del usuario se interpolaban sin sanear, lo que permitía inyectar enlaces arbitrarios en un correo enviado desde el dominio propio (vector de phishing hacia el admin y hacia el usuario).
 - Rate limiting en la apertura (5/hora) y respuesta (10/10 min) de tickets, que hasta ahora disparaban un correo por petición sin ningún límite.
