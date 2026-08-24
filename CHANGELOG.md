@@ -2,6 +2,23 @@
 
 ## [Unreleased]
 
+### Security
+- CSRF: añadida verificación `checkOrigin()` al endpoint `/api/moderate` (el único sin protección).
+- CSP: eliminado `'unsafe-eval'` de `script-src` en producción.
+
+### SEO
+- Meta description del home recortada a ~155 chars (estaba en 208).
+- OG image del layout raíz cambiada a 1200×630 (`og-default.png`).
+- Títulos de `/categorias` y `/empresas` acortados a ≤60 chars.
+- Añadido `lastModified` a todas las páginas estáticas del sitemap.
+- `generateStaticParams` añadido a `/e/[slug]` y `/p/[slug]` para pre-render en build.
+- Logos de empresa migrados de `<img>` a `next/image` en páginas públicas.
+
+### Code quality
+- Constantes de formulario (`FIELD_CLASS`, `LABEL_CLASS`, `SELECT_CLASS`) extraídas a `src/lib/form-classes.ts`.
+- `DEMO_PREVIEW_ENABLED` centralizado en `src/lib/demo-data.ts` (antes duplicado en 3 archivos).
+- Focus ring unificado en la página de edición (`focus-visible:ring-2`).
+
 ### Fixed — soft-404 en todas las rutas dinámicas
 - `src/app/loading.tsx` envolvía la aplicación entera en un límite de Suspense. Next volcaba la cabecera con status 200 antes de renderizar el contenido, así que cualquier `notFound()` o `redirect()` posterior pintaba su UI pero **no podía cambiar el código HTTP**: `/c/*`, `/p/*`, `/e/*` y `/articulos/*` inexistentes devolvían 200 en vez de 404, y el redirect canónico de `/p/[slug]` devolvía 200 en vez de 308.
 - Eliminado el `loading.tsx` de la raíz. El spinner vive ahora en `src/components/RouteLoading.tsx` y se reutiliza desde `/buscar`, `/empresas` y `/categorias` — segmentos que no contienen rutas con `notFound()`. `/panel` conserva su propio skeleton.

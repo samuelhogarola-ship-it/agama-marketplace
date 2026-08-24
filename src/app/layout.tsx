@@ -24,7 +24,6 @@ export const metadata: Metadata = {
     type: "website",
     locale: "es_MX",
     siteName: "TodoPlástico",
-    images: [{ url: "/todoplastico-symbol.png", width: 512, height: 512 }],
   },
   twitter: {
     card: "summary_large_image",

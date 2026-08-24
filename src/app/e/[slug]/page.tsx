@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { createClient } from "@/lib/supabase/server";
 import ProductCard from "@/components/ProductCard";
 import TrackedContactLink from "@/components/TrackedContactLink";
@@ -23,6 +24,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     alternates: { canonical: `/e/${slug}` },
     openGraph: data.logo_url ? { images: [data.logo_url] } : undefined,
   };
+}
+
+export async function generateStaticParams() {
+  const supabase = await createClient();
+  const { data } = await supabase.from("mkt_companies").select("slug").eq("status", "active").limit(100);
+  return (data ?? []).map((c) => ({ slug: c.slug }));
 }
 
 export default async function CompanyPage({ params }: Props) {
@@ -90,10 +97,11 @@ export default async function CompanyPage({ params }: Props) {
         {/* Avatar / logo */}
         <div className="flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-slate-200 bg-slate-50">
           {profile.logo_url ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
+            <Image
               src={profile.logo_url}
               alt={`Logo de ${profile.name}`}
+              width={80}
+              height={80}
               className="h-full w-full object-contain p-2"
             />
           ) : (

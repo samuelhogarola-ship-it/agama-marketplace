@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import Image from "next/image";
 import { notFound, permanentRedirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { categoryBySlug } from "@/lib/categories";
@@ -192,6 +193,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
+export async function generateStaticParams() {
+  const supabase = await createClient();
+  const { data } = await supabase.from("mkt_listings").select("id, slug").eq("status", "published").limit(200);
+  return (data ?? []).map((p) => ({ slug: p.slug ? `${p.slug}-${p.id}` : String(p.id) }));
+}
+
 export default async function ProductPage({ params }: Props) {
   const { slug } = await params;
   const id = parseId(slug);
@@ -329,10 +336,11 @@ export default async function ProductPage({ params }: Props) {
                 <div className="flex items-center gap-4">
                   <div className="flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-full border border-slate-200 bg-slate-50">
                     {product.company.logo_url ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img
+                      <Image
                         src={product.company.logo_url}
                         alt={`Logo de ${product.company.name}`}
+                        width={56}
+                        height={56}
                         className="h-full w-full object-contain p-2"
                       />
                     ) : (

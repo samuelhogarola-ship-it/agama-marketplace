@@ -7,7 +7,7 @@ import { createClient } from "@/lib/supabase/server";
 export const revalidate = 300;
 
 export const metadata: Metadata = {
-  title: "Comprar productos plásticos por categoría — Proveedores B2B México",
+  title: "Productos plásticos por categoría — TodoPlástico",
   description: "Todas las categorías de TodoPlástico: envases, bolsas, tarimas, cubetas, muebles, moldes, empaques, reciclado y más. Encuentra proveedores de la industria plástica en México.",
   alternates: { canonical: "/categorias" },
 };

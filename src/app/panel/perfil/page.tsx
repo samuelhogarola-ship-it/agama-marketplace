@@ -5,10 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { CATEGORIES } from "@/lib/categories";
 import { compressImage } from "@/lib/compress-image";
-import { DEMO_COMPANY } from "@/lib/demo-data";
-
-// Ver nota en /panel: el modo demo queda tras un flag explícito.
-const DEMO_PREVIEW_ENABLED = process.env.NEXT_PUBLIC_DEMO_PREVIEW === "1";
+import { DEMO_COMPANY, DEMO_PREVIEW_ENABLED } from "@/lib/demo-data";
 
 function PerfilContent() {
   const router = useRouter();
