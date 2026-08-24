@@ -202,8 +202,13 @@ export default async function ProductPage({ params }: Props) {
   // `parseId` solo mira los dígitos finales, así que cualquier slug con el id
   // correcto servía la misma ficha. Redirigimos a la URL canónica para no
   // multiplicar variantes de la misma página.
-  const canonicalSlug = `${product.slug}-${product.id}`;
-  if (slug !== canonicalSlug) permanentRedirect(`/p/${canonicalSlug}`);
+  //
+  // Si el anuncio no tiene slug (registros antiguos) no hay canónico al que
+  // redirigir: servimos la página tal cual en vez de mandar a `/p/null-<id>`.
+  if (product.slug) {
+    const canonicalSlug = `${product.slug}-${product.id}`;
+    if (slug !== canonicalSlug) permanentRedirect(`/p/${canonicalSlug}`);
+  }
 
   const cat = categoryBySlug(product.category);
   const photos = (product.photos ?? []).sort((a, b) => a.position - b.position);
