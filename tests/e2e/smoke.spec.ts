@@ -20,7 +20,35 @@ test.describe("smoke — páginas públicas", () => {
     await expect(page.getByRole("heading", { name: "Soluciones destacadas" })).toBeVisible();
   });
 
-  test("categoría inexistente da 404", async ({ page }) => {
+  // Comprueba el STATUS, no solo el texto: un `loading.tsx` mal colocado hace
+  // que Next vuelque la cabecera con 200 y el notFound() pinte la UI de 404
+  // sin cambiar el código HTTP. La versión anterior de este test miraba solo
+  // el texto y por eso el soft-404 pasó desapercibido.
+  test("las rutas inexistentes devuelven 404 de verdad", async ({ page }) => {
+    for (const path of [
+      "/c/categoria-que-no-existe",
+      "/p/nada-999999",
+      "/e/empresa-que-no-existe",
+      "/articulos/articulo-que-no-existe",
+      "/ruta-que-no-existe",
+    ]) {
+      const response = await page.goto(path);
+      expect(response?.status(), `${path} debe devolver 404`).toBe(404);
+    }
+  });
+
+  test("una ficha con slug incorrecto redirige 308 al canónico", async ({ request }) => {
+    const listing = await request.get("/sitemap.xml");
+    const match = (await listing.text()).match(/\/p\/([a-z0-9-]+)-(\d+)</);
+    test.skip(!match, "no hay anuncios publicados en el sitemap");
+
+    const [, slug, id] = match!;
+    const response = await request.get(`/p/slug-incorrecto-${id}`, { maxRedirects: 0 });
+    expect(response.status()).toBe(308);
+    expect(response.headers()["location"]).toContain(`/p/${slug}-${id}`);
+  });
+
+  test("categoría inexistente muestra la UI de 404", async ({ page }) => {
     await page.goto("/c/categoria-que-no-existe");
     await expect(page.getByText("Página no encontrada")).toBeVisible();
   });
