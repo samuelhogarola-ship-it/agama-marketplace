@@ -138,7 +138,7 @@ export default function PanelTickets({ userId }: { userId: string }) {
             <select
               value={form.category}
               onChange={e => setForm({ ...form, category: e.target.value as TicketCategory })}
-              className="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm focus:outline-none focus:border-brand"
+              className="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm focus:border-brand focus:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-1"
             >
               {CATEGORIES.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
             </select>
@@ -152,7 +152,7 @@ export default function PanelTickets({ userId }: { userId: string }) {
               placeholder="Describe brevemente tu consulta"
               value={form.subject}
               onChange={e => setForm({ ...form, subject: e.target.value })}
-              className="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm focus:outline-none focus:border-brand"
+              className="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm focus:border-brand focus:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-1"
             />
           </div>
           <div>
@@ -165,7 +165,7 @@ export default function PanelTickets({ userId }: { userId: string }) {
               placeholder="Explica el problema o consulta con el mayor detalle posible…"
               value={form.message}
               onChange={e => setForm({ ...form, message: e.target.value })}
-              className="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm resize-none focus:outline-none focus:border-brand"
+              className="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm resize-none focus:border-brand focus:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-1"
             />
           </div>
           {error && <p className="text-sm text-red-600">{error}</p>}
@@ -281,7 +281,7 @@ export default function PanelTickets({ userId }: { userId: string }) {
                   onChange={e => setReply(e.target.value)}
                   placeholder="Escribe tu respuesta…"
                   rows={3}
-                  className="flex-1 rounded-xl border border-slate-300 px-3 py-2 text-sm resize-none focus:outline-none focus:border-brand"
+                  className="flex-1 rounded-xl border border-slate-300 px-3 py-2 text-sm resize-none focus:border-brand focus:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-1"
                 />
                 <button
                   onClick={sendReply}

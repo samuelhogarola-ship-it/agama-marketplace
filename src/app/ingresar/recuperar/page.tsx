@@ -68,7 +68,7 @@ export default function RecuperarPage() {
             placeholder="ventas@tuempresa.com"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full rounded-lg border border-slate-300 px-4 py-2.5 focus:outline-none focus:border-brand"
+            className="w-full rounded-lg border border-slate-300 px-4 py-2.5 focus:border-brand focus:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-1"
           />
         </div>
         {error && <p className="text-sm text-red-600">{error}</p>}

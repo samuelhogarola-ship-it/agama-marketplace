@@ -50,6 +50,15 @@ Estado: **completa en código**.
 
 Estado: **operativa en demo; pendiente de hardening y configuración de producción**.
 
+### Prioridad inmediata — migraciones pendientes de aplicar
+
+Escritas y mergeadas, pero **sin ejecutar contra la base de datos**. Hasta que corran, el arreglo está en el repo y no en producción.
+
+- [ ] **`0012_close_limit_race.sql` — prioridad alta.** Cierra la carrera TOCTOU en los triggers de límite: hoy dos inserts concurrentes de la misma empresa pueden dejar 6 anuncios o 6 fotos, saltándose el límite de 5 que `CLAUDE.md` marca como no negociable. No depende de Stripe ni de la IA: se puede aplicar sola y en cualquier momento.
+- [ ] `0013_stripe_webhook_hardening.sql` — va con el bloque de Stripe (ver abajo). Aplicarla antes de activar los pagos.
+
+Ninguna de las dos se ha validado contra una BD: no había Postgres local ni Docker al escribirlas. Conviene aplicarlas primero en una rama de Supabase.
+
 - [x] Migrar `mkt_*` a un proyecto Supabase propio y validar tablas, Storage y RLS inicial.
 - [x] Separar envío a revisión de decisiones: solo `service_role` puede publicar o rechazar.
 - [x] Bloquear escritura de eventos de moderación por anunciantes y cerrar la moderación si falla IA.
@@ -57,6 +66,7 @@ Estado: **operativa en demo; pendiente de hardening y configuración de producci
 - [x] Preparar Docker, healthcheck y configuración base para el VPS de AGAMA.
 - [x] Configurar SMTP en Supabase Auth — usar mailer propio de Supabase (free, 2/h) hasta tener Resend/Brevo verificado.
 - [ ] Añadir `ANTHROPIC_API_KEY`, `SUPABASE_SERVICE_ROLE_KEY` y `TODO_PLASTICO_ADMIN_EMAILS` en el entorno seguro.
+- [ ] **Stripe (bloque aplazado).** Al activarlo: aplicar `0013`, añadir las cuatro claves (`STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `STRIPE_PRO_PRICE_ID`, `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`) y **verificar con un evento de prueba que `mkt_is_service_role()` detecta bien el rol**. Si esa detección falla, el webhook choca contra `mkt_protect_company_admin_fields` y el plan no sube a Pro pese al cobro. Ese camino nunca se ha ejercitado.
 - [ ] Crear usuario admin real y conectar las variables del nuevo Supabase en WF Studio.
 - [ ] Instalar Plausible o GA4 con consentimiento y definir eventos de búsqueda/contacto.
 - [x] Preparar seed repetible de categorías y perfil AGAMA.

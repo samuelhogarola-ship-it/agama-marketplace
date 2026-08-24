@@ -12,6 +12,16 @@
 
 ### Changed
 - Rate limiter extraído a `src/lib/rate-limit.ts` y compartido entre moderación y tickets; ahora purga entradas vencidas en lugar de crecer sin límite.
+- `checkOrigin` ya no deja pasar peticiones sin cabecera `Origin`: cae a `Sec-Fetch-Site` y rechaza si no hay ninguna de las dos. No aplica a webhooks, que se autentican por firma.
+- El modo demo del panel (`?preview=1`, que salta la autenticación y muestra datos ficticios) queda tras el flag `NEXT_PUBLIC_DEMO_PREVIEW`. Afecta a `/panel`, `/panel/perfil` y `/panel/editar/[id]`.
+- Indicador de foco visible en los 26 campos de formulario del sitio: el patrón anterior anulaba el outline y lo sustituía por un cambio de borde de 1px.
+
+### Fixed (cont.)
+- `/p/[slug]` servía la misma ficha para cualquier slug con el id correcto (`parseId` solo mira los dígitos finales). Ahora redirige 308 a la URL canónica en lugar de multiplicar variantes indexables.
+- Carrera TOCTOU en los triggers de límite (`0012`): dos inserts concurrentes podían superar los 5 anuncios o las 5 fotos. Añadido lock de fila sobre la entidad padre antes de contar.
+- Webhook de Stripe (`0013`): sin deduplicación, un reintento de Stripe reprocesaba el evento; sin guarda de orden, un `subscription.updated` retrasado resucitaba el plan Pro tras un `deleted`. Añadida tabla `mkt_stripe_events` con el id como PK y la función `mkt_apply_stripe_event`, que comprueba el orden y escribe en la misma transacción.
+- `mkt_protect_company_admin_fields` detectaba service_role solo por `request.jwt.claim.role`, una ruta de claim legacy. Si el runtime no la puebla, el webhook chocaría contra su propia protección y el plan nunca subiría a Pro pese al cobro. Sustituido por el helper `mkt_is_service_role()`, que acepta las cuatro formas posibles. **Sin verificar contra la BD**: Stripe no está configurado y este camino nunca se ha ejercitado.
+- Promesa flotante sin `catch` externo en la notificación de respuesta de tickets.
 
 ### Added — MVP funcional (Fase 1 + parte de F2/F3)
 - App Next.js 15 (App Router, TS, Tailwind 4) con marca AGAMA (logo oficial, paleta navy/azul) arriba y abajo.

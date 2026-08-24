@@ -257,7 +257,7 @@ function RejectDialog({ rejectId, rejectReason, setRejectReason, busy, onClose, 
               value={rejectReason}
               onChange={(e) => setRejectReason(e.target.value)}
               placeholder="Escribe el motivo del rechazo o selecciona una opción de arriba…"
-              className="mt-4 w-full rounded-xl border border-slate-300 px-4 py-3 text-sm focus:outline-none focus:border-brand"
+              className="mt-4 w-full rounded-xl border border-slate-300 px-4 py-3 text-sm focus:border-brand focus:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-1"
             />
             <p className="mt-1 text-xs text-slate-400">
               {rejectReason.length} caracteres (mínimo 20)
