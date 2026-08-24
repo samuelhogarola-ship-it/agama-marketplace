@@ -12,3 +12,12 @@ test-results/
 supabase/.temp/
 .DS_Store
 *.log
+
+# Caché incremental de TypeScript: se regenera en cada build y ensuciaba el
+# árbol de trabajo constantemente (llegó a colarse en 3 commits).
+tsconfig.tsbuildinfo
+
+# Salida de herramientas locales, no del proyecto
+graphify-out/
+output/
+tmp/
