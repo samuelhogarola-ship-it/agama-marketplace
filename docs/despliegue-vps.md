@@ -50,13 +50,47 @@ curl http://127.0.0.1:3010/api/health
 
 ## Actualizaciones
 
-```bash
-git pull
-docker compose -f docker-compose.prod.yml up -d --build
-docker image prune -f
+En la práctica el despliegue **lo gestiona Coolify**, no un `docker compose` a mano. La app es la `applicationId = 3` (uuid `c10qewr1rcqq09uh9mne96te`), sigue la rama `main` y su fuente es *Public GitHub*. La otra aplicación del VPS (`e9x7k0zb6cg5zuas3zj2apug`) es **agama.com.mx** — no confundirlas.
+
+### Despliegue automático
+
+Cada push a `main` dispara un despliegue mediante un webhook de GitHub que apunta al endpoint manual de Coolify:
+
+```
+https://2.24.10.239.sslip.io/webhooks/source/github/events/manual
 ```
 
-Conservar un backup de Supabase antes de actualizar y comprobar `/api/health` después del reinicio.
+El secreto vive en la columna `manual_webhook_secret_github` de la app en la base de datos de Coolify, y es distinto del de agama.com.mx, así que cada webhook solo dispara su propia aplicación.
+
+> **Contexto:** entre el 8 y el 24 de agosto de 2026 este webhook no existía. Coolify tenía el secreto guardado —así que en su interfaz el despliegue figuraba como automático— pero en GitHub no había ningún webhook que lo llamara. Producción acumuló 14 commits sin que nada avisara. Si vuelve a quedarse atrás, lo primero que hay que mirar es si el webhook sigue dado de alta en el repo.
+
+### Despliegue manual
+
+Si hace falta forzarlo (o el webhook falla), desde el VPS:
+
+```bash
+docker exec coolify php artisan tinker --execute="
+\$app = App\Models\Application::find(3);
+\$uuid = (string) new Visus\Cuid2\Cuid2();
+queue_application_deployment(application: \$app, deployment_uuid: \$uuid, force_rebuild: true, is_api: true);
+echo \$uuid;"
+```
+
+Seguimiento del despliegue (`in_progress` → `finished`, unos 5 minutos):
+
+```bash
+docker exec coolify-db psql -U coolify -d coolify -t -A \
+  -c "select status from application_deployment_queues where deployment_uuid='<uuid>';"
+```
+
+### Después de desplegar
+
+Conservar un backup de Supabase antes de actualizar y comprobar que el despliegue llegó de verdad al dominio —no basta con el check verde del PR, que solo refleja la build de Vercel:
+
+```bash
+curl -s -o /dev/null -w "%{http_code}\n" https://todo-plastico.com/api/health
+curl -s https://todo-plastico.com/ | grep -oE "<title>[^<]*</title>"
+```
 
 ## Nginx mínimo
 
