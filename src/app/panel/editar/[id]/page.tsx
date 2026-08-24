@@ -13,15 +13,12 @@ import {
 } from "@/lib/listing-policy";
 import { compressImage } from "@/lib/compress-image";
 import { photoUrl } from "@/lib/types";
-import { DEMO_LISTINGS } from "@/lib/demo-data";
+import { DEMO_LISTINGS, DEMO_PREVIEW_ENABLED } from "@/lib/demo-data";
 
 const TITLE_MAX = 120;
 const DESC_MAX = 3000;
 
 type ExistingPhoto = { id: number; storage_path: string; position: number };
-
-// Ver nota en /panel: el modo demo queda tras un flag explícito.
-const DEMO_PREVIEW_ENABLED = process.env.NEXT_PUBLIC_DEMO_PREVIEW === "1";
 
 function EditListingContent() {
   const params = useParams<{ id: string }>();
@@ -339,7 +336,7 @@ function EditListingContent() {
             value={form.title}
             onChange={(e) => setForm({ ...form, title: e.target.value })}
             placeholder="Título del anuncio"
-            className="mt-1 w-full rounded-lg border border-slate-300 px-4 py-2.5 outline-none focus:border-brand"
+            className="mt-1 w-full rounded-lg border border-slate-300 px-4 py-2.5 focus:border-brand focus:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-1"
           />
         </div>
 
@@ -420,7 +417,7 @@ function EditListingContent() {
             rows={7}
             value={form.description}
             onChange={(e) => setForm({ ...form, description: e.target.value })}
-            className="mt-1 w-full rounded-lg border border-slate-300 px-4 py-2.5 outline-none focus:border-brand"
+            className="mt-1 w-full rounded-lg border border-slate-300 px-4 py-2.5 focus:border-brand focus:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-1"
           />
         </div>
 
@@ -456,7 +453,7 @@ function EditListingContent() {
               required
               value={form.unit}
               onChange={(e) => setForm({ ...form, unit: e.target.value })}
-              className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 outline-none focus:border-brand"
+              className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 focus:border-brand focus:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-1"
             >
               {SALE_UNITS.map((unit) => (
                 <option key={unit.value} value={unit.value}>
@@ -475,7 +472,7 @@ function EditListingContent() {
                 setForm({ ...form, min_purchase_qty: e.target.value })
               }
               placeholder="Compra mínima"
-              className="w-full rounded-lg border border-slate-300 px-3 py-2.5 outline-none focus:border-brand"
+              className="w-full rounded-lg border border-slate-300 px-3 py-2.5 focus:border-brand focus:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-1"
             />
             <input
               required
@@ -483,7 +480,7 @@ function EditListingContent() {
               value={form.location}
               onChange={(e) => setForm({ ...form, location: e.target.value })}
               placeholder="Ubicación"
-              className="w-full rounded-lg border border-slate-300 px-3 py-2.5 outline-none focus:border-brand"
+              className="w-full rounded-lg border border-slate-300 px-3 py-2.5 focus:border-brand focus:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-1"
             />
           </div>
         </div>
@@ -500,7 +497,7 @@ function EditListingContent() {
               onChange={(e) =>
                 setForm({ ...form, contact_method: e.target.value })
               }
-              className="w-full rounded-lg border border-slate-300 bg-white px-4 py-2.5 outline-none focus:border-brand"
+              className="w-full rounded-lg border border-slate-300 bg-white px-4 py-2.5 focus:border-brand focus:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-1"
             >
               {CONTACT_METHODS.map((m) => (
                 <option key={m.value} value={m.value}>
@@ -515,7 +512,7 @@ function EditListingContent() {
                 setForm({ ...form, contact_value: e.target.value })
               }
               placeholder={contactPlaceholder(form.contact_method)}
-              className="w-full rounded-lg border border-slate-300 px-4 py-2.5 outline-none focus:border-brand"
+              className="w-full rounded-lg border border-slate-300 px-4 py-2.5 focus:border-brand focus:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-1"
             />
           </div>
         </div>
@@ -532,7 +529,7 @@ function EditListingContent() {
               setForm({ ...form, external_url: e.target.value })
             }
             placeholder="https://tuempresa.com/producto"
-            className="mt-1 w-full rounded-lg border border-slate-300 px-4 py-2.5 outline-none focus:border-brand"
+            className="mt-1 w-full rounded-lg border border-slate-300 px-4 py-2.5 focus:border-brand focus:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-1"
           />
           <p className="mt-1 text-xs text-slate-500">
             Solo enlaces de la web propia de tu empresa.

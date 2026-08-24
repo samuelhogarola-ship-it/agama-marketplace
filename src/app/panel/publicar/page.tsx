@@ -18,11 +18,7 @@ const MAX_PHOTOS = 5;
 const TITLE_MAX = 120;
 const DESC_MAX = 3000;
 
-const LABEL_CLASS = "block text-sm font-medium text-slate-700";
-// El foco no puede depender solo del color de borde: se añade un anillo visible.
-const FIELD_CLASS =
-  "w-full rounded-lg border border-slate-300 px-4 py-2.5 focus:border-brand focus:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-1";
-const SELECT_CLASS = `${FIELD_CLASS} bg-white`;
+import { LABEL_CLASS, FIELD_CLASS, SELECT_CLASS } from "@/lib/form-classes";
 
 export default function PublicarPage() {
   const router = useRouter();

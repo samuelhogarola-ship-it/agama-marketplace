@@ -7,7 +7,7 @@ import { createClient } from "@/lib/supabase/client";
 import { photoUrl, productPath, type Company, type Product } from "@/lib/types";
 import { formatPrice } from "@/components/ProductCard";
 import { categoryBySlug } from "@/lib/categories";
-import { DEMO_COMPANY, DEMO_LISTINGS } from "@/lib/demo-data";
+import { DEMO_COMPANY, DEMO_LISTINGS, DEMO_PREVIEW_ENABLED } from "@/lib/demo-data";
 import PanelTickets from "@/components/PanelTickets";
 
 const STATUS_LABEL: Record<string, { text: string; cls: string }> = {
@@ -31,10 +31,6 @@ function getInitials(name: string) {
   );
 }
 
-// El modo demo salta la autenticación y muestra datos ficticios. Es intencional
-// (se usa para enseñar el panel sin cuenta), pero queda tras un flag explícito
-// para no dejarlo accesible en producción por descuido.
-const DEMO_PREVIEW_ENABLED = process.env.NEXT_PUBLIC_DEMO_PREVIEW === "1";
 
 function PanelContent() {
   const router = useRouter();

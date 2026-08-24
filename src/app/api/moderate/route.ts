@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { isRateLimited } from "@/lib/rate-limit";
+import { checkOrigin } from "@/lib/csrf";
 
 const MODEL = "claude-haiku-4-5-20251001";
 
@@ -80,6 +81,9 @@ Devuelve SOLO JSON: {"verdict":"approve","violations":[],"confidence":0.95,"reas
 }
 
 export async function POST(req: NextRequest) {
+  const originError = checkOrigin(req);
+  if (originError) return originError;
+
   const { listing_id } = await req.json().catch(() => ({}));
   if (!listing_id) return NextResponse.json({ error: "listing_id requerido" }, { status: 400 });
 

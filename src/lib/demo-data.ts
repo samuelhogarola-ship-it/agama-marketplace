@@ -1,5 +1,7 @@
 import type { Company, Product } from "@/lib/types";
 
+export const DEMO_PREVIEW_ENABLED = process.env.NEXT_PUBLIC_DEMO_PREVIEW === "1";
+
 export const DEMO_COMPANY: Company = {
   id: "agama-preview",
   ref_code: "TP-0001",

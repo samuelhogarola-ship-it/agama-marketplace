@@ -12,7 +12,7 @@ export const revalidate = 300;
 
 // Fuente única: la misma descripción alimenta la meta description y el JSON-LD.
 const HOME_DESCRIPTION =
-  "Directorio B2B gratuito de la industria plástica en México. Encuentra tarimas, envases, bolsas, cubetas, resinas, maquinaria y proveedores verificados. Publicar es gratis. Impulsado por AGAMA.";
+  "Directorio B2B gratuito de la industria plástica en México. Encuentra envases, bolsas, tarimas, cubetas y proveedores verificados. Publicar es gratis.";
 
 export const metadata: Metadata = {
   // `absolute` evita que la plantilla del layout añada "| TodoPlástico" al título de la home.
