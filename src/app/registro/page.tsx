@@ -136,7 +136,7 @@ export default function RegistroPage() {
             placeholder="Plásticos del Norte S.A."
             value={form.company}
             onChange={(e) => setForm({ ...form, company: e.target.value })}
-            className="w-full rounded-lg border border-slate-300 px-4 py-2.5 focus:outline-none focus:border-brand"
+            className="w-full rounded-lg border border-slate-300 px-4 py-2.5 focus:border-brand focus:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-1"
           />
         </div>
         <div>
@@ -151,7 +151,7 @@ export default function RegistroPage() {
             maxLength={13}
             value={form.rfc}
             onChange={(e) => setForm({ ...form, rfc: e.target.value.toUpperCase() })}
-            className="w-full rounded-lg border border-slate-300 px-4 py-2.5 focus:outline-none focus:border-brand font-mono tracking-wide uppercase"
+            className="w-full rounded-lg border border-slate-300 px-4 py-2.5 focus:border-brand focus:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-1 font-mono tracking-wide uppercase"
           />
         </div>
         <div>
@@ -165,7 +165,7 @@ export default function RegistroPage() {
             placeholder="ventas@tuempresa.com"
             value={form.email}
             onChange={(e) => setForm({ ...form, email: e.target.value })}
-            className="w-full rounded-lg border border-slate-300 px-4 py-2.5 focus:outline-none focus:border-brand"
+            className="w-full rounded-lg border border-slate-300 px-4 py-2.5 focus:border-brand focus:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-1"
           />
         </div>
         {method === "password" && (
@@ -181,7 +181,7 @@ export default function RegistroPage() {
               placeholder="Mínimo 8 caracteres"
               value={form.password}
               onChange={(e) => setForm({ ...form, password: e.target.value })}
-              className="w-full rounded-lg border border-slate-300 px-4 py-2.5 focus:outline-none focus:border-brand"
+              className="w-full rounded-lg border border-slate-300 px-4 py-2.5 focus:border-brand focus:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-1"
             />
           </div>
         )}

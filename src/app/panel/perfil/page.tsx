@@ -7,10 +7,13 @@ import { CATEGORIES } from "@/lib/categories";
 import { compressImage } from "@/lib/compress-image";
 import { DEMO_COMPANY } from "@/lib/demo-data";
 
+// Ver nota en /panel: el modo demo queda tras un flag explícito.
+const DEMO_PREVIEW_ENABLED = process.env.NEXT_PUBLIC_DEMO_PREVIEW === "1";
+
 function PerfilContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const previewMode = searchParams.get("preview") === "1";
+  const previewMode = DEMO_PREVIEW_ENABLED && searchParams.get("preview") === "1";
   const [form, setForm] = useState({
     name: "",
     description: "",
@@ -232,7 +235,7 @@ function PerfilContent() {
             required
             value={form.name}
             onChange={(e) => setForm({ ...form, name: e.target.value })}
-            className="mt-1 w-full rounded-lg border border-slate-300 px-4 py-2.5 focus:outline-none focus:border-brand"
+            className="mt-1 w-full rounded-lg border border-slate-300 px-4 py-2.5 focus:border-brand focus:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-1"
           />
         </div>
         <div>
@@ -245,7 +248,7 @@ function PerfilContent() {
             value={form.description}
             onChange={(e) => setForm({ ...form, description: e.target.value })}
             placeholder="A qué se dedica tu empresa, desde cuándo, qué fabricas o distribuyes…"
-            className="mt-1 w-full rounded-lg border border-slate-300 px-4 py-2.5 focus:outline-none focus:border-brand"
+            className="mt-1 w-full rounded-lg border border-slate-300 px-4 py-2.5 focus:border-brand focus:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-1"
           />
         </div>
 
@@ -280,7 +283,7 @@ function PerfilContent() {
               value={form.location}
               onChange={(e) => setForm({ ...form, location: e.target.value })}
               placeholder="Iztapalapa, CDMX"
-              className="mt-1 w-full rounded-lg border border-slate-300 px-4 py-2.5 focus:outline-none focus:border-brand"
+              className="mt-1 w-full rounded-lg border border-slate-300 px-4 py-2.5 focus:border-brand focus:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-1"
             />
           </div>
           <div>
@@ -291,7 +294,7 @@ function PerfilContent() {
               value={form.phone}
               onChange={(e) => setForm({ ...form, phone: e.target.value })}
               placeholder="+52 55 0000 0000"
-              className="mt-1 w-full rounded-lg border border-slate-300 px-4 py-2.5 focus:outline-none focus:border-brand"
+              className="mt-1 w-full rounded-lg border border-slate-300 px-4 py-2.5 focus:border-brand focus:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-1"
             />
           </div>
         </div>
@@ -305,7 +308,7 @@ function PerfilContent() {
               value={form.website}
               onChange={(e) => setForm({ ...form, website: e.target.value })}
               placeholder="https://tuempresa.com"
-              className="mt-1 w-full rounded-lg border border-slate-300 px-4 py-2.5 focus:outline-none focus:border-brand"
+              className="mt-1 w-full rounded-lg border border-slate-300 px-4 py-2.5 focus:border-brand focus:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-1"
             />
           </div>
           <div>
@@ -317,7 +320,7 @@ function PerfilContent() {
               value={form.email}
               onChange={(e) => setForm({ ...form, email: e.target.value })}
               placeholder="ventas@tuempresa.com"
-              className="mt-1 w-full rounded-lg border border-slate-300 px-4 py-2.5 focus:outline-none focus:border-brand"
+              className="mt-1 w-full rounded-lg border border-slate-300 px-4 py-2.5 focus:border-brand focus:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-1"
             />
           </div>
           <div>
@@ -328,7 +331,7 @@ function PerfilContent() {
               value={form.whatsapp}
               onChange={(e) => setForm({ ...form, whatsapp: e.target.value })}
               placeholder="+52 55 0000 0000"
-              className="mt-1 w-full rounded-lg border border-slate-300 px-4 py-2.5 focus:outline-none focus:border-brand"
+              className="mt-1 w-full rounded-lg border border-slate-300 px-4 py-2.5 focus:border-brand focus:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-1"
             />
           </div>
         </div>

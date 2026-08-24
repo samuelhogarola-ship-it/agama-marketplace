@@ -34,21 +34,24 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
 
   if (error) return NextResponse.json({ error: "No se pudo enviar el mensaje." }, { status: 500 });
 
-  supabase
-    .from("mkt_tickets")
-    .select("ticket_code, subject")
-    .eq("id", id)
-    .single()
-    .then(({ data }) => {
-      if (data) {
-        sendTicketReplyToAdmin({
-          ticketCode: data.ticket_code,
-          subject: data.subject,
-          message,
-          userEmail: user.email ?? "desconocido",
-        }).catch(() => {});
-      }
+  // La notificación no debe bloquear ni tumbar la respuesta: se lanza en segundo
+  // plano con el catch en el nivel externo, no solo en el envío del correo.
+  void (async () => {
+    const { data } = await supabase
+      .from("mkt_tickets")
+      .select("ticket_code, subject")
+      .eq("id", id)
+      .single();
+    if (!data) return;
+    await sendTicketReplyToAdmin({
+      ticketCode: data.ticket_code,
+      subject: data.subject,
+      message,
+      userEmail: user.email ?? "desconocido",
     });
+  })().catch((err) => {
+    console.error("[tickets reply] notificación al admin falló:", err);
+  });
 
   return NextResponse.json({ ok: true });
 }

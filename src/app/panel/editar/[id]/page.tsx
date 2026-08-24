@@ -20,11 +20,14 @@ const DESC_MAX = 3000;
 
 type ExistingPhoto = { id: number; storage_path: string; position: number };
 
+// Ver nota en /panel: el modo demo queda tras un flag explícito.
+const DEMO_PREVIEW_ENABLED = process.env.NEXT_PUBLIC_DEMO_PREVIEW === "1";
+
 function EditListingContent() {
   const params = useParams<{ id: string }>();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const previewMode = searchParams.get("preview") === "1";
+  const previewMode = DEMO_PREVIEW_ENABLED && searchParams.get("preview") === "1";
   const [form, setForm] = useState({
     title: "",
     description: "",

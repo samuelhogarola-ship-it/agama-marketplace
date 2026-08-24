@@ -31,10 +31,15 @@ function getInitials(name: string) {
   );
 }
 
+// El modo demo salta la autenticación y muestra datos ficticios. Es intencional
+// (se usa para enseñar el panel sin cuenta), pero queda tras un flag explícito
+// para no dejarlo accesible en producción por descuido.
+const DEMO_PREVIEW_ENABLED = process.env.NEXT_PUBLIC_DEMO_PREVIEW === "1";
+
 function PanelContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const previewMode = searchParams.get("preview") === "1";
+  const previewMode = DEMO_PREVIEW_ENABLED && searchParams.get("preview") === "1";
   const upgradeSuccess = searchParams.get("upgrade") === "success";
   const [profile, setProfile] = useState<Company | null>(null);
   const [products, setProducts] = useState<Product[]>([]);

@@ -110,7 +110,7 @@ export default function AdminTicketInbox({ initialTickets }: { initialTickets: A
           <select
             value={filterStatus}
             onChange={e => setFilterStatus(e.target.value as TicketStatus | "all")}
-            className="text-xs border border-slate-200 rounded-lg px-2 py-1.5 focus:outline-none focus:border-brand"
+            className="text-xs border border-slate-200 rounded-lg px-2 py-1.5 focus:border-brand focus:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-1"
           >
             <option value="all">Todos</option>
             <option value="open">Abiertos</option>
@@ -166,7 +166,7 @@ export default function AdminTicketInbox({ initialTickets }: { initialTickets: A
               <select
                 value={selected.priority}
                 onChange={e => updatePriority(selected.id, e.target.value as TicketPriority)}
-                className="text-xs border border-slate-200 rounded-lg px-2 py-1.5 focus:outline-none focus:border-brand"
+                className="text-xs border border-slate-200 rounded-lg px-2 py-1.5 focus:border-brand focus:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-1"
               >
                 <option value="low">Baja</option>
                 <option value="normal">Normal</option>
@@ -176,7 +176,7 @@ export default function AdminTicketInbox({ initialTickets }: { initialTickets: A
               <select
                 value={selected.status}
                 onChange={e => updateStatus(selected.id, e.target.value as TicketStatus)}
-                className="text-xs border border-slate-200 rounded-lg px-2 py-1.5 focus:outline-none focus:border-brand"
+                className="text-xs border border-slate-200 rounded-lg px-2 py-1.5 focus:border-brand focus:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-1"
               >
                 <option value="open">Abierto</option>
                 <option value="in_progress">En curso</option>
@@ -232,7 +232,7 @@ export default function AdminTicketInbox({ initialTickets }: { initialTickets: A
                 onChange={e => setReply(e.target.value)}
                 placeholder={isInternal ? "Escribe una nota interna…" : "Escribe tu respuesta al cliente…"}
                 rows={3}
-                className={`flex-1 rounded-xl border px-3 py-2 text-sm resize-none focus:outline-none focus:border-brand ${isInternal ? "border-amber-300 bg-amber-50" : "border-slate-300"}`}
+                className={`flex-1 rounded-xl border px-3 py-2 text-sm resize-none focus:border-brand focus:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-1 ${isInternal ? "border-amber-300 bg-amber-50" : "border-slate-300"}`}
               />
               <button
                 onClick={sendReply}

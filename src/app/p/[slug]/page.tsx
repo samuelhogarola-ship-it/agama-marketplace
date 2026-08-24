@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { categoryBySlug } from "@/lib/categories";
 import { type Product } from "@/lib/types";
@@ -198,6 +198,12 @@ export default async function ProductPage({ params }: Props) {
   if (!id) notFound();
   const product = await getProduct(id);
   if (!product) notFound();
+
+  // `parseId` solo mira los dígitos finales, así que cualquier slug con el id
+  // correcto servía la misma ficha. Redirigimos a la URL canónica para no
+  // multiplicar variantes de la misma página.
+  const canonicalSlug = `${product.slug}-${product.id}`;
+  if (slug !== canonicalSlug) permanentRedirect(`/p/${canonicalSlug}`);
 
   const cat = categoryBySlug(product.category);
   const photos = (product.photos ?? []).sort((a, b) => a.position - b.position);

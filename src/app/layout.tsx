@@ -52,7 +52,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                 type="search"
                 name="q"
                 placeholder="Buscar empresas, productos o servicios…"
-                className="w-full rounded-l-full border border-r-0 border-slate-300 px-4 py-2 text-sm focus:outline-none focus:border-brand"
+                className="w-full rounded-l-full border border-r-0 border-slate-300 px-4 py-2 text-sm focus:border-brand focus:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-1"
               />
               <button type="submit" aria-label="Buscar" className="flex h-[38px] items-center rounded-r-full border border-slate-300 bg-slate-50 px-3 text-slate-500 hover:bg-brand hover:text-white hover:border-brand">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>

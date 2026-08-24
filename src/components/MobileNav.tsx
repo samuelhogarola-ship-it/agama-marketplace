@@ -88,7 +88,7 @@ export default function MobileNav({ isLoggedIn }: { isLoggedIn: boolean }) {
               type="search"
               name="q"
               placeholder="Buscar empresas, productos o servicios…"
-              className="w-full rounded-full border border-slate-300 px-4 py-2.5 text-sm focus:outline-none focus:border-brand"
+              className="w-full rounded-full border border-slate-300 px-4 py-2.5 text-sm focus:border-brand focus:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-1"
             />
           </form>
         </div>
