@@ -27,5 +27,9 @@ jobs:
       - run: npm run typecheck
       - run: npm run lint
       - run: npm run build
+      - name: Prepare standalone for Playwright
+        run: |
+          cp -r .next/static .next/standalone/.next/static
+          cp -r public .next/standalone/public
       - run: npx playwright install --with-deps chromium
       - run: npx playwright test --project=chromium
