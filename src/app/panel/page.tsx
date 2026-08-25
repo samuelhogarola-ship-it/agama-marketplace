@@ -246,21 +246,21 @@ function PanelContent() {
           >
             Publicar producto
           </Link>
-          {profile?.plan === "pro" ? (
-            <Link
-              href="/panel/estadisticas"
-              className="rounded-lg px-3 py-2.5 text-slate-600 hover:bg-slate-50 hover:text-brand-dark"
-            >
-              Estadísticas
-            </Link>
-          ) : (
-            <span className="flex items-center justify-between rounded-lg px-3 py-2.5 text-slate-400 cursor-not-allowed">
-              Estadísticas
+          <Link
+            href="/panel/estadisticas"
+            className={`flex items-center justify-between rounded-lg px-3 py-2.5 ${
+              profile?.plan === "pro"
+                ? "text-slate-600 hover:bg-slate-50 hover:text-brand-dark"
+                : "text-slate-400 hover:bg-slate-50"
+            }`}
+          >
+            Estadísticas
+            {profile?.plan !== "pro" && (
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" className="h-3.5 w-3.5">
                 <path fillRule="evenodd" d="M8 1a3.5 3.5 0 0 0-3.5 3.5V7H3a1 1 0 0 0-1 1v5a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V8a1 1 0 0 0-1-1h-1.5V4.5A3.5 3.5 0 0 0 8 1Zm2 6V4.5a2 2 0 1 0-4 0V7h4Z" clipRule="evenodd" />
               </svg>
-            </span>
-          )}
+            )}
+          </Link>
           <Link
             href="/panel/ajustes"
             className="rounded-lg px-3 py-2.5 text-slate-600 hover:bg-slate-50 hover:text-brand-dark"
