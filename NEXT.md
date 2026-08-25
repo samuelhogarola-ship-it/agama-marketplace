@@ -56,11 +56,8 @@ Auditorías completas en tres ejes: seguridad, SEO, calidad de código.
 
 ## HIGH — Resolver antes del lanzamiento
 
-### H1. Artículos editoriales violan la política de contenido prohibido
-- **Archivos:** `src/lib/articles.ts` (líneas ~96-185, 344-360, 517-533, 708-724)
-- **Problema:** La plataforma prohíbe pigmentos, masterbatch y aditivos (competencia de AGAMA), pero hay ~6 artículos SEO dedicados exactamente a esos temas: "masterbatch vs pigmento", "aditivos UV", "dispersión de color", etc. La categoría editorial "Color y pigmentos" también nombra directamente el producto prohibido.
-- **Impacto:** Contradice la política de negocio y posiciona la plataforma para keywords que compiten con AGAMA.
-- **Fix:** Eliminar o reescribir esos artículos para enfocarlos en el cliente (transformador), no en el producto AGAMA.
+### ~~H1. Artículos editoriales violan la política de contenido prohibido~~ ✅ Resuelto
+- 5 artículos reescritos desde perspectiva del comprador. Categoría "Color y pigmentos" eliminada. Menciones incidentales de masterbatch reemplazadas por términos genéricos.
 
 ### ~~H2. Open redirect en `/ingresar`~~ ✅ Ya resuelto
 - Validación en `ingresar/page.tsx:28` y `auth/callback/route.ts:10`: `startsWith("/") && !startsWith("//")`, fallback a `/panel`.
