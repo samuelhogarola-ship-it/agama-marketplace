@@ -232,6 +232,12 @@ function PanelContent() {
           >
             Mi empresa
           </Link>
+          <a
+            href="#catalogo"
+            className="rounded-lg px-3 py-2.5 text-slate-600 hover:bg-slate-50 hover:text-brand-dark"
+          >
+            Catálogo
+          </a>
           <Link
             href={
               previewMode ? "/panel/publicar?preview=1" : "/panel/publicar"
@@ -240,6 +246,28 @@ function PanelContent() {
           >
             Publicar producto
           </Link>
+          {profile?.plan === "pro" ? (
+            <Link
+              href="/panel/estadisticas"
+              className="rounded-lg px-3 py-2.5 text-slate-600 hover:bg-slate-50 hover:text-brand-dark"
+            >
+              Estadísticas
+            </Link>
+          ) : (
+            <span className="flex items-center justify-between rounded-lg px-3 py-2.5 text-slate-400 cursor-not-allowed">
+              Estadísticas
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" className="h-3.5 w-3.5">
+                <path fillRule="evenodd" d="M8 1a3.5 3.5 0 0 0-3.5 3.5V7H3a1 1 0 0 0-1 1v5a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V8a1 1 0 0 0-1-1h-1.5V4.5A3.5 3.5 0 0 0 8 1Zm2 6V4.5a2 2 0 1 0-4 0V7h4Z" clipRule="evenodd" />
+              </svg>
+            </span>
+          )}
+          <Link
+            href="/panel/ajustes"
+            className="rounded-lg px-3 py-2.5 text-slate-600 hover:bg-slate-50 hover:text-brand-dark"
+          >
+            Ajustes
+          </Link>
+          <div className="my-1 border-t border-slate-100" />
           {profile?.slug && (
             <Link
               href={`/e/${profile.slug}`}
@@ -251,12 +279,6 @@ function PanelContent() {
               <span className="text-slate-300">↗</span>
             </Link>
           )}
-          <Link
-            href="/empresas"
-            className="rounded-lg px-3 py-2.5 text-slate-600 hover:bg-slate-50 hover:text-brand-dark"
-          >
-            Ver directorio
-          </Link>
           {!previewMode && (
             <a
               href="#soporte"
@@ -420,7 +442,7 @@ function PanelContent() {
           </p>
         ) : null}
 
-        <section className="mt-10" aria-labelledby="listings-title">
+        <section id="catalogo" className="mt-10 scroll-mt-28" aria-labelledby="listings-title">
           <div className="flex flex-wrap items-end justify-between gap-3 border-b border-slate-200 pb-4">
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.2em] text-brand-sky">

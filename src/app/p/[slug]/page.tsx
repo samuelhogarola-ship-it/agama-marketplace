@@ -13,6 +13,7 @@ import TrackedContactLink from "@/components/TrackedContactLink";
 import { safeJsonLd } from "@/lib/jsonld";
 import { photoUrl } from "@/lib/types";
 
+export const dynamic = "force-dynamic";
 export const revalidate = 300;
 
 type Props = { params: Promise<{ slug: string }> };
@@ -47,16 +48,20 @@ function formatDate(value?: string | null) {
 }
 
 async function getProduct(id: number): Promise<Product | null> {
-  const supabase = await createClient();
-  const { data } = await supabase
-    .from("mkt_listings")
-    .select(
-      "*, photos:mkt_listing_photos(*), company:mkt_companies(name, slug, location, website, phone, email, whatsapp, logo_url)"
-    )
-    .eq("status", "published")
-    .eq("id", id)
-    .single();
-  return data as Product | null;
+  try {
+    const supabase = await createClient();
+    const { data } = await supabase
+      .from("mkt_listings")
+      .select(
+        "*, photos:mkt_listing_photos(*), company:mkt_companies(name, slug, location, website, phone, email, whatsapp, logo_url)"
+      )
+      .eq("status", "published")
+      .eq("id", id)
+      .single();
+    return data as Product | null;
+  } catch {
+    return null;
+  }
 }
 
 function ContactActions({
