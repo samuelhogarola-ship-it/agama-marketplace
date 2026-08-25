@@ -369,7 +369,7 @@ export default async function ProductPage({ params }: Props) {
           </section>
 
           <section className="border-t border-slate-200 py-4 text-sm text-slate-400">
-            <span>
+            <span suppressHydrationWarning>
               {product.updated_at
                 ? `Actualizado ${formatDate(product.updated_at)}`
                 : `Publicado ${formatDate(product.created_at)}`}

@@ -48,7 +48,7 @@ export default async function ArticlePage({ params }: Props) {
         <h1 className="mt-4 text-4xl font-semibold leading-[1.05] tracking-[-0.045em] text-brand-dark sm:text-6xl">{article.title}</h1>
         <p className="mt-6 text-xl leading-8 text-slate-600">{article.excerpt}</p>
         <div className="mt-6 flex items-center gap-3 text-sm text-slate-500">
-          <time dateTime={article.date}>{new Date(article.date + "T12:00:00").toLocaleDateString("es-MX", { year: "numeric", month: "long", day: "numeric" })}</time>
+          <time dateTime={article.date} suppressHydrationWarning>{new Date(article.date + "T12:00:00").toLocaleDateString("es-MX", { year: "numeric", month: "long", day: "numeric" })}</time>
           {article.author && (
             <>
               <span aria-hidden="true">·</span>
