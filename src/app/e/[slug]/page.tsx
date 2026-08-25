@@ -15,15 +15,19 @@ type Props = { params: Promise<{ slug: string }> };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const supabase = await createClient();
-  const { data } = await supabase.from("mkt_companies").select("name, description, logo_url").eq("slug", slug).single();
-  if (!data) return {};
-  return {
-    title: `${data.name} — empresa de la industria plástica`,
-    description: data.description?.slice(0, 160) ?? `Perfil de ${data.name} en TodoPlástico.`,
-    alternates: { canonical: `/e/${slug}` },
-    openGraph: data.logo_url ? { images: [data.logo_url] } : undefined,
-  };
+  try {
+    const supabase = await createClient();
+    const { data } = await supabase.from("mkt_companies").select("name, description, logo_url").eq("slug", slug).single();
+    if (!data) return {};
+    return {
+      title: `${data.name} — empresa de la industria plástica`,
+      description: data.description?.slice(0, 160) ?? `Perfil de ${data.name} en TodoPlástico.`,
+      alternates: { canonical: `/e/${slug}` },
+      openGraph: data.logo_url ? { images: [data.logo_url] } : undefined,
+    };
+  } catch {
+    return {};
+  }
 }
 
 export function generateStaticParams() {
@@ -33,7 +37,13 @@ export function generateStaticParams() {
 export default async function CompanyPage({ params }: Props) {
   const { slug } = await params;
   const supabase = await createClient();
-  const { data: profile } = await supabase.from("mkt_companies").select("id, name, slug, description, location, website, phone, email, whatsapp, categories, logo_url, is_verified, is_featured, status, created_at").eq("slug", slug).single<Company>();
+  let profile: Company | null = null;
+  try {
+    const { data } = await supabase.from("mkt_companies").select("id, name, slug, description, location, website, phone, email, whatsapp, categories, logo_url, is_verified, is_featured, status, created_at").eq("slug", slug).single<Company>();
+    profile = data;
+  } catch {
+    /* Supabase unreachable */
+  }
   if (!profile) notFound();
 
   const { data: products } = await supabase
