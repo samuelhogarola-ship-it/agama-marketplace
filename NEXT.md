@@ -62,15 +62,11 @@ Auditorías completas en tres ejes: seguridad, SEO, calidad de código.
 - **Impacto:** Contradice la política de negocio y posiciona la plataforma para keywords que compiten con AGAMA.
 - **Fix:** Eliminar o reescribir esos artículos para enfocarlos en el cliente (transformador), no en el producto AGAMA.
 
-### H2. Open redirect en `/ingresar`
-- **Archivo:** `src/app/ingresar/page.tsx` (~línea 29)
-- **Problema:** El parámetro `next` de la URL se pasa directamente a `router.push()` sin validación. Un atacante puede construir `https://todo-plastico.com/ingresar?next=https://evil.com` y redirigir al usuario tras login.
-- **Fix:** Validar que `next` empiece con `/` y no contenga `//`.
+### ~~H2. Open redirect en `/ingresar`~~ ✅ Ya resuelto
+- Validación en `ingresar/page.tsx:28` y `auth/callback/route.ts:10`: `startsWith("/") && !startsWith("//")`, fallback a `/panel`.
 
-### H3. No hay headers de seguridad (CSP/HSTS)
-- **Archivo:** `next.config.ts`
-- **Problema:** No se configuran Content-Security-Policy ni Strict-Transport-Security.
-- **Fix:** Añadir `headers()` en `next.config.ts` con CSP restrictiva y HSTS.
+### ~~H3. No hay headers de seguridad (CSP/HSTS)~~ ✅ Ya resuelto
+- `next.config.ts:10-19`: CSP, HSTS, X-Frame-Options, X-Content-Type-Options, Referrer-Policy, Permissions-Policy.
 
 ### H4. Resend SMTP no verificado — auth emails no funcionan
 - **Problema:** Ni `agamaeu.com` ni `todo-plastico.com` tienen registros DKIM/SPF de Resend. Signup devuelve 500.
