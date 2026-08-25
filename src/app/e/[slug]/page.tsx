@@ -33,7 +33,11 @@ export function generateStaticParams() {
 export default async function CompanyPage({ params }: Props) {
   const { slug } = await params;
   const supabase = await createClient();
-  const { data: profile } = await supabase.from("mkt_companies").select("id, name, slug, description, location, website, phone, email, whatsapp, categories, logo_url, is_verified, is_featured, status, created_at").eq("slug", slug).single<Company>();
+  let profile: Company | null = null;
+  try {
+    const { data } = await supabase.from("mkt_companies").select("id, name, slug, description, location, website, phone, email, whatsapp, categories, logo_url, is_verified, is_featured, status, created_at").eq("slug", slug).single<Company>();
+    profile = data;
+  } catch { /* Supabase unreachable */ }
   if (!profile) notFound();
 
   const { data: products } = await supabase
