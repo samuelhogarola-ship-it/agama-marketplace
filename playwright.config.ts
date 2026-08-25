@@ -19,7 +19,7 @@ export default defineConfig({
   ],
   webServer: process.env.SKIP_WEBSERVER ? undefined : {
     command: process.env.CI
-      ? 'npx next start --hostname 0.0.0.0 --port 3210'
+      ? 'PORT=3210 HOSTNAME=0.0.0.0 node .next/standalone/server.js'
       : 'npm run dev -- --hostname 0.0.0.0 --port 3210',
     url: 'http://localhost:3210',
     reuseExistingServer: !process.env.CI,

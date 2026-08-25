@@ -9,6 +9,7 @@ import type { Company, Product } from "@/lib/types";
 import { safeJsonLd } from "@/lib/jsonld";
 import { CATEGORIES } from "@/lib/categories";
 
+export const dynamic = "force-dynamic";
 export const revalidate = 300;
 
 type Props = { params: Promise<{ slug: string }> };

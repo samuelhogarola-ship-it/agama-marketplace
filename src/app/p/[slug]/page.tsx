@@ -13,6 +13,7 @@ import TrackedContactLink from "@/components/TrackedContactLink";
 import { safeJsonLd } from "@/lib/jsonld";
 import { photoUrl } from "@/lib/types";
 
+export const dynamic = "force-dynamic";
 export const revalidate = 300;
 
 type Props = { params: Promise<{ slug: string }> };
