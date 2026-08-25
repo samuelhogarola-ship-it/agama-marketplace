@@ -26,10 +26,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export async function generateStaticParams() {
-  const supabase = await createClient();
-  const { data } = await supabase.from("mkt_companies").select("slug").eq("status", "active").limit(100);
-  return (data ?? []).map((c) => ({ slug: c.slug }));
+export function generateStaticParams() {
+  return [];
 }
 
 export default async function CompanyPage({ params }: Props) {
