@@ -1,8 +1,56 @@
-# NEXT — TodoPlástico (2026-08-10)
+# NEXT — TodoPlástico
 
-## Auditoría completa — Findings
+## Comprobación final pre-lanzamiento (2026-08-25)
 
-Auditoría realizada 2026-08-10. Tres ejes: seguridad, consistencia funcional, calidad de código.
+Verificación end-to-end de todos los paneles y flujos antes de declarar Fase 1 completa.
+
+### Flujos a comprobar en producción (todo-plastico.com)
+
+- [ ] **Auth:** registro con email + contraseña → llega email de confirmación → clic confirma → login OK *(requiere test manual)*
+- [ ] **Auth:** login con magic link → llega email → clic abre sesión (probar Safari + Chrome) *(requiere test manual)*
+- [ ] **Auth:** recuperación de contraseña → email llega → cambio funciona *(requiere test manual)*
+- [ ] **Panel empresa:** crear perfil completo (logo, contacto, categorías) → se guarda *(requiere auth)*
+- [ ] **Panel publicar:** crear anuncio con 5 fotos → pasa a `pending_review` → moderación IA corre (si ANTHROPIC_KEY está) *(requiere auth)*
+- [ ] **Panel editar:** editar anuncio publicado → vuelve a `pending_review` *(requiere auth)*
+- [ ] **Panel tickets:** crear ticket de soporte → aparece en admin *(requiere auth)*
+- [ ] **Admin moderación:** aprobar y rechazar anuncio desde cola → empresa ve motivo *(requiere auth)*
+- [ ] **Admin dashboard:** métricas cargan sin errores *(requiere auth)*
+- [x] **Público home:** categorías, productos recientes, hero carousel, búsqueda ✅ (2026-08-25)
+- [x] **Público /c/[cat]:** listado filtra correctamente, subcategorías funcionan ✅ (2026-08-25)
+- [x] **Público /e/[slug]:** ⚠️ página devolvía 404 por select de columna `plan` no permitida por RLS column grant → fix en PR #19 + migración 0014
+- [x] **Público /p/[slug]:** ficha con galería, precio, contacto, botones ✅ — hydration error #418 corregido con `suppressHydrationWarning` en PR #19
+- [x] **Público /articulos:** listado + ficha individual renderiza contenido ✅ (2026-08-25)
+- [x] **SEO:** sitemap.xml → URLs dinámicas tienen `lastmod`; estáticas lo tendrán tras deploy de PR #18 ✅
+- [x] **SEO:** OG image → 1200×630 dinámico en `/opengraph-image` ✅
+- [x] **Mobile:** responsive en 375px — hero, nav, búsqueda, CTA, categorías ✅ (2026-08-25)
+- [x] **Cookies:** banner aparece, "Solo esenciales" funciona, banner se oculta correctamente ✅ (2026-08-25)
+- [x] **Búsqueda:** `/buscar?q=envases` devuelve empresas + artículos ✅ (2026-08-25)
+- [x] **404:** página personalizada "Página no encontrada" ✅
+- [x] **robots.txt:** correcto — bloquea /panel, /ingresar, /registro, /buscar, /admin, /auth ✅
+- [x] **/ingresar:** formulario login renderiza ✅
+- [x] **/registro:** formulario registro renderiza ✅
+
+### Bugs encontrados y corregidos (PR #19)
+
+1. **`/empresas` mostraba 0 empresas** — el select incluía `plan`, columna no autorizada por el column-level grant de migración 0004. Supabase devuelve error silencioso → `data = null`. Fix: quitar `plan` del select.
+2. **`/e/[slug]` devolvía 404** — misma causa: `select("*")` intenta leer `plan`. Fix: select explícito de columnas autorizadas.
+3. **React hydration error #418 en `/p/[slug]`** — `Intl.DateTimeFormat("es-MX")` produce output distinto en Node.js vs browser. Fix: `suppressHydrationWarning` en el `<span>` de fecha.
+4. **Hydration potencial en `/articulos/[slug]`** — misma causa con `toLocaleDateString`. Fix preventivo: `suppressHydrationWarning` en `<time>`.
+5. **Migración 0014** creada — grant de `plan` y `ref_code` a anon/authenticated para que el panel y futuras lecturas funcionen.
+
+### Bloqueantes pendientes (no son de código)
+
+1. **Site URL en Supabase** → cambiar a `https://todo-plastico.com` + añadir callback URL
+2. **ANTHROPIC_API_KEY** → añadir en Coolify
+3. **Migraciones 0011, 0013 + 0014** → aplicar en BD de producción (0014 arregla `/empresas` y `/e/[slug]` que no pueden leer `plan`)
+4. **Stripe live key** → cuando se active plan Pro
+5. **Google Search Console** → verificar dominio + enviar sitemap
+
+---
+
+## Auditoría ronda 1 (2026-08-10) + ronda 2 (2026-08-24)
+
+Auditorías completas en tres ejes: seguridad, SEO, calidad de código.
 
 ---
 

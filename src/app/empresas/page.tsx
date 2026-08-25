@@ -25,7 +25,7 @@ export default async function EmpresasPage({ searchParams }: Props) {
   const supabase = await createClient();
   let request = supabase
     .from("mkt_companies")
-    .select("id, name, slug, description, location, website, phone, email, whatsapp, categories, logo_url, plan, is_verified, is_featured, status, created_at", { count: "exact" })
+    .select("id, name, slug, description, location, website, phone, email, whatsapp, categories, logo_url, is_verified, is_featured, status, created_at", { count: "exact" })
     .eq("status", "active")
     .order("is_featured", { ascending: false })
     .order("name");

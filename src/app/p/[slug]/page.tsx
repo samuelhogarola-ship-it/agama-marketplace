@@ -193,10 +193,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export async function generateStaticParams() {
-  const supabase = await createClient();
-  const { data } = await supabase.from("mkt_listings").select("id, slug").eq("status", "published").limit(200);
-  return (data ?? []).map((p) => ({ slug: p.slug ? `${p.slug}-${p.id}` : String(p.id) }));
+export function generateStaticParams() {
+  return [];
 }
 
 export default async function ProductPage({ params }: Props) {
@@ -369,7 +367,7 @@ export default async function ProductPage({ params }: Props) {
           </section>
 
           <section className="border-t border-slate-200 py-4 text-sm text-slate-400">
-            <span>
+            <span suppressHydrationWarning>
               {product.updated_at
                 ? `Actualizado ${formatDate(product.updated_at)}`
                 : `Publicado ${formatDate(product.created_at)}`}
