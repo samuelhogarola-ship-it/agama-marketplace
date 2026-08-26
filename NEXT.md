@@ -10,7 +10,7 @@ Verificación end-to-end de todos los paneles y flujos antes de declarar Fase 1 
 - [ ] **Auth:** login con magic link → llega email → clic abre sesión (probar Safari + Chrome) *(requiere test manual)*
 - [ ] **Auth:** recuperación de contraseña → email llega → cambio funciona *(requiere test manual)*
 - [ ] **Panel empresa:** crear perfil completo (logo, contacto, categorías) → se guarda *(requiere auth)*
-- [ ] **Panel publicar:** crear anuncio con 5 fotos → pasa a `pending_review` → moderación IA corre (si ANTHROPIC_KEY está) *(requiere auth)*
+- [ ] **Panel publicar:** crear anuncio con 5 fotos → pasa a `pending_review` → moderación IA corre (si OPENAI_API_KEY está) *(requiere auth)*
 - [ ] **Panel editar:** editar anuncio publicado → vuelve a `pending_review` *(requiere auth)*
 - [ ] **Panel tickets:** crear ticket de soporte → aparece en admin *(requiere auth)*
 - [ ] **Admin moderación:** aprobar y rechazar anuncio desde cola → empresa ve motivo *(requiere auth)*
@@ -41,7 +41,7 @@ Verificación end-to-end de todos los paneles y flujos antes de declarar Fase 1 
 ### Bloqueantes pendientes (no son de código)
 
 1. **Site URL en Supabase** → cambiar a `https://todo-plastico.com` + añadir callback URL
-2. **ANTHROPIC_API_KEY** → añadir en Coolify
+2. **OPENAI_API_KEY** → añadir en Coolify
 3. **Migraciones 0011, 0013 + 0014** → aplicar en BD de producción (0014 arregla `/empresas` y `/e/[slug]` que no pueden leer `plan`)
 4. **Stripe live key** → cuando se active plan Pro
 5. **Google Search Console** → verificar dominio + enviar sitemap
@@ -196,10 +196,10 @@ Sin esto, signup y magic link no mandan emails. Nadie puede registrarse.
 3. Verificar en Resend
 4. Supabase dashboard → Auth → SMTP → Host: `smtp.resend.com`, Port: 465, User: `resend`, Pass: API key, Sender: `noreply@send.todo-plastico.com`
 
-### 2. ANTHROPIC_API_KEY en servidor
+### 2. OPENAI_API_KEY en servidor
 Sin esto, la moderación IA (capas 2 y 3) no corre — solo actúa el regex.
 
-→ Variable de entorno en Coolify/Docker: `ANTHROPIC_API_KEY=sk-ant-...`
+→ Variable de entorno en Coolify/Docker: `OPENAI_API_KEY=sk-proj-...`
 
 ---
 
