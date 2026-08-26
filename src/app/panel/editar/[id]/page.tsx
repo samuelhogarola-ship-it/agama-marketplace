@@ -206,6 +206,11 @@ function EditListingContent() {
 
     const supabase = createClient();
     const { data: company } = await supabase.rpc("mkt_my_company");
+    if (!company?.rfc) {
+      setError("Para publicar anuncios necesitas registrar el RFC/CIF de tu empresa. Ve a tu perfil de empresa y complétalo.");
+      setSaving(false);
+      return;
+    }
     if (
       form.external_url &&
       !isOwnAdvertiserUrl(form.external_url, company?.website)
