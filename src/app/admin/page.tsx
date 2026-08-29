@@ -4,15 +4,15 @@ import { createAdminClient, isAdminUser } from "@/lib/supabase/admin";
 import AdminQueue from "@/components/AdminQueue";
 import AdminCompaniesList from "@/components/AdminCompaniesList";
 import AdminTicketInbox from "@/components/AdminTicketInbox";
+import { resolvePublicUmamiConfig } from "@/lib/umami-public";
 
 const dateFormatter = new Intl.DateTimeFormat("es-MX", { day: "2-digit", month: "short", year: "numeric" });
 
 async function getUmamiStats() {
-  const url = process.env.NEXT_PUBLIC_UMAMI_URL;
-  const websiteId = process.env.NEXT_PUBLIC_UMAMI_WEBSITE_ID;
+  const { url, websiteId } = resolvePublicUmamiConfig();
   const user = process.env.UMAMI_API_USER ?? "admin";
   const pass = process.env.UMAMI_API_PASS;
-  if (!url || !websiteId || !pass) return null;
+  if (!pass) return null;
   try {
     const authRes = await fetch(`${url}/api/auth/login`, {
       method: "POST",
