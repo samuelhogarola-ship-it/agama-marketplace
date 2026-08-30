@@ -1,16 +1,15 @@
 import Script from "next/script";
+import { resolvePublicUmamiConfig } from "@/lib/umami-public";
 
-const UMAMI_URL = process.env.NEXT_PUBLIC_UMAMI_URL;
-const UMAMI_ID  = process.env.NEXT_PUBLIC_UMAMI_WEBSITE_ID;
+const { url: UMAMI_URL, websiteId: UMAMI_ID } = resolvePublicUmamiConfig();
 
 // Umami es cookieless → no requiere consentimiento (GDPR/LFPDPPP compliant)
 export default function Analytics() {
-  if (!UMAMI_URL || !UMAMI_ID) return null;
-
   return (
     <Script
       src={`${UMAMI_URL}/script.js`}
       data-website-id={UMAMI_ID}
+      data-domains="todo-plastico.com,www.todo-plastico.com"
       strategy="afterInteractive"
     />
   );

@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Analytics
+- Umami usa un fallback público y validado para la instancia Agama y el sitio TodoPlástico, evitando que un build de Coolify sin variables `NEXT_PUBLIC_*` elimine el tracker de producción.
+- El tracker queda restringido a `todo-plastico.com` y `www.todo-plastico.com`.
+
 ### Security
 - CSRF: añadida verificación `checkOrigin()` al endpoint `/api/moderate` (el único sin protección).
 - CSP: eliminado `'unsafe-eval'` de `script-src` en producción.

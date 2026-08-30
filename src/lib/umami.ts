@@ -1,12 +1,13 @@
-const UMAMI_URL = process.env.NEXT_PUBLIC_UMAMI_URL;
-const UMAMI_WEBSITE_ID = process.env.NEXT_PUBLIC_UMAMI_WEBSITE_ID;
+import { resolvePublicUmamiConfig } from "@/lib/umami-public";
+
+const { url: UMAMI_URL, websiteId: UMAMI_WEBSITE_ID } = resolvePublicUmamiConfig();
 const UMAMI_USER = process.env.UMAMI_API_USER;
 const UMAMI_PASS = process.env.UMAMI_API_PASS;
 
 let cachedToken: { value: string; expiresAt: number } | null = null;
 
 async function getToken(): Promise<string | null> {
-  if (!UMAMI_URL || !UMAMI_USER || !UMAMI_PASS) return null;
+  if (!UMAMI_USER || !UMAMI_PASS) return null;
   if (cachedToken && Date.now() < cachedToken.expiresAt) return cachedToken.value;
 
   const res = await fetch(`${UMAMI_URL}/api/auth/login`, {
@@ -22,7 +23,7 @@ async function getToken(): Promise<string | null> {
 
 async function umamiGet<T>(path: string, params: Record<string, string>): Promise<T | null> {
   const token = await getToken();
-  if (!token || !UMAMI_URL || !UMAMI_WEBSITE_ID) return null;
+  if (!token) return null;
 
   const qs = new URLSearchParams(params).toString();
   const res = await fetch(
@@ -90,5 +91,5 @@ export async function getPageviews(
 }
 
 export function isConfigured(): boolean {
-  return !!(UMAMI_URL && UMAMI_WEBSITE_ID && UMAMI_USER && UMAMI_PASS);
+  return !!(UMAMI_USER && UMAMI_PASS);
 }
