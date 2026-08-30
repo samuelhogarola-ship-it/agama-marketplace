@@ -1,8 +1,9 @@
 "use client";
 
-import { Suspense, useState, useEffect } from "react";
+import { Suspense, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
+import { sendMagicLink } from "./actions";
 import { createClient } from "@/lib/supabase/client";
 
 type AuthMethod = "password" | "magic-link";
@@ -20,10 +21,6 @@ function LoginForm() {
   );
   const [sent, setSent] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [origin, setOrigin] = useState("");
-
-  useEffect(() => setOrigin(window.location.origin), []);
-
   const rawNext = params.get("next") ?? "/panel";
   const next = rawNext.startsWith("/") && !rawNext.startsWith("//") ? rawNext : "/panel";
 
@@ -36,15 +33,10 @@ function LoginForm() {
       const supabase = createClient();
 
       if (method === "magic-link") {
-        const { error } = await supabase.auth.signInWithOtp({
-          email,
-          options: {
-            emailRedirectTo: `${origin}/auth/callback?next=${encodeURIComponent(next)}`,
-          },
-        });
+        const result = await sendMagicLink(email, next);
         setLoading(false);
-        if (error) {
-          setError("No se pudo enviar el enlace. Verifica el email e inténtalo de nuevo.");
+        if (!result.ok) {
+          setError(result.error);
           return;
         }
         setSent(true);
