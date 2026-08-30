@@ -1,5 +1,6 @@
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
+import { protectedAreaRedirect } from "@/lib/auth-role";
 
 type CookieToSet = { name: string; value: string; options?: CookieOptions };
 
@@ -35,6 +36,19 @@ export async function middleware(request: NextRequest) {
     url.pathname = "/ingresar";
     url.searchParams.set("next", request.nextUrl.pathname);
     return NextResponse.redirect(url);
+  }
+
+  if (user) {
+    const destination = protectedAreaRedirect(
+      request.nextUrl.pathname,
+      user.app_metadata?.role,
+    );
+    if (destination) {
+      const url = request.nextUrl.clone();
+      url.pathname = destination;
+      url.search = "";
+      return NextResponse.redirect(url);
+    }
   }
 
   return response;

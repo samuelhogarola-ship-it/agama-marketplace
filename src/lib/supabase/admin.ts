@@ -15,5 +15,7 @@ export function isAdminEmail(email?: string | null) {
 }
 
 export function isAdminUser(user: Pick<User, "email" | "app_metadata"> | null | undefined) {
-  return Boolean(user && (isAdminEmail(user.email) || user.app_metadata?.role === "admin"));
+  if (!user) return false;
+  if (user.app_metadata?.role === "company") return false;
+  return isAdminEmail(user.email) || user.app_metadata?.role === "admin";
 }
