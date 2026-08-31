@@ -243,7 +243,7 @@ export default function PublicarPage() {
   }
 
   return (
-    <div className="mx-auto max-w-2xl px-4 py-12">
+    <div className="mx-auto max-w-2xl py-4 lg:py-0">
       <p className="text-xs font-semibold uppercase tracking-[0.2em] text-brand-sky">
         Mi panel
       </p>

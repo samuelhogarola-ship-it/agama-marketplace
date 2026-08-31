@@ -296,13 +296,13 @@ function EditListingContent() {
 
   if (loading)
     return (
-      <div className="mx-auto max-w-2xl px-5 py-16 text-slate-400">
+      <div className="mx-auto max-w-2xl py-12 text-slate-400">
         Cargando anuncio...
       </div>
     );
 
   return (
-    <div className="mx-auto max-w-2xl px-5 py-12">
+    <div className="mx-auto max-w-2xl py-4 lg:py-0">
       {previewMode ? (
         <div className="mb-8 rounded-2xl border border-brand/20 bg-brand-light px-5 py-4 text-sm text-slate-700">
           <span className="font-semibold text-brand-dark">
@@ -644,7 +644,7 @@ export default function EditListingPage() {
   return (
     <Suspense
       fallback={
-        <div className="mx-auto max-w-2xl px-5 py-16 text-slate-400">
+        <div className="mx-auto max-w-2xl py-12 text-slate-400">
           Cargando anuncio…
         </div>
       }

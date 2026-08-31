@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/client";
 import { CATEGORIES } from "@/lib/categories";
 import { compressImage } from "@/lib/compress-image";
 import { DEMO_COMPANY, DEMO_PREVIEW_ENABLED } from "@/lib/demo-data";
+import { normalizeTaxId, taxIdSaveError } from "@/lib/tax-id";
 
 function PerfilContent() {
   const router = useRouter();
@@ -13,6 +14,7 @@ function PerfilContent() {
   const previewMode = DEMO_PREVIEW_ENABLED && searchParams.get("preview") === "1";
   const [form, setForm] = useState({
     name: "",
+    rfc: "",
     description: "",
     location: "",
     website: "",
@@ -26,12 +28,14 @@ function PerfilContent() {
   const [uploadingLogo, setUploadingLogo] = useState(false);
   const [loading, setLoading] = useState(true);
   const [saved, setSaved] = useState(false);
+  const [saveMessage, setSaveMessage] = useState<string | null>(null);
   const logoInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (previewMode) {
       setForm({
         name: DEMO_COMPANY.name,
+        rfc: DEMO_COMPANY.rfc ?? "",
         description: DEMO_COMPANY.description ?? "",
         location: DEMO_COMPANY.location ?? "",
         website: DEMO_COMPANY.website ?? "",
@@ -58,6 +62,7 @@ function PerfilContent() {
       if (data) {
         setForm({
           name: data.name ?? "",
+          rfc: data.rfc ?? "",
           description: data.description ?? "",
           location: data.location ?? "",
           website: data.website ?? "",
@@ -118,6 +123,8 @@ function PerfilContent() {
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
+    setSaved(false);
+    setSaveMessage(null);
     if (previewMode) {
       setSaved(true);
       return;
@@ -131,6 +138,7 @@ function PerfilContent() {
       .from("mkt_companies")
       .update({
         name: form.name,
+        rfc: normalizeTaxId(form.rfc),
         description: form.description,
         location: form.location,
         website: form.website,
@@ -142,6 +150,7 @@ function PerfilContent() {
       .eq("id", user.id);
     if (saveError) {
       setSaved(false);
+      setSaveMessage(taxIdSaveError(saveError));
       return;
     }
     setSaved(true);
@@ -152,13 +161,13 @@ function PerfilContent() {
 
   if (loading)
     return (
-      <div className="mx-auto max-w-2xl px-4 py-16 text-slate-400">
+      <div className="mx-auto max-w-2xl py-12 text-slate-400">
         Cargando…
       </div>
     );
 
   return (
-    <div className="mx-auto max-w-2xl px-4 py-12">
+    <div className="mx-auto max-w-2xl py-4 lg:py-0">
       {previewMode ? (
         <div className="mb-8 rounded-2xl border border-brand/20 bg-brand-light px-5 py-4 text-sm text-slate-700">
           <span className="font-semibold text-brand-dark">
@@ -233,6 +242,22 @@ function PerfilContent() {
             value={form.name}
             onChange={(e) => setForm({ ...form, name: e.target.value })}
             className="mt-1 w-full rounded-lg border border-slate-300 px-4 py-2.5 focus:border-brand focus:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-1"
+          />
+        </div>
+        <div className="rounded-xl border border-brand/20 bg-brand-light/50 p-4">
+          <label htmlFor="company-tax-id" className="block text-sm font-semibold text-brand-dark">
+            RFC/CIF de la empresa
+          </label>
+          <p className="mt-1 text-xs leading-5 text-slate-600">
+            Es necesario para publicar anuncios. Solo identifica a tu empresa y evita cuentas duplicadas; no se muestra en la ficha pública.
+          </p>
+          <input
+            id="company-tax-id"
+            value={form.rfc}
+            onChange={(e) => setForm({ ...form, rfc: e.target.value.toUpperCase() })}
+            placeholder="Ej. ABC010203XY9 o B12345678"
+            autoComplete="off"
+            className="mt-3 w-full rounded-lg border border-slate-300 bg-white px-4 py-2.5 font-mono uppercase tracking-wide focus:border-brand focus:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-1"
           />
         </div>
         <div>
@@ -333,6 +358,12 @@ function PerfilContent() {
           </div>
         </div>
 
+        {saveMessage ? (
+          <p role="alert" className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+            {saveMessage}
+          </p>
+        ) : null}
+
         <button className="rounded-full bg-brand px-8 py-3 text-sm font-semibold text-white hover:bg-brand-dark">
           {saved
             ? previewMode
@@ -349,7 +380,7 @@ export default function PerfilPage() {
   return (
     <Suspense
       fallback={
-        <div className="mx-auto max-w-2xl px-4 py-16 text-slate-400">
+        <div className="mx-auto max-w-2xl py-12 text-slate-400">
           Cargando ficha…
         </div>
       }
