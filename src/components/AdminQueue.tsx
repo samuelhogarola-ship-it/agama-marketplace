@@ -4,6 +4,12 @@ import { useState, useEffect, useRef } from "react";
 import { photoUrl } from "@/lib/types";
 
 type Photo = { storage_path: string };
+type AiRecommendation = {
+  verdict: "approve" | "reject" | "review";
+  violations: string[];
+  confidence: number;
+  reason_es: string | null;
+};
 
 type QueueItem = {
   id: number;
@@ -39,8 +45,27 @@ export default function AdminQueue({
   const [busy, setBusy] = useState<number | null>(null);
   const [rejectId, setRejectId] = useState<number | null>(null);
   const [rejectReason, setRejectReason] = useState("");
+  const [aiRecommendations, setAiRecommendations] = useState<Record<number, AiRecommendation>>({});
 
   const [error, setError] = useState<string | null>(null);
+
+  async function requestAiReview(id: number) {
+    setBusy(id);
+    setError(null);
+    try {
+      const res = await fetch("/api/moderate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ listing_id: id }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) setError(data.error ?? `Error en la valoración IA (${res.status})`);
+      else setAiRecommendations((current) => ({ ...current, [id]: data as AiRecommendation }));
+    } catch {
+      setError("Error de conexión durante la valoración IA");
+    }
+    setBusy(null);
+  }
 
   async function approve(id: number) {
     setBusy(id);
@@ -144,6 +169,13 @@ export default function AdminQueue({
                   ) : (
                     <>
                       <button
+                        disabled={busy === item.id || Boolean(aiRecommendations[item.id])}
+                        onClick={() => requestAiReview(item.id)}
+                        className="rounded-full border border-sky-200 px-5 py-2.5 text-sm font-semibold text-sky-700 hover:bg-sky-50 disabled:opacity-50"
+                      >
+                        {busy === item.id ? "Valorando…" : aiRecommendations[item.id] ? "Valoración realizada" : "Valorar con IA"}
+                      </button>
+                      <button
                         disabled={busy === item.id}
                         onClick={() => {
                           setRejectId(item.id);
@@ -164,6 +196,16 @@ export default function AdminQueue({
                   )}
                 </div>
               </div>
+              {aiRecommendations[item.id] ? (
+                <div className="mt-5 rounded-xl border border-sky-100 bg-sky-50 p-4 text-sm text-slate-700">
+                  <p className="font-semibold text-sky-900">
+                    Recomendación IA: {aiRecommendations[item.id].verdict === "approve" ? "aprobar" : aiRecommendations[item.id].verdict === "reject" ? "rechazar" : "revisar"}
+                    {` · ${Math.round(aiRecommendations[item.id].confidence * 100)}% de confianza`}
+                  </p>
+                  {aiRecommendations[item.id].reason_es ? <p className="mt-1">{aiRecommendations[item.id].reason_es}</p> : null}
+                  <p className="mt-2 text-xs text-sky-800">La IA solo recomienda. La decisión final sigue siendo manual.</p>
+                </div>
+              ) : null}
             </article>
           );
         })}

@@ -2,6 +2,11 @@
 
 ## [Unreleased]
 
+### Moderación
+- Los anuncios nuevos, editados o reactivados quedan en revisión sin llamar automáticamente a OpenAI.
+- La valoración con IA solo puede iniciarla un administrador desde la cola y nunca publica ni rechaza: la decisión final continúa siendo humana.
+- Las valoraciones se reutilizan mientras el contenido no cambie para evitar consumo duplicado de tokens.
+
 ### Analytics
 - Umami usa un fallback público y validado para la instancia Agama y el sitio TodoPlástico, evitando que un build de Coolify sin variables `NEXT_PUBLIC_*` elimine el tracker de producción.
 - El tracker queda restringido a `todo-plastico.com` y `www.todo-plastico.com`.

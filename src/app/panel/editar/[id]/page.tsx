@@ -276,18 +276,6 @@ function EditListingContent() {
       }
     }
 
-    const moderation = await fetch("/api/moderate", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ listing_id: Number(params.id) }),
-    });
-    const result = await moderation.json().catch(() => ({}));
-    if (!moderation.ok) {
-      setError(result.error ?? "No se pudo enviar a moderación.");
-      setSaving(false);
-      return;
-    }
-
     router.push("/panel");
     router.refresh();
   }

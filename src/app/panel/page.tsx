@@ -95,12 +95,11 @@ function PanelContent() {
     setActionError(null);
     const supabase = createClient();
     if (status === "pending_review") {
-      const moderation = await fetch("/api/moderate", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ listing_id: id }),
-      });
-      if (!moderation.ok)
+      const result = await supabase
+        .from("mkt_listings")
+        .update({ status: "pending_review", rejection_reason: null })
+        .eq("id", id);
+      if (result.error)
         setActionError(
           "No se pudo enviar el anuncio a revisión. Inténtalo de nuevo."
         );
