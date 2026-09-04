@@ -19,19 +19,6 @@ const STATUS_LABEL: Record<string, { text: string; cls: string }> = {
   draft: { text: "Borrador", cls: "bg-slate-100 text-slate-600" },
 };
 
-function getInitials(name: string) {
-  return (
-    name
-      .split(" ")
-      .filter(Boolean)
-      .slice(0, 2)
-      .map((part) => part[0])
-      .join("")
-      .toUpperCase() || "TP"
-  );
-}
-
-
 function PanelContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -39,16 +26,13 @@ function PanelContent() {
   const upgradeSuccess = searchParams.get("upgrade") === "success";
   const [profile, setProfile] = useState<Company | null>(null);
   const [products, setProducts] = useState<Product[]>([]);
-  const [email, setEmail] = useState("");
   const [userId, setUserId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [actionError, setActionError] = useState<string | null>(null);
   const [deleteConfirmId, setDeleteConfirmId] = useState<number | null>(null);
-  const [upgrading, setUpgrading] = useState(false);
 
   const load = useCallback(async () => {
     if (previewMode) {
-      setEmail("admin@agama-pigmentos.com");
       setProfile(DEMO_COMPANY);
       setProducts(DEMO_LISTINGS);
       setLoading(false);
@@ -62,7 +46,6 @@ function PanelContent() {
       router.replace("/ingresar?next=/panel");
       return;
     }
-    setEmail(user.email ?? "");
     setUserId(user.id);
     let [{ data: prof }, { data: prods }] = await Promise.all([
       supabase.from("mkt_companies").select("*").eq("id", user.id).maybeSingle(),
@@ -112,12 +95,11 @@ function PanelContent() {
     setActionError(null);
     const supabase = createClient();
     if (status === "pending_review") {
-      const moderation = await fetch("/api/moderate", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ listing_id: id }),
-      });
-      if (!moderation.ok)
+      const result = await supabase
+        .from("mkt_listings")
+        .update({ status: "pending_review", rejection_reason: null })
+        .eq("id", id);
+      if (result.error)
         setActionError(
           "No se pudo enviar el anuncio a revisión. Inténtalo de nuevo."
         );
@@ -153,25 +135,6 @@ function PanelContent() {
     await load();
   }
 
-  async function signOut() {
-    await createClient().auth.signOut();
-    window.location.href = "/";
-  }
-
-  async function upgradeToPro() {
-    setUpgrading(true);
-    try {
-      const res = await fetch("/api/stripe/checkout", { method: "POST", headers: { "Content-Type": "application/json" } });
-      const data = await res.json();
-      if (data.url) window.location.href = data.url;
-      else setActionError(data.error ?? "No se pudo iniciar el pago.");
-    } catch {
-      setActionError("Error de red. Inténtalo de nuevo.");
-    } finally {
-      setUpgrading(false);
-    }
-  }
-
   const counts = useMemo(
     () => ({
       published: products.filter((p) => p.status === "published").length,
@@ -203,120 +166,7 @@ function PanelContent() {
     );
 
   return (
-    <div className="mx-auto grid w-full max-w-7xl gap-8 px-5 py-10 sm:px-8 lg:grid-cols-[230px_minmax(0,1fr)] lg:px-12 lg:py-14">
-      <aside className="h-fit lg:sticky lg:top-28">
-        <div className="flex items-center gap-3 border-b border-slate-200 pb-5">
-          <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-brand-dark text-sm font-bold text-white">
-            {getInitials(profile?.name ?? "Mi empresa")}
-          </span>
-          <div className="min-w-0">
-            <p className="truncate text-sm font-semibold text-brand-dark">
-              {profile?.name ?? "Mi empresa"}
-            </p>
-            <p className="truncate text-xs text-slate-500">{email}</p>
-          </div>
-        </div>
-        <nav
-          aria-label="Panel de empresa"
-          className="mt-5 grid gap-1 text-sm font-medium"
-        >
-          <Link
-            href="/panel"
-            className="rounded-lg bg-brand-light px-3 py-2.5 font-semibold text-brand-dark"
-          >
-            Resumen
-          </Link>
-          <Link
-            href={previewMode ? "/panel/perfil?preview=1" : "/panel/perfil"}
-            className="rounded-lg px-3 py-2.5 text-slate-600 hover:bg-slate-50 hover:text-brand-dark"
-          >
-            Mi empresa
-          </Link>
-          <a
-            href="#catalogo"
-            className="rounded-lg px-3 py-2.5 text-slate-600 hover:bg-slate-50 hover:text-brand-dark"
-          >
-            Catálogo
-          </a>
-          <Link
-            href={
-              previewMode ? "/panel/publicar?preview=1" : "/panel/publicar"
-            }
-            className="rounded-lg px-3 py-2.5 text-slate-600 hover:bg-slate-50 hover:text-brand-dark"
-          >
-            Publicar producto
-          </Link>
-          <Link
-            href="/panel/estadisticas"
-            className={`flex items-center justify-between rounded-lg px-3 py-2.5 ${
-              profile?.plan === "pro"
-                ? "text-slate-600 hover:bg-slate-50 hover:text-brand-dark"
-                : "text-slate-400 hover:bg-slate-50"
-            }`}
-          >
-            Estadísticas
-            {profile?.plan !== "pro" && (
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" className="h-3.5 w-3.5">
-                <path fillRule="evenodd" d="M8 1a3.5 3.5 0 0 0-3.5 3.5V7H3a1 1 0 0 0-1 1v5a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V8a1 1 0 0 0-1-1h-1.5V4.5A3.5 3.5 0 0 0 8 1Zm2 6V4.5a2 2 0 1 0-4 0V7h4Z" clipRule="evenodd" />
-              </svg>
-            )}
-          </Link>
-          <Link
-            href="/panel/ajustes"
-            className="rounded-lg px-3 py-2.5 text-slate-600 hover:bg-slate-50 hover:text-brand-dark"
-          >
-            Ajustes
-          </Link>
-          <div className="my-1 border-t border-slate-100" />
-          {profile?.slug && (
-            <Link
-              href={`/e/${profile.slug}`}
-              target="_blank"
-              rel="noreferrer"
-              className="flex items-center justify-between rounded-lg px-3 py-2.5 text-slate-600 hover:bg-slate-50 hover:text-brand-dark"
-            >
-              Ver ficha pública
-              <span className="text-slate-300">↗</span>
-            </Link>
-          )}
-          {!previewMode && (
-            <a
-              href="#soporte"
-              className="rounded-lg px-3 py-2.5 text-slate-600 hover:bg-slate-50 hover:text-brand-dark"
-            >
-              Soporte
-            </a>
-          )}
-        </nav>
-        <div className="mt-8 border-t border-slate-200 pt-5">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-400">
-            Plan actual
-          </p>
-          <p className="mt-2 text-sm font-semibold text-brand-dark">
-            {profile?.plan === "pro" ? "Pro" : "Gratuito"}
-          </p>
-          <p className="mt-1 text-xs leading-5 text-slate-500">
-            {activeCount}/{limit === Infinity ? "∞" : limit} anuncios activos
-          </p>
-          {!previewMode && profile?.plan !== "pro" && (
-            <button
-              onClick={upgradeToPro}
-              disabled={upgrading}
-              className="mt-3 w-full rounded-lg bg-brand px-3 py-2 text-xs font-semibold text-white hover:bg-brand-dark disabled:opacity-50 transition-colors"
-            >
-              {upgrading ? "Redirigiendo…" : "Subir a Pro"}
-            </button>
-          )}
-          <button
-            onClick={signOut}
-            className="mt-5 text-xs font-semibold text-slate-500 hover:text-brand-dark"
-          >
-            Cerrar sesión
-          </button>
-        </div>
-      </aside>
-
-      <main className="min-w-0">
+    <div className="min-w-0">
         {upgradeSuccess && (
           <div className="mb-8 rounded-2xl border border-emerald-200 bg-emerald-50 px-5 py-4 text-sm text-emerald-800">
             <span className="font-semibold">¡Plan Pro activado!</span> Ya puedes publicar anuncios ilimitados. Gracias por tu apoyo.
@@ -616,7 +466,6 @@ function PanelContent() {
             <PanelTickets userId={(profile?.id ?? userId)!} />
           </section>
         )}
-      </main>
     </div>
   );
 }

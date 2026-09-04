@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import type { Company } from "@/lib/types";
+import ProCheckoutButton from "@/components/ProCheckoutButton";
 
 type FormState = {
   email: string;
@@ -81,11 +82,11 @@ export default function AjustesPage() {
   }
 
   if (loading) {
-    return <div className="mx-auto max-w-3xl px-5 py-16 text-sm text-slate-400 sm:px-8">Cargando…</div>;
+    return <div className="mx-auto max-w-3xl py-12 text-sm text-slate-400">Cargando…</div>;
   }
 
   return (
-    <div className="mx-auto max-w-2xl px-5 py-10 sm:px-8 lg:py-14">
+    <div className="mx-auto max-w-2xl py-4 lg:py-0">
       <p className="text-xs font-semibold uppercase tracking-[0.24em] text-brand-sky">Ajustes</p>
       <h1 className="mt-3 text-3xl font-semibold tracking-[-0.04em] text-brand-dark sm:text-4xl">
         Configuración de tu cuenta
@@ -122,12 +123,10 @@ export default function AjustesPage() {
               </p>
             </div>
             {profile?.plan !== "pro" && (
-              <Link
-                href="/panel"
-                className="rounded-full bg-brand px-4 py-2 text-sm font-semibold text-white hover:bg-brand-dark"
-              >
-                Subir a Pro
-              </Link>
+              <ProCheckoutButton
+                onError={(text) => setMessage({ type: "error", text })}
+                className="rounded-full bg-brand px-4 py-2 text-sm font-semibold text-white hover:bg-brand-dark disabled:opacity-50"
+              />
             )}
           </div>
           {profile?.plan === "pro" && (

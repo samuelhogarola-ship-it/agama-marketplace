@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { createAdminClient } from "@/lib/supabase/admin";
+import { createAdminClient, isAdminUser } from "@/lib/supabase/admin";
 import { isRateLimited } from "@/lib/rate-limit";
 import { checkOrigin } from "@/lib/csrf";
+import { canRequestAiReview, combineAiReview, isReusableAiReview, type AiReviewResult } from "@/lib/moderation-workflow";
 
 const MODEL = "gpt-4o-mini";
 
@@ -11,12 +12,7 @@ const BANNED_RE =
 const CONTACT_RE =
   /\b\d{10}\b|\+?52[\s.-]?\d{10}|[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}|(wa\.me|whats\s*app)/i;
 
-interface ModResult {
-  verdict: "approve" | "reject" | "review";
-  violations: string[];
-  confidence: number;
-  reason_es: string | null;
-}
+type ModResult = AiReviewResult;
 
 async function callOpenAI(messages: { role: string; content: unknown }[], maxTokens = 300): Promise<string> {
   const key = process.env.OPENAI_API_KEY;
@@ -92,21 +88,39 @@ export async function POST(req: NextRequest) {
 
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return NextResponse.json({ error: "No autenticado" }, { status: 401 });
-  if (isRateLimited({ key: `moderate:${user.id}`, max: 5, windowMs: 60_000 }))
+  if (!user || !isAdminUser(user)) return NextResponse.json({ error: "No autorizado" }, { status: 403 });
+  if (isRateLimited({ key: `admin-ai-review:${user.id}`, max: 5, windowMs: 60_000 }))
     return NextResponse.json({ error: "Demasiadas solicitudes. Espera un minuto." }, { status: 429 });
   const admin = createAdminClient();
   if (!admin) return NextResponse.json({ error: "Moderación no configurada" }, { status: 503 });
 
-  const { data: product } = await supabase
+  const { data: product } = await admin
     .from("mkt_listings")
     .select("*, photos:mkt_listing_photos(storage_path, position)")
     .eq("id", listing_id)
-    .eq("company_id", user.id)
     .single();
 
   if (!product) return NextResponse.json({ error: "Anuncio no encontrado" }, { status: 404 });
-  if (product.status === "blocked") return NextResponse.json({ error: "Anuncio bloqueado" }, { status: 403 });
+  if (!canRequestAiReview({ isAdmin: true, status: product.status }))
+    return NextResponse.json({ error: "El anuncio no está pendiente de revisión" }, { status: 409 });
+
+  const { data: previousReview } = await admin
+    .from("mkt_moderation_events")
+    .select("verdict, violations, confidence, reason, created_at")
+    .eq("listing_id", listing_id)
+    .eq("source", "ai")
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  if (previousReview && isReusableAiReview({ listingUpdatedAt: product.updated_at, reviewCreatedAt: previousReview.created_at })) {
+    return NextResponse.json({
+      verdict: previousReview.verdict,
+      violations: previousReview.violations ?? [],
+      confidence: Number(previousReview.confidence ?? 0),
+      reason_es: previousReview.reason,
+      cached: true,
+    });
+  }
 
   const fullText = `${product.title} ${product.description}`;
 
@@ -119,37 +133,19 @@ export async function POST(req: NextRequest) {
     const reason = hardViolations.includes("competencia_pigmentos_masterbatch_aditivos")
       ? "No se permiten pigmentos, masterbatch, aditivos ni colorantes."
       : "No se permiten teléfonos, emails ni WhatsApp en la publicación.";
-    await admin.rpc("mkt_submit_listing", { p_listing_id: listing_id, p_verdict: "reject", p_reason: reason });
     await admin.from("mkt_moderation_events").insert({ listing_id, verdict: "reject", violations: hardViolations, reason, source: "rules", confidence: 1.0 });
-    return NextResponse.json({ verdict: "reject", reason });
+    return NextResponse.json({ verdict: "reject", violations: hardViolations, confidence: 1, reason_es: reason });
   }
 
-  // Sin IA configurada: queda pendiente para revision humana.
   if (!process.env.OPENAI_API_KEY) {
-    await admin.rpc("mkt_submit_listing", { p_listing_id: listing_id, p_verdict: "pending" });
-    await admin.from("mkt_moderation_events").insert({ listing_id, verdict: "review", violations: [], reason: "Revisión IA pendiente de configuración", source: "rules", confidence: 0 });
-    return NextResponse.json({ verdict: "review", reason: "Tu publicación está pendiente de revisión." });
+    return NextResponse.json({ error: "Valoración IA no configurada" }, { status: 503 });
   }
 
   let textResult: ModResult;
   try {
     textResult = await classifyText(product.title, product.description, product.category);
   } catch {
-    await admin.rpc("mkt_submit_listing", { p_listing_id: listing_id, p_verdict: "pending" });
-    await admin.from("mkt_moderation_events").insert({ listing_id, verdict: "review", violations: [], reason: "Error en clasificador IA", source: "ai", confidence: 0 });
-    return NextResponse.json({ verdict: "review", reason: "Tu publicación está pendiente de revisión." });
-  }
-
-  if (textResult.verdict === "reject" && textResult.confidence >= 0.8) {
-    await admin.rpc("mkt_submit_listing", { p_listing_id: listing_id, p_verdict: "reject", p_reason: textResult.reason_es });
-    await admin.from("mkt_moderation_events").insert({ listing_id, verdict: "reject", violations: textResult.violations, reason: textResult.reason_es, source: "ai", confidence: textResult.confidence, model: MODEL });
-    return NextResponse.json({ verdict: "reject", reason: textResult.reason_es });
-  }
-
-  if (textResult.verdict !== "approve" || textResult.confidence < 0.75) {
-    await admin.rpc("mkt_submit_listing", { p_listing_id: listing_id, p_verdict: "pending" });
-    await admin.from("mkt_moderation_events").insert({ listing_id, verdict: "review", violations: textResult.violations, reason: textResult.reason_es, source: "ai", confidence: textResult.confidence, model: MODEL });
-    return NextResponse.json({ verdict: "review", reason: "Tu publicación está siendo revisada." });
+    return NextResponse.json({ error: "No se pudo completar la valoración IA" }, { status: 502 });
   }
 
   // Layer 3: GPT-4o-mini vision
@@ -160,27 +156,25 @@ export async function POST(req: NextRequest) {
     (p) => `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/mkt-photos/${p.storage_path}`,
   );
 
+  let imageResult: ModResult | null = null;
   if (photoUrls.length > 0) {
     try {
-      const visionResult = await classifyImages(photoUrls, product.title);
-      if (visionResult.verdict === "reject" && visionResult.confidence >= 0.8) {
-        await admin.rpc("mkt_submit_listing", { p_listing_id: listing_id, p_verdict: "reject", p_reason: visionResult.reason_es });
-        await admin.from("mkt_moderation_events").insert({ listing_id, verdict: "reject", violations: visionResult.violations, reason: visionResult.reason_es, source: "ai", confidence: visionResult.confidence, model: MODEL });
-        return NextResponse.json({ verdict: "reject", reason: visionResult.reason_es });
-      }
-      if (visionResult.verdict === "review") {
-        await admin.rpc("mkt_submit_listing", { p_listing_id: listing_id, p_verdict: "pending" });
-        await admin.from("mkt_moderation_events").insert({ listing_id, verdict: "review", violations: visionResult.violations, reason: visionResult.reason_es, source: "ai", confidence: visionResult.confidence, model: MODEL });
-        return NextResponse.json({ verdict: "review", reason: "Las imágenes están siendo revisadas." });
-      }
+      imageResult = await classifyImages(photoUrls, product.title);
     } catch {
-      await admin.rpc("mkt_submit_listing", { p_listing_id: listing_id, p_verdict: "pending" });
-      await admin.from("mkt_moderation_events").insert({ listing_id, verdict: "review", violations: [], reason: "Error en revisión visual", source: "ai", confidence: 0, model: MODEL });
-      return NextResponse.json({ verdict: "review", reason: "Las imágenes están pendientes de revisión." });
+      return NextResponse.json({ error: "No se pudo completar la valoración de imágenes" }, { status: 502 });
     }
   }
 
-  await admin.rpc("mkt_submit_listing", { p_listing_id: listing_id, p_verdict: "approve" });
-  await admin.from("mkt_moderation_events").insert({ listing_id, verdict: "approve", violations: [], reason: null, source: "ai", confidence: textResult.confidence, model: MODEL });
-  return NextResponse.json({ verdict: "approve" });
+  const recommendation = combineAiReview({ text: textResult, image: imageResult });
+  const { error: logError } = await admin.from("mkt_moderation_events").insert({
+    listing_id,
+    verdict: recommendation.verdict,
+    violations: recommendation.violations,
+    reason: recommendation.reason_es,
+    source: "ai",
+    confidence: recommendation.confidence,
+    model: MODEL,
+  });
+  if (logError) return NextResponse.json({ error: "No se pudo guardar la valoración IA" }, { status: 500 });
+  return NextResponse.json(recommendation);
 }

@@ -2,8 +2,8 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
+import ProCheckoutButton from "@/components/ProCheckoutButton";
 
 type ListingStat = {
   id: number;
@@ -103,12 +103,12 @@ export default function EstadisticasPage() {
   }, [plan, fetchStats]);
 
   if (loading) {
-    return <div className="mx-auto max-w-4xl px-5 py-16 text-sm text-slate-400 sm:px-8">Cargando…</div>;
+    return <div className="mx-auto max-w-4xl py-12 text-sm text-slate-400">Cargando…</div>;
   }
 
   if (plan !== "pro") {
     return (
-      <div className="mx-auto max-w-3xl px-5 py-16 sm:px-8">
+      <div className="mx-auto max-w-3xl py-4 lg:py-0">
         <p className="text-xs font-semibold uppercase tracking-[0.24em] text-brand-sky">Estadísticas</p>
         <h1 className="mt-4 text-3xl font-semibold tracking-[-0.04em] text-brand-dark sm:text-4xl">
           Conoce quién visita tus anuncios.
@@ -138,19 +138,16 @@ export default function EstadisticasPage() {
           <p className="mt-1 text-sm text-slate-600">
             Sube a Pro para desbloquear estadísticas detalladas de tus anuncios y publicar sin límite.
           </p>
-          <Link
-            href="/panel"
-            className="mt-4 inline-block rounded-full bg-brand px-5 py-2.5 text-sm font-semibold text-white hover:bg-brand-dark"
-          >
-            Subir a Pro
-          </Link>
+          <div className="mt-4">
+            <ProCheckoutButton />
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="mx-auto max-w-4xl px-5 py-10 sm:px-8 lg:px-12 lg:py-14">
+    <div className="mx-auto max-w-4xl py-4 lg:py-0">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.24em] text-brand-sky">Estadísticas</p>
