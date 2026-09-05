@@ -54,3 +54,24 @@ test("Pro checkout reports a network failure without redirecting", async () => {
   });
   assert.deepEqual(destinations, []);
 });
+
+test("Pro checkout rejects a non-string checkout URL", async () => {
+  const destinations: string[] = [];
+
+  const result = await startProCheckout({
+    request: async () => Response.json({ url: { unexpected: true } }),
+    redirect: (url) => destinations.push(url),
+  });
+
+  assert.deepEqual(result, { ok: false, error: "No se pudo iniciar el pago." });
+  assert.deepEqual(destinations, []);
+});
+
+test("Pro checkout ignores a non-string API error", async () => {
+  const result = await startProCheckout({
+    request: async () => Response.json({ error: { unexpected: true } }, { status: 503 }),
+    redirect: () => assert.fail("must not redirect"),
+  });
+
+  assert.deepEqual(result, { ok: false, error: "No se pudo iniciar el pago." });
+});

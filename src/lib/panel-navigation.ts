@@ -14,3 +14,11 @@ export function panelSectionForPath(pathname: string): PanelSection {
   if (pathname.startsWith("/panel/ajustes")) return "settings";
   return "summary";
 }
+
+export function panelHref(path: string, previewMode: boolean) {
+  if (!previewMode) return path;
+
+  const [pathAndQuery, fragment] = path.split("#", 2);
+  const separator = pathAndQuery.includes("?") ? "&" : "?";
+  return `${pathAndQuery}${separator}preview=1${fragment ? `#${fragment}` : ""}`;
+}

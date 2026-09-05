@@ -1,9 +1,10 @@
+import { randomUUID } from "node:crypto";
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient, isAdminUser } from "@/lib/supabase/admin";
 import { isRateLimited } from "@/lib/rate-limit";
 import { checkOrigin } from "@/lib/csrf";
-import { canRequestAiReview, combineAiReview, isReusableAiReview, type AiReviewResult } from "@/lib/moderation-workflow";
+import { canRequestAiReview, combineAiReview, isReusableAiReview, runWithAiReviewClaim, type AiReviewResult } from "@/lib/moderation-workflow";
 
 const MODEL = "gpt-4o-mini";
 
@@ -29,6 +30,7 @@ async function callOpenAI(messages: { role: string; content: unknown }[], maxTok
       temperature: 0,
       messages,
     }),
+    signal: AbortSignal.timeout(60_000),
   });
   if (!res.ok) throw new Error(`OpenAI ${res.status}`);
   const data = await res.json();
@@ -106,13 +108,17 @@ export async function POST(req: NextRequest) {
 
   const { data: previousReview } = await admin
     .from("mkt_moderation_events")
-    .select("verdict, violations, confidence, reason, created_at")
+    .select("verdict, violations, confidence, reason, created_at, reviewed_listing_updated_at")
     .eq("listing_id", listing_id)
     .eq("source", "ai")
     .order("created_at", { ascending: false })
     .limit(1)
     .maybeSingle();
-  if (previousReview && isReusableAiReview({ listingUpdatedAt: product.updated_at, reviewCreatedAt: previousReview.created_at })) {
+  if (previousReview && isReusableAiReview({
+    listingUpdatedAt: product.updated_at,
+    reviewCreatedAt: previousReview.created_at,
+    reviewedListingUpdatedAt: previousReview.reviewed_listing_updated_at,
+  })) {
     return NextResponse.json({
       verdict: previousReview.verdict,
       violations: previousReview.violations ?? [],
@@ -122,59 +128,136 @@ export async function POST(req: NextRequest) {
     });
   }
 
-  const fullText = `${product.title} ${product.description}`;
-
-  // Layer 1: hard regex
-  const hardViolations: string[] = [];
-  if (BANNED_RE.test(fullText)) hardViolations.push("competencia_pigmentos_masterbatch_aditivos");
-  if (CONTACT_RE.test(fullText)) hardViolations.push("datos_contacto");
-
-  if (hardViolations.length > 0) {
-    const reason = hardViolations.includes("competencia_pigmentos_masterbatch_aditivos")
-      ? "No se permiten pigmentos, masterbatch, aditivos ni colorantes."
-      : "No se permiten teléfonos, emails ni WhatsApp en la publicación.";
-    await admin.from("mkt_moderation_events").insert({ listing_id, verdict: "reject", violations: hardViolations, reason, source: "rules", confidence: 1.0 });
-    return NextResponse.json({ verdict: "reject", violations: hardViolations, confidence: 1, reason_es: reason });
-  }
-
-  if (!process.env.OPENAI_API_KEY) {
-    return NextResponse.json({ error: "Valoración IA no configurada" }, { status: 503 });
-  }
-
-  let textResult: ModResult;
+  const claimOwner = randomUUID();
   try {
-    textResult = await classifyText(product.title, product.description, product.category);
-  } catch {
-    return NextResponse.json({ error: "No se pudo completar la valoración IA" }, { status: 502 });
-  }
+    const claimedReview = await runWithAiReviewClaim({
+      claim: async () => {
+        const { data, error } = await admin.rpc("mkt_claim_ai_review", {
+          p_listing_id: listing_id,
+          p_listing_updated_at: product.updated_at,
+          p_owner_token: claimOwner,
+        });
+        if (error) throw error;
+        return data === true;
+      },
+      release: async () => {
+        const { error } = await admin.rpc("mkt_release_ai_review_claim", {
+          p_listing_id: listing_id,
+          p_listing_updated_at: product.updated_at,
+          p_owner_token: claimOwner,
+        });
+        if (error) console.error("Could not release AI review claim", error);
+      },
+      run: async () => {
+        const renewClaim = async () => {
+          const { data, error } = await admin.rpc("mkt_renew_ai_review_claim", {
+            p_listing_id: listing_id,
+            p_listing_updated_at: product.updated_at,
+            p_owner_token: claimOwner,
+          });
+          if (error) throw error;
+          return data === true;
+        };
 
-  // Layer 3: GPT-4o-mini vision
-  const photos = ((product.photos ?? []) as { storage_path: string; position: number }[])
-    .sort((a, b) => a.position - b.position)
-    .slice(0, 5);
-  const photoUrls = photos.map(
-    (p) => `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/mkt-photos/${p.storage_path}`,
-  );
+        // Otra petición puede haber terminado entre la primera lectura y la reserva.
+        const { data: reviewAfterClaim } = await admin
+          .from("mkt_moderation_events")
+          .select("verdict, violations, confidence, reason, created_at, reviewed_listing_updated_at")
+          .eq("listing_id", listing_id)
+          .eq("source", "ai")
+          .order("created_at", { ascending: false })
+          .limit(1)
+          .maybeSingle();
+        if (reviewAfterClaim && isReusableAiReview({
+          listingUpdatedAt: product.updated_at,
+          reviewCreatedAt: reviewAfterClaim.created_at,
+          reviewedListingUpdatedAt: reviewAfterClaim.reviewed_listing_updated_at,
+        })) {
+          return NextResponse.json({
+            verdict: reviewAfterClaim.verdict,
+            violations: reviewAfterClaim.violations ?? [],
+            confidence: Number(reviewAfterClaim.confidence ?? 0),
+            reason_es: reviewAfterClaim.reason,
+            cached: true,
+          });
+        }
 
-  let imageResult: ModResult | null = null;
-  if (photoUrls.length > 0) {
-    try {
-      imageResult = await classifyImages(photoUrls, product.title);
-    } catch {
-      return NextResponse.json({ error: "No se pudo completar la valoración de imágenes" }, { status: 502 });
+        const fullText = `${product.title} ${product.description}`;
+        const hardViolations: string[] = [];
+        if (BANNED_RE.test(fullText)) hardViolations.push("competencia_pigmentos_masterbatch_aditivos");
+        if (CONTACT_RE.test(fullText)) hardViolations.push("datos_contacto");
+
+        if (hardViolations.length > 0) {
+          const reason = hardViolations.includes("competencia_pigmentos_masterbatch_aditivos")
+            ? "No se permiten pigmentos, masterbatch, aditivos ni colorantes."
+            : "No se permiten teléfonos, emails ni WhatsApp en la publicación.";
+          await admin.from("mkt_moderation_events").insert({ listing_id, verdict: "reject", violations: hardViolations, reason, source: "rules", confidence: 1.0 });
+          return NextResponse.json({ verdict: "reject", violations: hardViolations, confidence: 1, reason_es: reason });
+        }
+
+        if (!process.env.OPENAI_API_KEY) {
+          return NextResponse.json({ error: "Valoración IA no configurada" }, { status: 503 });
+        }
+
+        let textResult: ModResult;
+        try {
+          if (!(await renewClaim())) {
+            return NextResponse.json({ error: "La reserva de valoración IA ha caducado" }, { status: 409 });
+          }
+          textResult = await classifyText(product.title, product.description, product.category);
+        } catch {
+          return NextResponse.json({ error: "No se pudo completar la valoración IA" }, { status: 502 });
+        }
+
+        const photos = ((product.photos ?? []) as { storage_path: string; position: number }[])
+          .sort((a, b) => a.position - b.position)
+          .slice(0, 5);
+        const photoUrls = photos.map(
+          (p) => `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/mkt-photos/${p.storage_path}`,
+        );
+
+        let imageResult: ModResult | null = null;
+        if (photoUrls.length > 0) {
+          try {
+            if (!(await renewClaim())) {
+              return NextResponse.json({ error: "La reserva de valoración IA ha caducado" }, { status: 409 });
+            }
+            imageResult = await classifyImages(photoUrls, product.title);
+          } catch {
+            return NextResponse.json({ error: "No se pudo completar la valoración de imágenes" }, { status: 502 });
+          }
+        }
+
+        const recommendation = combineAiReview({ text: textResult, image: imageResult });
+        const { data: saveStatus, error: saveError } = await admin.rpc("mkt_save_ai_review", {
+          p_listing_id: listing_id,
+          p_listing_updated_at: product.updated_at,
+          p_owner_token: claimOwner,
+          p_verdict: recommendation.verdict,
+          p_violations: recommendation.violations,
+          p_reason: recommendation.reason_es,
+          p_confidence: recommendation.confidence,
+          p_model: MODEL,
+        });
+        if (saveError) {
+          return NextResponse.json({ error: "No se pudo guardar la valoración IA" }, { status: 500 });
+        }
+        if (saveStatus !== "saved") {
+          return NextResponse.json(
+            { error: "El anuncio cambió durante la valoración. Vuelve a solicitarla." },
+            { status: 409 },
+          );
+        }
+        return NextResponse.json(recommendation);
+      },
+    });
+
+    if (!claimedReview.claimed) {
+      return NextResponse.json({ error: "Ya hay una valoración IA en curso" }, { status: 409 });
     }
+    return claimedReview.value;
+  } catch (error) {
+    console.error("Could not coordinate AI review", error);
+    return NextResponse.json({ error: "No se pudo iniciar la valoración IA" }, { status: 500 });
   }
-
-  const recommendation = combineAiReview({ text: textResult, image: imageResult });
-  const { error: logError } = await admin.from("mkt_moderation_events").insert({
-    listing_id,
-    verdict: recommendation.verdict,
-    violations: recommendation.violations,
-    reason: recommendation.reason_es,
-    source: "ai",
-    confidence: recommendation.confidence,
-    model: MODEL,
-  });
-  if (logError) return NextResponse.json({ error: "No se pudo guardar la valoración IA" }, { status: 500 });
-  return NextResponse.json(recommendation);
 }
