@@ -20,10 +20,13 @@ export function canRequestAiReview({
 export function isReusableAiReview({
   listingUpdatedAt,
   reviewCreatedAt,
+  reviewedListingUpdatedAt,
 }: {
   listingUpdatedAt: string;
   reviewCreatedAt: string;
+  reviewedListingUpdatedAt?: string | null;
 }) {
+  if (reviewedListingUpdatedAt) return reviewedListingUpdatedAt === listingUpdatedAt;
   return new Date(reviewCreatedAt).getTime() >= new Date(listingUpdatedAt).getTime();
 }
 
@@ -34,7 +37,7 @@ export function isCurrentAiReviewVersion({
   reviewedListingUpdatedAt: string;
   currentListingUpdatedAt: string;
 }) {
-  return new Date(reviewedListingUpdatedAt).getTime() === new Date(currentListingUpdatedAt).getTime();
+  return reviewedListingUpdatedAt === currentListingUpdatedAt;
 }
 
 export function combineAiReview({

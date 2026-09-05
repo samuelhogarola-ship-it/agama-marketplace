@@ -25,6 +25,14 @@ test("a saved AI review is reused until the listing changes", () => {
     isReusableAiReview({ listingUpdatedAt: "2026-09-03T10:02:00Z", reviewCreatedAt: "2026-09-03T10:01:00Z" }),
     false,
   );
+  assert.equal(
+    isReusableAiReview({
+      listingUpdatedAt: "2026-09-03T10:02:00.000001Z",
+      reviewCreatedAt: "2026-09-03T10:03:00Z",
+      reviewedListingUpdatedAt: "2026-09-03T10:02:00.000000Z",
+    }),
+    false,
+  );
 });
 
 test("an AI result is only stored for the listing version it reviewed", () => {
@@ -38,7 +46,7 @@ test("an AI result is only stored for the listing version it reviewed", () => {
   assert.equal(
     isCurrentAiReviewVersion({
       reviewedListingUpdatedAt: "2026-09-05T10:00:00.000Z",
-      currentListingUpdatedAt: "2026-09-05T10:00:01.000Z",
+      currentListingUpdatedAt: "2026-09-05T10:00:00.000001Z",
     }),
     false,
   );

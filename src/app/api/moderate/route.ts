@@ -1,9 +1,10 @@
+import { randomUUID } from "node:crypto";
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient, isAdminUser } from "@/lib/supabase/admin";
 import { isRateLimited } from "@/lib/rate-limit";
 import { checkOrigin } from "@/lib/csrf";
-import { canRequestAiReview, combineAiReview, isCurrentAiReviewVersion, isReusableAiReview, runWithAiReviewClaim, type AiReviewResult } from "@/lib/moderation-workflow";
+import { canRequestAiReview, combineAiReview, isReusableAiReview, runWithAiReviewClaim, type AiReviewResult } from "@/lib/moderation-workflow";
 
 const MODEL = "gpt-4o-mini";
 
@@ -29,6 +30,7 @@ async function callOpenAI(messages: { role: string; content: unknown }[], maxTok
       temperature: 0,
       messages,
     }),
+    signal: AbortSignal.timeout(60_000),
   });
   if (!res.ok) throw new Error(`OpenAI ${res.status}`);
   const data = await res.json();
@@ -106,13 +108,17 @@ export async function POST(req: NextRequest) {
 
   const { data: previousReview } = await admin
     .from("mkt_moderation_events")
-    .select("verdict, violations, confidence, reason, created_at")
+    .select("verdict, violations, confidence, reason, created_at, reviewed_listing_updated_at")
     .eq("listing_id", listing_id)
     .eq("source", "ai")
     .order("created_at", { ascending: false })
     .limit(1)
     .maybeSingle();
-  if (previousReview && isReusableAiReview({ listingUpdatedAt: product.updated_at, reviewCreatedAt: previousReview.created_at })) {
+  if (previousReview && isReusableAiReview({
+    listingUpdatedAt: product.updated_at,
+    reviewCreatedAt: previousReview.created_at,
+    reviewedListingUpdatedAt: previousReview.reviewed_listing_updated_at,
+  })) {
     return NextResponse.json({
       verdict: previousReview.verdict,
       violations: previousReview.violations ?? [],
@@ -122,12 +128,14 @@ export async function POST(req: NextRequest) {
     });
   }
 
+  const claimOwner = randomUUID();
   try {
     const claimedReview = await runWithAiReviewClaim({
       claim: async () => {
         const { data, error } = await admin.rpc("mkt_claim_ai_review", {
           p_listing_id: listing_id,
           p_listing_updated_at: product.updated_at,
+          p_owner_token: claimOwner,
         });
         if (error) throw error;
         return data === true;
@@ -136,20 +144,35 @@ export async function POST(req: NextRequest) {
         const { error } = await admin.rpc("mkt_release_ai_review_claim", {
           p_listing_id: listing_id,
           p_listing_updated_at: product.updated_at,
+          p_owner_token: claimOwner,
         });
         if (error) console.error("Could not release AI review claim", error);
       },
       run: async () => {
+        const renewClaim = async () => {
+          const { data, error } = await admin.rpc("mkt_renew_ai_review_claim", {
+            p_listing_id: listing_id,
+            p_listing_updated_at: product.updated_at,
+            p_owner_token: claimOwner,
+          });
+          if (error) throw error;
+          return data === true;
+        };
+
         // Otra petición puede haber terminado entre la primera lectura y la reserva.
         const { data: reviewAfterClaim } = await admin
           .from("mkt_moderation_events")
-          .select("verdict, violations, confidence, reason, created_at")
+          .select("verdict, violations, confidence, reason, created_at, reviewed_listing_updated_at")
           .eq("listing_id", listing_id)
           .eq("source", "ai")
           .order("created_at", { ascending: false })
           .limit(1)
           .maybeSingle();
-        if (reviewAfterClaim && isReusableAiReview({ listingUpdatedAt: product.updated_at, reviewCreatedAt: reviewAfterClaim.created_at })) {
+        if (reviewAfterClaim && isReusableAiReview({
+          listingUpdatedAt: product.updated_at,
+          reviewCreatedAt: reviewAfterClaim.created_at,
+          reviewedListingUpdatedAt: reviewAfterClaim.reviewed_listing_updated_at,
+        })) {
           return NextResponse.json({
             verdict: reviewAfterClaim.verdict,
             violations: reviewAfterClaim.violations ?? [],
@@ -178,6 +201,9 @@ export async function POST(req: NextRequest) {
 
         let textResult: ModResult;
         try {
+          if (!(await renewClaim())) {
+            return NextResponse.json({ error: "La reserva de valoración IA ha caducado" }, { status: 409 });
+          }
           textResult = await classifyText(product.title, product.description, product.category);
         } catch {
           return NextResponse.json({ error: "No se pudo completar la valoración IA" }, { status: 502 });
@@ -193,6 +219,9 @@ export async function POST(req: NextRequest) {
         let imageResult: ModResult | null = null;
         if (photoUrls.length > 0) {
           try {
+            if (!(await renewClaim())) {
+              return NextResponse.json({ error: "La reserva de valoración IA ha caducado" }, { status: 409 });
+            }
             imageResult = await classifyImages(photoUrls, product.title);
           } catch {
             return NextResponse.json({ error: "No se pudo completar la valoración de imágenes" }, { status: 502 });
@@ -200,35 +229,25 @@ export async function POST(req: NextRequest) {
         }
 
         const recommendation = combineAiReview({ text: textResult, image: imageResult });
-        const { data: currentProduct, error: currentProductError } = await admin
-          .from("mkt_listings")
-          .select("updated_at")
-          .eq("id", listing_id)
-          .single();
-        if (
-          currentProductError ||
-          !currentProduct ||
-          !isCurrentAiReviewVersion({
-            reviewedListingUpdatedAt: product.updated_at,
-            currentListingUpdatedAt: currentProduct.updated_at,
-          })
-        ) {
+        const { data: saveStatus, error: saveError } = await admin.rpc("mkt_save_ai_review", {
+          p_listing_id: listing_id,
+          p_listing_updated_at: product.updated_at,
+          p_owner_token: claimOwner,
+          p_verdict: recommendation.verdict,
+          p_violations: recommendation.violations,
+          p_reason: recommendation.reason_es,
+          p_confidence: recommendation.confidence,
+          p_model: MODEL,
+        });
+        if (saveError) {
+          return NextResponse.json({ error: "No se pudo guardar la valoración IA" }, { status: 500 });
+        }
+        if (saveStatus !== "saved") {
           return NextResponse.json(
             { error: "El anuncio cambió durante la valoración. Vuelve a solicitarla." },
             { status: 409 },
           );
         }
-
-        const { error: logError } = await admin.from("mkt_moderation_events").insert({
-          listing_id,
-          verdict: recommendation.verdict,
-          violations: recommendation.violations,
-          reason: recommendation.reason_es,
-          source: "ai",
-          confidence: recommendation.confidence,
-          model: MODEL,
-        });
-        if (logError) return NextResponse.json({ error: "No se pudo guardar la valoración IA" }, { status: 500 });
         return NextResponse.json(recommendation);
       },
     });

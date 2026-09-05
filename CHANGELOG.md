@@ -6,7 +6,8 @@
 - Los anuncios nuevos, editados o reactivados quedan en revisión sin llamar automáticamente a OpenAI.
 - La valoración con IA solo puede iniciarla un administrador desde la cola y nunca publica ni rechaza: la decisión final continúa siendo humana.
 - Las valoraciones se reutilizan mientras el contenido no cambie para evitar consumo duplicado de tokens.
-- Una reserva atómica por versión del anuncio impide que dos peticiones concurrentes consuman tokens duplicados; expira tras cinco minutos si una petición se interrumpe.
+- Una reserva atómica, renovable y ligada a un propietario por versión del anuncio impide que dos peticiones concurrentes consuman tokens duplicados; expira tras cinco minutos si una petición se interrumpe.
+- La versión y propiedad de la reserva se vuelven a validar dentro de la misma transacción que guarda la recomendación IA, evitando registrar resultados obsoletos.
 - Añadir, modificar o borrar una foto invalida la valoración IA anterior, y las señales de texto e imagen se conservan al combinar recomendaciones.
 
 ### Panel
