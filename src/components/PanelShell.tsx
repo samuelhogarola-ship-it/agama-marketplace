@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { DEMO_COMPANY, DEMO_LISTINGS, DEMO_PREVIEW_ENABLED } from "@/lib/demo-data";
-import { panelSectionForPath, type PanelSection } from "@/lib/panel-navigation";
+import { panelHref, panelSectionForPath, type PanelSection } from "@/lib/panel-navigation";
 import ProCheckoutButton from "@/components/ProCheckoutButton";
 
 type ShellCompany = {
@@ -75,17 +75,13 @@ export default function PanelShell({ children }: { children: ReactNode }) {
     window.location.href = "/";
   }
 
-  function panelHref(path: string) {
-    return previewMode ? `${path}${path.includes("?") ? "&" : "?"}preview=1` : path;
-  }
-
   const navItems: { section: PanelSection; label: string; href: string; muted?: boolean }[] = [
-    { section: "summary", label: "Resumen", href: panelHref("/panel") },
-    { section: "company", label: "Mi empresa", href: panelHref("/panel/perfil") },
-    { section: "catalog", label: "Catálogo", href: "/panel#catalogo" },
-    { section: "publish", label: "Publicar producto", href: panelHref("/panel/publicar") },
-    { section: "stats", label: "Estadísticas", href: "/panel/estadisticas", muted: company?.plan !== "pro" },
-    { section: "settings", label: "Ajustes", href: "/panel/ajustes" },
+    { section: "summary", label: "Resumen", href: panelHref("/panel", previewMode) },
+    { section: "company", label: "Mi empresa", href: panelHref("/panel/perfil", previewMode) },
+    { section: "catalog", label: "Catálogo", href: panelHref("/panel#catalogo", previewMode) },
+    { section: "publish", label: "Publicar producto", href: panelHref("/panel/publicar", previewMode) },
+    { section: "stats", label: "Estadísticas", href: panelHref("/panel/estadisticas", previewMode), muted: company?.plan !== "pro" },
+    { section: "settings", label: "Ajustes", href: panelHref("/panel/ajustes", previewMode) },
   ];
 
   return (

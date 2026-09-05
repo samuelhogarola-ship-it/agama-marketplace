@@ -12,18 +12,24 @@ export async function startProCheckout(
 ): Promise<CheckoutResult> {
   try {
     const response = await dependencies.request();
-    const data = (await response.json()) as { url?: string; error?: string };
+    const data: unknown = await response.json();
+    const url = isRecord(data) && typeof data.url === "string" ? data.url : null;
+    const apiError = isRecord(data) && typeof data.error === "string" ? data.error : null;
 
-    if (!response.ok || !data.url) {
+    if (!response.ok || !url) {
       return {
         ok: false,
-        error: data.error ?? "No se pudo iniciar el pago.",
+        error: apiError ?? "No se pudo iniciar el pago.",
       };
     }
 
-    dependencies.redirect(data.url);
+    dependencies.redirect(url);
     return { ok: true };
   } catch {
     return { ok: false, error: "Error de red. Inténtalo de nuevo." };
   }
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null;
 }

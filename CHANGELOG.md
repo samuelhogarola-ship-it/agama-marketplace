@@ -6,6 +6,14 @@
 - Los anuncios nuevos, editados o reactivados quedan en revisión sin llamar automáticamente a OpenAI.
 - La valoración con IA solo puede iniciarla un administrador desde la cola y nunca publica ni rechaza: la decisión final continúa siendo humana.
 - Las valoraciones se reutilizan mientras el contenido no cambie para evitar consumo duplicado de tokens.
+- Una reserva atómica por versión del anuncio impide que dos peticiones concurrentes consuman tokens duplicados; expira tras cinco minutos si una petición se interrumpe.
+- Añadir, modificar o borrar una foto invalida la valoración IA anterior, y las señales de texto e imagen se conservan al combinar recomendaciones.
+
+### Panel
+- Los enlaces de navegación mantienen `preview=1`, incluso cuando contienen un fragmento como `#catalogo`.
+
+### Pagos
+- El inicio de Stripe valida en runtime que la URL y los errores recibidos sean texto antes de usarlos.
 
 ### Analytics
 - Umami usa un fallback público y validado para la instancia Agama y el sitio TodoPlástico, evitando que un build de Coolify sin variables `NEXT_PUBLIC_*` elimine el tracker de producción.
