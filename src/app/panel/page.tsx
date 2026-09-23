@@ -48,7 +48,6 @@ function PanelContent() {
       return;
     }
     setUserId(user.id);
-    setActionError(null);
     try {
       const [prof, listings] = await Promise.all([
         loadCompany(supabase, user),
