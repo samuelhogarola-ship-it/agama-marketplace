@@ -1,5 +1,13 @@
 # Changelog
 
+## Corrección de guardado de empresa — 2026-09-23
+
+- El panel lee la ficha privada mediante la RPC del propietario, evitando errores por columnas restringidas.
+- El primer guardado crea la empresa si todavía no existe y confirma la fila escrita antes de mostrar éxito.
+- Se guardan las categorías vacías como lista y el logo junto con la primera ficha.
+- Los errores de carga, sesión y guardado se muestran sin perder los campos introducidos.
+- Pruebas de regresión para creación, edición, permisos, RFC duplicado y actualizaciones sin filas.
+
 ## [Unreleased]
 
 ### Moderación

@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/client";
 import { CATEGORIES } from "@/lib/categories";
 import { compressImage } from "@/lib/compress-image";
 import { DEMO_COMPANY, DEMO_PREVIEW_ENABLED } from "@/lib/demo-data";
+import { saveCompany } from "@/lib/company-profile";
 import { normalizeTaxId, taxIdSaveError } from "@/lib/tax-id";
 
 function PerfilContent() {
@@ -27,6 +28,8 @@ function PerfilContent() {
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
   const [uploadingLogo, setUploadingLogo] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [loadFailed, setLoadFailed] = useState(false);
   const [saved, setSaved] = useState(false);
   const [saveMessage, setSaveMessage] = useState<string | null>(null);
   const logoInputRef = useRef<HTMLInputElement>(null);
@@ -58,7 +61,13 @@ function PerfilContent() {
         router.replace("/ingresar?next=/panel/perfil");
         return;
       }
-      const { data } = await supabase.rpc("mkt_my_company");
+      const { data, error } = await supabase.rpc("mkt_my_company");
+      if (error) {
+        setLoadFailed(true);
+        setSaveMessage("No se pudo cargar tu ficha. Recarga la página antes de guardar.");
+        setLoading(false);
+        return;
+      }
       if (data) {
         setForm({
           name: data.name ?? "",
@@ -74,7 +83,11 @@ function PerfilContent() {
         setLogoUrl(data.logo_url ?? null);
       }
       setLoading(false);
-    })();
+    })().catch(() => {
+      setLoadFailed(true);
+      setSaveMessage("No se pudo cargar tu ficha. Recarga la página antes de guardar.");
+      setLoading(false);
+    });
   }, [previewMode, router]);
 
   async function onLogoChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -85,31 +98,25 @@ function PerfilContent() {
     if (previewMode) return;
 
     setUploadingLogo(true);
-    const supabase = createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    if (!user) return;
-
-    const compressed = await compressImage(file);
-    const ext =
-      { "image/jpeg": "jpg", "image/png": "png", "image/webp": "webp" }[
-        compressed.type
-      ] ?? "jpg";
-    const path = `logos/${user.id}.${ext}`;
-    const { error: upErr } = await supabase.storage
-      .from("mkt-photos")
-      .upload(path, compressed, { upsert: true });
-
-    if (!upErr) {
-      const url = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/mkt-photos/${path}`;
-      await supabase
-        .from("mkt_companies")
-        .update({ logo_url: url })
-        .eq("id", user.id);
-      setLogoUrl(url);
+    setSaved(false);
+    setSaveMessage(null);
+    try {
+      const supabase = createClient();
+      const { data: { user }, error: authError } = await supabase.auth.getUser();
+      if (authError || !user) throw new Error("session");
+      const compressed = await compressImage(file);
+      const ext = { "image/jpeg": "jpg", "image/png": "png", "image/webp": "webp" }[compressed.type] ?? "jpg";
+      const path = `${user.id}/logos/${crypto.randomUUID()}.${ext}`;
+      const { error } = await supabase.storage.from("mkt-photos").upload(path, compressed);
+      if (error) throw error;
+      // Persist with the form, including when this is the company's first save.
+      setLogoUrl(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/mkt-photos/${path}`);
+    } catch {
+      setLogoPreview(null);
+      setSaveMessage("No se pudo subir el logo. Vuelve a intentarlo antes de guardar.");
+    } finally {
+      setUploadingLogo(false);
     }
-    setUploadingLogo(false);
   }
 
   function toggleCategory(slug: string) {
@@ -129,15 +136,17 @@ function PerfilContent() {
       setSaved(true);
       return;
     }
-    const supabase = createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    if (!user) return;
-    const { error: saveError } = await supabase
-      .from("mkt_companies")
-      .update({
-        name: form.name,
+    if (saving || uploadingLogo || loadFailed) return;
+    setSaving(true);
+    try {
+      const supabase = createClient();
+      const { data: { user }, error: authError } = await supabase.auth.getUser();
+      if (authError || !user) {
+        setSaveMessage("Tu sesión ha caducado. Vuelve a ingresar para guardar tu empresa.");
+        return;
+      }
+      await saveCompany(supabase, user, {
+        name: form.name.trim(),
         rfc: normalizeTaxId(form.rfc),
         description: form.description,
         location: form.location,
@@ -145,16 +154,16 @@ function PerfilContent() {
         phone: form.phone,
         email: form.email,
         whatsapp: form.whatsapp,
-        categories: form.categories.length > 0 ? form.categories : null,
-      })
-      .eq("id", user.id);
-    if (saveError) {
-      setSaved(false);
-      setSaveMessage(taxIdSaveError(saveError));
-      return;
+        categories: form.categories,
+        logo_url: logoUrl,
+      });
+      setSaved(true);
+      setTimeout(() => router.push("/panel"), 800);
+    } catch (error) {
+      setSaveMessage(taxIdSaveError(error && typeof error === "object" ? error : {}));
+    } finally {
+      setSaving(false);
     }
-    setSaved(true);
-    setTimeout(() => router.push("/panel"), 800);
   }
 
   const currentLogo = logoPreview ?? logoUrl;
@@ -364,8 +373,8 @@ function PerfilContent() {
           </p>
         ) : null}
 
-        <button className="rounded-full bg-brand px-8 py-3 text-sm font-semibold text-white hover:bg-brand-dark">
-          {saved
+        <button disabled={saving || uploadingLogo || loadFailed} className="rounded-full bg-brand px-8 py-3 text-sm font-semibold text-white hover:bg-brand-dark disabled:opacity-50">
+          {saving ? "Guardando…" : saved
             ? previewMode
               ? "Cambios de demo guardados ✓"
               : "Guardado ✓"

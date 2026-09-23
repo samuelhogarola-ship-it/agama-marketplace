@@ -8,6 +8,7 @@ import { photoUrl, productPath, type Company, type Product } from "@/lib/types";
 import { formatPrice } from "@/components/ProductCard";
 import { categoryBySlug } from "@/lib/categories";
 import { DEMO_COMPANY, DEMO_LISTINGS, DEMO_PREVIEW_ENABLED } from "@/lib/demo-data";
+import { loadCompany } from "@/lib/company-profile";
 import PanelTickets from "@/components/PanelTickets";
 
 const STATUS_LABEL: Record<string, { text: string; cls: string }> = {
@@ -47,42 +48,20 @@ function PanelContent() {
       return;
     }
     setUserId(user.id);
-    let [{ data: prof }, { data: prods }] = await Promise.all([
-      supabase.from("mkt_companies").select("*").eq("id", user.id).maybeSingle(),
-      supabase
-        .from("mkt_listings")
-        .select("*, photos:mkt_listing_photos(storage_path, position)")
-        .eq("company_id", user.id)
-        .order("created_at", { ascending: false }),
-    ]);
-    if (!prof) {
-      const name =
-        (user.user_metadata?.company_name as string) ??
-        user.email?.split("@")[0] ??
-        "Mi empresa";
-      const slug = `${name
-        .toLowerCase()
-        .normalize("NFD")
-        .replace(/[̀-ͯ]/g, "")
-        .replace(/[^a-z0-9]+/g, "-")
-        .replace(/(^-|-$)/g, "")
-        .slice(0, 60)}-${user.id.slice(0, 6)}`;
-      const meta = user.user_metadata ?? {};
-      const { data: created } = await supabase
-        .from("mkt_companies")
-        .insert({
-          id: user.id,
-          name: name.slice(0, 120),
-          slug,
-          ...(meta.rfc ? { rfc: meta.rfc } : {}),
-          ...(meta.accepted_terms_at ? { accepted_terms_at: meta.accepted_terms_at } : {}),
-        })
-        .select()
-        .single();
-      prof = created;
+    try {
+      const [prof, listings] = await Promise.all([
+        loadCompany(supabase, user),
+        supabase.from("mkt_listings")
+          .select("*, photos:mkt_listing_photos(storage_path, position)")
+          .eq("company_id", user.id)
+          .order("created_at", { ascending: false }),
+      ]);
+      if (listings.error) throw listings.error;
+      setProfile(prof);
+      setProducts((listings.data as Product[]) ?? []);
+    } catch {
+      setActionError("No se pudo cargar tu empresa. Recarga la página para volver a intentarlo.");
     }
-    setProfile(prof);
-    setProducts((prods as Product[]) ?? []);
     setLoading(false);
   }, [previewMode, router]);
 
