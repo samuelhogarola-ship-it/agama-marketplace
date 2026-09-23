@@ -1,11 +1,11 @@
-# Despliegue TodoPlástico en el VPS
+# Despliegue TodoPlásticos en el VPS
 
 ## Arquitectura
 
 - Next.js en Docker, aislado de las aplicaciones de AGAMA.
 - Puerto interno del contenedor: `3000`.
 - Puerto local del VPS: `3010`.
-- Nginx/Caddy publica `todo-plastico.com` hacia `127.0.0.1:3010`.
+- Nginx/Caddy publica `todoplásticos.com` hacia `127.0.0.1:3010`.
 - Supabase independiente para Auth, Postgres y Storage.
 
 ## Variables de producción
@@ -15,14 +15,14 @@ Crea `.env.production` en el VPS. No lo subas al repositorio:
 ```env
 NEXT_PUBLIC_SUPABASE_URL=https://tiynnllrcdhsvrzsdsct.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=<publishable-or-anon-key>
-NEXT_PUBLIC_SITE_URL=https://todo-plastico.com
+NEXT_PUBLIC_SITE_URL=https://todoplásticos.com
 SUPABASE_SERVICE_ROLE_KEY=<service-role-key>
 TODO_PLASTICO_ADMIN_EMAILS=<email-admin-1>,<email-admin-2>
 ANTHROPIC_API_KEY=<anthropic-key>
 ALLOW_INDEXING=true
 
 # Umami (añadir tras instalar — ver sección más abajo)
-NEXT_PUBLIC_UMAMI_URL=https://stats.todo-plastico.com
+NEXT_PUBLIC_UMAMI_URL=https://stats.todoplásticos.com
 NEXT_PUBLIC_UMAMI_WEBSITE_ID=<website-id-de-umami>
 ```
 
@@ -30,10 +30,10 @@ La `service role key` solo se usa en servidor y nunca debe empezar por `NEXT_PUB
 
 ## Crear el Supabase nuevo
 
-1. Crear un proyecto independiente para TodoPlástico.
+1. Crear un proyecto independiente para TodoPlásticos.
 2. Ejecutar todas las migraciones en orden: `0001` a `0008`.
 3. Comprobar las tablas `mkt_*` y el bucket `mkt-photos`.
-4. Configurar Auth con Site URL `https://todo-plastico.com` y redirect `https://todo-plastico.com/auth/callback`.
+4. Configurar Auth con Site URL `https://todoplásticos.com` y redirect `https://todoplásticos.com/auth/callback`.
 5. Configurar SMTP/Resend antes de invitar empresas.
 6. Crear el primer usuario admin y añadir su email a `TODO_PLASTICO_ADMIN_EMAILS`.
 
@@ -88,15 +88,15 @@ docker exec coolify-db psql -U coolify -d coolify -t -A \
 Conservar un backup de Supabase antes de actualizar y comprobar que el despliegue llegó de verdad al dominio —no basta con el check verde del PR, que solo refleja la build de Vercel:
 
 ```bash
-curl -s -o /dev/null -w "%{http_code}\n" https://todo-plastico.com/api/health
-curl -s https://todo-plastico.com/ | grep -oE "<title>[^<]*</title>"
+curl -s -o /dev/null -w "%{http_code}\n" https://todoplásticos.com/api/health
+curl -s https://todoplásticos.com/ | grep -oE "<title>[^<]*</title>"
 ```
 
 ## Nginx mínimo
 
 ```nginx
 server {
-    server_name todo-plastico.com www.todo-plastico.com;
+    server_name todoplásticos.com www.todoplásticos.com;
     location / {
         proxy_pass http://127.0.0.1:3010;
         proxy_http_version 1.1;
@@ -130,13 +130,13 @@ docker compose -f docker-compose.umami.yml --env-file .env.umami up -d
 
 Verifica que arrancó: `curl http://127.0.0.1:3011/api/heartbeat`
 
-### 3. Nginx para stats.todo-plastico.com
+### 3. Nginx para stats.todoplásticos.com
 
 Añade este bloque en tu configuración nginx y obtén certificado con Certbot:
 
 ```nginx
 server {
-    server_name stats.todo-plastico.com;
+    server_name stats.todoplásticos.com;
     location / {
         proxy_pass http://127.0.0.1:3011;
         proxy_http_version 1.1;
@@ -150,20 +150,20 @@ server {
 ```
 
 ```bash
-certbot --nginx -d stats.todo-plastico.com
+certbot --nginx -d stats.todoplásticos.com
 ```
 
 ### 4. Configurar el sitio en Umami
 
-1. Abre `https://stats.todo-plastico.com` en el navegador.
+1. Abre `https://stats.todoplásticos.com` en el navegador.
 2. Login inicial: usuario `admin`, contraseña `umami` — **cámbiala inmediatamente**.
-3. Ajustes → Sitios web → Añadir sitio web: nombre `TodoPlástico`, dominio `todo-plastico.com`.
+3. Ajustes → Sitios web → Añadir sitio web: nombre `TodoPlásticos`, dominio `todoplásticos.com`.
 4. Copia el **Website ID** (UUID) que aparece.
 
 ### 5. Añadir a `.env.production`
 
 ```env
-NEXT_PUBLIC_UMAMI_URL=https://stats.todo-plastico.com
+NEXT_PUBLIC_UMAMI_URL=https://stats.todoplásticos.com
 NEXT_PUBLIC_UMAMI_WEBSITE_ID=<uuid-del-paso-4>
 ```
 
@@ -175,3 +175,9 @@ Luego redeploy: `docker compose -f docker-compose.prod.yml up -d --build`
 - País, dispositivo, navegador, OS
 - Fuente de tráfico (referrer)
 - Los eventos custom (`trackEvent`) de búsqueda y clics de contacto ya están integrados en el código
+
+## Cambio de marca y dominio (septiembre de 2026)
+
+La configuración propuesta usa `todoplásticos.com` y `contacto@todoplásticos.es`, pendiente de confirmar la tilde y la S del correo. Los equivalentes ASCII para DNS, certificados, hosting, Supabase y Resend son `xn--todoplsticos-hbb.com` y `xn--todoplsticos-hbb.es`.
+
+Antes de publicar: conectar el dominio en el hosting y DNS, actualizar `NEXT_PUBLIC_SITE_URL` y reconstruir la aplicación, actualizar Site URL y redirect URLs de Supabase Auth, verificar el dominio `.es` en Resend y la recepción del buzón, actualizar el dominio del sitio en Umami y configurar redirecciones permanentes del dominio anterior. Los cambios de código no configuran estos servicios externos.

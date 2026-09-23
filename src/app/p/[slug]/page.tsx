@@ -175,7 +175,7 @@ function SummaryPanel({
         <ShareButton title={product.title} url={fullUrl} />
       </div>
       <p className="mt-4 text-xs leading-5 text-slate-400">
-        TodoPlástico no procesa pagos ni intermedia operaciones. El acuerdo se
+        TodoPlásticos no procesa pagos ni intermedia operaciones. El acuerdo se
         realiza directamente entre empresas.
       </p>
     </aside>
@@ -218,7 +218,7 @@ export default async function ProductPage({ params }: Props) {
 
   const cat = categoryBySlug(product.category);
   const photos = (product.photos ?? []).sort((a, b) => a.position - b.position);
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://todo-plastico.com";
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://todoplásticos.com";
 
   // Related: same company + same category (parallel)
   const supabase = await createClient();

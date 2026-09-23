@@ -1,10 +1,10 @@
-# NEXT — TodoPlástico
+# NEXT — TodoPlásticos
 
 ## Comprobación final pre-lanzamiento (2026-08-25)
 
 Verificación end-to-end de todos los paneles y flujos antes de declarar Fase 1 completa.
 
-### Flujos a comprobar en producción (todo-plastico.com)
+### Flujos a comprobar en producción (todoplásticos.com)
 
 - [ ] **Auth:** registro con email + contraseña → llega email de confirmación → clic confirma → login OK *(requiere test manual)*
 - [ ] **Auth:** login con magic link → llega email → clic abre sesión (probar Safari + Chrome) *(requiere test manual)*
@@ -40,7 +40,7 @@ Verificación end-to-end de todos los paneles y flujos antes de declarar Fase 1 
 
 ### Bloqueantes pendientes (no son de código)
 
-1. **Site URL en Supabase** → cambiar a `https://todo-plastico.com` + añadir callback URL
+1. **Site URL en Supabase** → cambiar a `https://todoplásticos.com` + añadir callback URL
 2. **OPENAI_API_KEY** → añadir en Coolify
 3. **Migraciones 0011, 0013 + 0014** → aplicar en BD de producción (0014 arregla `/empresas` y `/e/[slug]` que no pueden leer `plan`)
 4. **Stripe live key** → cuando se active plan Pro
@@ -66,8 +66,8 @@ Auditorías completas en tres ejes: seguridad, SEO, calidad de código.
 - `next.config.ts:10-19`: CSP, HSTS, X-Frame-Options, X-Content-Type-Options, Referrer-Policy, Permissions-Policy.
 
 ### H4. Resend SMTP no verificado — auth emails no funcionan
-- **Problema:** Ni `agamaeu.com` ni `todo-plastico.com` tienen registros DKIM/SPF de Resend. Signup devuelve 500.
-- **Fix:** En resend.com/domains → Añadir `send.todo-plastico.com` → copiar DNS records a IONOS → verificar → actualizar SMTP en Supabase Auth.
+- **Problema:** Ni `agamaeu.com` ni `todoplásticos.com` tienen registros DKIM/SPF de Resend. Signup devuelve 500.
+- **Fix:** En resend.com/domains → Añadir `send.todoplásticos.com` → copiar DNS records a IONOS → verificar → actualizar SMTP en Supabase Auth.
 
 ---
 
@@ -191,10 +191,10 @@ Auditorías completas en tres ejes: seguridad, SEO, calidad de código.
 Sin esto, signup y magic link no mandan emails. Nadie puede registrarse.
 
 **Pasos:**
-1. resend.com/domains → Add Domain → `send.todo-plastico.com`
+1. resend.com/domains → Add Domain → `send.todoplásticos.com`
 2. Copiar 3 CNAME (DKIM) + 1 TXT (SPF) + 1 MX a IONOS DNS
 3. Verificar en Resend
-4. Supabase dashboard → Auth → SMTP → Host: `smtp.resend.com`, Port: 465, User: `resend`, Pass: API key, Sender: `noreply@send.todo-plastico.com`
+4. Supabase dashboard → Auth → SMTP → Host: `smtp.resend.com`, Port: 465, User: `resend`, Pass: API key, Sender: `noreply@send.todoplásticos.com`
 
 ### 2. OPENAI_API_KEY en servidor
 Sin esto, la moderación IA (capas 2 y 3) no corre — solo actúa el regex.

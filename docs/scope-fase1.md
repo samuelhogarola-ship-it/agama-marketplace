@@ -1,6 +1,6 @@
-# TodoPlástico — Definición de Fase 1
+# TodoPlásticos — Definición de Fase 1
 
-> **Documento de alcance** | Dominio: todo-plastico.com | Fecha: 31 de julio de 2026 | Estado: implementado en código; dependencias de producción pendientes
+> **Documento de alcance** | Dominio: todoplásticos.com | Fecha: 31 de julio de 2026 | Estado: implementado en código; dependencias de producción pendientes
 
 ---
 
@@ -23,7 +23,7 @@
 
 ## 1. Objetivo redefinido
 
-> **Posicionamiento:** TodoPlástico es una plataforma sectorial B2B gratuita orientada a tráfico y visibilidad, no un marketplace transaccional.
+> **Posicionamiento:** TodoPlásticos es una plataforma sectorial B2B gratuita orientada a tráfico y visibilidad, no un marketplace transaccional.
 
 Construir un punto de entrada digital para profesionales, compradores y proveedores de la industria del plástico en México que combine:
 
@@ -32,7 +32,7 @@ Construir un punto de entrada digital para profesionales, compradores y proveedo
 - **Portal de contenido editorial** útil sobre la industria.
 - **Presencia destacada de AGAMA** como impulsor del proyecto.
 
-La conversión se produce fuera de la plataforma: visita a la web del proveedor, llamada, correo, WhatsApp o formulario externo. TodoPlástico no intermedia ni gestiona transacciones.
+La conversión se produce fuera de la plataforma: visita a la web del proveedor, llamada, correo, WhatsApp o formulario externo. TodoPlásticos no intermedia ni gestiona transacciones.
 
 ### Relación con AGAMA
 
@@ -168,8 +168,8 @@ Tres capas secuenciales; si una capa rechaza, las siguientes no se ejecutan.
 La revisión automática no es una validación técnica, legal ni comercial. Solo modera formato y cumplimiento de las normas de la plataforma. Los términos de uso deben reflejar explícitamente que:
 
 - Cada empresa es responsable de sus publicaciones.
-- TodoPlástico no garantiza exactitud de la información.
-- TodoPlástico no interviene en la compraventa.
+- TodoPlásticos no garantiza exactitud de la información.
+- TodoPlásticos no interviene en la compraventa.
 - AGAMA impulsa la plataforma pero no asume responsabilidad sobre anuncios de terceros.
 
 ---
@@ -270,7 +270,7 @@ Prefijo `mkt_` en todas las tablas. RLS activada desde el primer día. Constrain
 | BD + Auth + Storage | Supabase | Proyecto propio antes de producción. RLS estricta. |
 | Moderación IA | Claude Haiku (API route Next.js) | Texto + visión. Clave solo en servidor. |
 | Email | Resend | Solo confirmación de registro en F1. |
-| Hosting | Vercel | Deploy por PR, previews. Dominio: todo-plastico.com. |
+| Hosting | Vercel | Deploy por PR, previews. Dominio: todoplásticos.com. |
 | Contenido editorial | Markdown/MDX en repo o tabla mkt_articles | Decisión abierta: archivos vs. BD + CMS admin. |
 | Imágenes | Supabase Storage + compresión en cliente | Bucket mkt-photos. |
 | SEO | SSR, sitemap dinámico, Schema.org, canonical | Ya parcialmente implementado. |
@@ -300,7 +300,7 @@ Recomendación: empezar con Opción A (MDX) para lanzar rápido y migrar a Opci�
 | Moderación IA con falsos positivos altos | Medio — empresas frustradas por rechazos incorrectos | Umbral conservador (enviar a cola humana en caso de duda), motivos claros, opción de corrección |
 | Abuso de datos de contacto públicos (scraping) | Bajo-medio — empresas reciben spam externo | Rate limiting, honeypot fields, monitoreo de patrones de acceso |
 | Pigmentos/masterbatch/aditivos burlando moderación | Medio — conflicto con negocio de AGAMA | Tres capas de moderación + escaneo periódico del catálogo publicado |
-| Dominio sin configurar | Medio — SEO en vercel.app pierde valor para la marca | Configurar todo-plastico.com en Vercel y Supabase antes de activar indexación |
+| Dominio sin configurar | Medio — SEO en vercel.app pierde valor para la marca | Configurar todoplásticos.com en Vercel y Supabase antes de activar indexación |
 
 ---
 
@@ -309,7 +309,7 @@ Recomendación: empezar con Opción A (MDX) para lanzar rápido y migrar a Opci�
 ### Bloqueantes (antes de producción)
 
 - **Proyecto Supabase propio** — migrar tablas `mkt_*` y bucket `mkt-photos` fuera de studio-panel.
-- **Dominio todo-plastico.com** — registrar/transferir, configurar DNS en Vercel.
+- **Dominio todoplásticos.com** — registrar/transferir, configurar DNS en Vercel.
 - **SMTP en Supabase** — Resend para emails de autenticación.
 - **ANTHROPIC_API_KEY en Vercel** — para moderación IA completa.
 - **Textos legales revisados** — términos, privacidad, política de contenido adaptados al nuevo modelo (sin intermediación).
@@ -367,7 +367,7 @@ La Fase 1 se considera completa cuando se cumplen todos estos criterios.
 ### Técnicos
 
 - Proyecto Supabase propio con RLS en todas las tablas.
-- Dominio todo-plastico.com configurado y funcionando.
+- Dominio todoplásticos.com configurado y funcionando.
 - SMTP operativo (registro por email funciona).
 - Moderación IA activa (ANTHROPIC_API_KEY configurada).
 - SSR correcto: metas, Schema.org, sitemap, robots en todas las páginas públicas.

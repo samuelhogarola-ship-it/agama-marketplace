@@ -41,7 +41,7 @@ async function classifyText(title: string, description: string, category: string
   const raw = await callOpenAI([
     {
       role: "system",
-      content: `Eres el moderador de TodoPlástico, plataforma B2B gratuita de la industria plástica en México, impulsada por AGAMA.
+      content: `Eres el moderador de TodoPlásticos, plataforma B2B gratuita de la industria plástica en México, impulsada por AGAMA.
 
 PERMITIDO: plásticos (envases, tarimas, bolsas, tubería, perfiles, láminas, maquinaria, resinas PET/PE/PP/PVC/PS/ABS, molido, pacas), servicios de transformación plástica.
 PROHIBIDO:
@@ -70,7 +70,7 @@ async function classifyImages(urls: string[], title: string): Promise<ModResult>
           ...urls.map((url) => ({ type: "image_url", image_url: { url } })),
           {
             type: "text",
-            text: `Fotos de "${title}" en TodoPlástico (plásticos B2B México). ¿Muestran pigmentos, masterbatch, aditivos, productos ajenos al plástico, o datos de contacto incrustados en la imagen?
+            text: `Fotos de "${title}" en TodoPlásticos (plásticos B2B México). ¿Muestran pigmentos, masterbatch, aditivos, productos ajenos al plástico, o datos de contacto incrustados en la imagen?
 Devuelve SOLO JSON: {"verdict":"approve","violations":[],"confidence":0.95,"reason_es":null}`,
           },
         ],

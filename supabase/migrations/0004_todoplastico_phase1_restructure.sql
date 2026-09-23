@@ -1,4 +1,4 @@
--- TodoPlastico Fase 1: directorio B2B gratuito, contacto externo y anuncios.
+-- TodoPlasticos Fase 1: directorio B2B gratuito, contacto externo y anuncios.
 
 -- ============ Eliminar mensajeria interna fuera de Fase 1 ============
 drop table if exists public.mkt_messages cascade;
@@ -138,7 +138,7 @@ begin
     return query select 'reject'::text, v,
       case
         when 'competencia_pigmentos_masterbatch_aditivos' = any(v)
-          then 'No se permiten pigmentos, masterbatch, aditivos ni colorantes en TodoPlastico.'
+          then 'No se permiten pigmentos, masterbatch, aditivos ni colorantes en TodoPlasticos.'
         else 'Los datos de contacto deben ir en los campos de empresa o enlace externo, no dentro del texto del anuncio.'
       end;
   end if;

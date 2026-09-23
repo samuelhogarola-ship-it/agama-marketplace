@@ -9,7 +9,7 @@ export default function Analytics() {
     <Script
       src={`${UMAMI_URL}/script.js`}
       data-website-id={UMAMI_ID}
-      data-domains="todo-plastico.com,www.todo-plastico.com"
+      data-domains="xn--todoplsticos-hbb.com,www.xn--todoplsticos-hbb.com"
       strategy="afterInteractive"
     />
   );

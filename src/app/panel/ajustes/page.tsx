@@ -231,7 +231,7 @@ export default function AjustesPage() {
           </div>
           {profile?.slug && (
             <div className="rounded-lg bg-slate-50 px-3 py-2.5 text-xs text-slate-500">
-              Perfil público: <span className="font-medium text-slate-700">todo-plastico.com/e/{profile.slug}</span>
+              Perfil público: <span className="font-medium text-slate-700">todoplásticos.com/e/{profile.slug}</span>
             </div>
           )}
         </div>

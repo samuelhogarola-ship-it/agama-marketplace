@@ -1,4 +1,4 @@
-# Roadmap — TodoPlástico
+# Roadmap — TodoPlásticos
 
 Estado actualizado: 2 de agosto de 2026. Las fases de producto están implementadas en código y la infraestructura del nuevo Supabase ya está creada. El trabajo activo es preparación de lanzamiento y operación.
 
@@ -8,13 +8,13 @@ Estado: **completa en código**.
 
 - [x] Next.js 15 App Router, TypeScript y Tailwind 4.
 - [x] Supabase con Auth, Postgres, Storage y prefijo `mkt_`.
-- [x] Estructura de datos TodoPlástico: empresas, anuncios, fotos, categorías, artículos, banners y moderación.
+- [x] Estructura de datos TodoPlásticos: empresas, anuncios, fotos, categorías, artículos, banners y moderación.
 - [x] RLS, headers de seguridad, protección de rutas y sanitización de JSON-LD/filtros.
 - [x] Sitemap, robots, metadatos SSR y rutas semánticas.
 - [x] CI en pull requests: instalación limpia, typecheck, build y smoke Playwright.
 - [x] Smoke Playwright en Chromium desktop.
 
-Pendientes operativos antes de producción: proyecto Supabase propio, dominio `todo-plastico.com`, claves de Anthropic y carga inicial de datos. SMTP activo con mailer interno Supabase.
+Pendientes operativos antes de producción: proyecto Supabase propio, dominio `todoplásticos.com`, claves de Anthropic y carga inicial de datos. SMTP activo con mailer interno Supabase.
 
 ## Fase 1 — Directorio y catálogo B2B
 
@@ -29,7 +29,7 @@ Estado: **completa en código**.
 - [x] Límite de 5 anuncios activos y 5 fotos por anuncio aplicado en BD.
 - [x] Compresión y resize de imágenes en cliente antes de subirlas.
 - [x] Contacto externo por web, teléfono, email, WhatsApp y enlace de empresa.
-- [x] Branding de TodoPlástico e integración visible y sutil de AGAMA.
+- [x] Branding de TodoPlásticos e integración visible y sutil de AGAMA.
 - [x] Textos legales y normas de comunidad adaptados al modelo no transaccional.
 
 ## Fase 2 — Moderación, contenido y operación
@@ -73,7 +73,7 @@ Ninguna de las dos se ha validado contra una BD: no había Postgres local ni Doc
 - [x] Mantener el seed alineado con el catálogo aprobado.
 - [ ] Cargar proveedores iniciales, anuncios reales y artículos revisados.
 - [ ] Revisar legalmente términos, privacidad LFPDPPP y normas de comunidad.
-- [ ] Conectar `todo-plastico.com`, activar indexación y verificar Search Console.
+- [ ] Conectar `todoplásticos.com`, activar indexación y verificar Search Console.
 - [ ] Ejecutar smoke desktop + mobile y checklist de lanzamiento.
 
 ## Fase 4 — Evolución posterior

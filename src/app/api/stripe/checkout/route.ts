@@ -4,7 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getStripe } from "@/lib/stripe";
 
 const PRICE_ID = process.env.STRIPE_PRO_PRICE_ID;
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://todo-plastico.com";
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://todoplásticos.com";
 
 export async function POST(req: NextRequest) {
   const originError = checkOrigin(req);

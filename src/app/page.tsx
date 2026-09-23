@@ -15,12 +15,12 @@ const HOME_DESCRIPTION =
   "Directorio B2B gratuito de la industria plástica en México. Encuentra envases, bolsas, tarimas, cubetas y proveedores verificados. Publicar es gratis.";
 
 export const metadata: Metadata = {
-  // `absolute` evita que la plantilla del layout añada "| TodoPlástico" al título de la home.
-  title: { absolute: "TodoPlástico — Comprar y vender productos plásticos en México" },
+  // `absolute` evita que la plantilla del layout añada "| TodoPlásticos" al título de la home.
+  title: { absolute: "TodoPlásticos — Comprar y vender productos plásticos en México" },
   description: HOME_DESCRIPTION,
   alternates: { canonical: "/" },
   openGraph: {
-    title: "TodoPlástico — Comprar y vender productos plásticos en México",
+    title: "TodoPlásticos — Comprar y vender productos plásticos en México",
     description: HOME_DESCRIPTION,
     url: "/",
   },
@@ -46,11 +46,11 @@ export default async function Home() {
       .limit(8),
   ]);
 
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://todo-plastico.com";
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://todoplásticos.com";
   const orgJsonLd = {
     "@context": "https://schema.org",
     "@type": "Organization",
-    name: "TodoPlástico",
+    name: "TodoPlásticos",
     url: siteUrl,
     logo: `${siteUrl}/todoplastico-symbol.png`,
     description: HOME_DESCRIPTION,
@@ -58,7 +58,7 @@ export default async function Home() {
   const siteJsonLd = {
     "@context": "https://schema.org",
     "@type": "WebSite",
-    name: "TodoPlástico",
+    name: "TodoPlásticos",
     url: siteUrl,
     potentialAction: {
       "@type": "SearchAction",
@@ -90,7 +90,7 @@ export default async function Home() {
               Empresas, productos y servicios para encontrar oportunidades reales en la industria plástica.
             </p>
             <form action="/buscar" className="mt-8 flex max-w-xl flex-col gap-2 rounded-2xl bg-white p-2 text-brand-dark shadow-2xl shadow-black/20 sm:flex-row">
-              <label htmlFor="hero-search" className="sr-only">Buscar en TodoPlástico</label>
+              <label htmlFor="hero-search" className="sr-only">Buscar en TodoPlásticos</label>
               <input
                 id="hero-search"
                 name="q"
@@ -161,7 +161,7 @@ export default async function Home() {
           <div className="mx-auto max-w-7xl px-5 py-20 sm:px-8 lg:px-12 lg:py-24">
             <div className="flex items-end justify-between gap-6">
               <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.24em] text-brand-sky">Selección TodoPlástico</p>
+                <p className="text-xs font-semibold uppercase tracking-[0.24em] text-brand-sky">Selección TodoPlásticos</p>
                 <h2 className="mt-3 text-3xl font-semibold tracking-[-0.03em] text-brand-dark sm:text-4xl">Anuncios destacados.</h2>
               </div>
               <Link href="/buscar" className="hidden text-sm font-semibold text-brand-dark underline decoration-slate-300 underline-offset-8 hover:decoration-brand sm:block">

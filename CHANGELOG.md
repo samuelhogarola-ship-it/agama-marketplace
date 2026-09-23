@@ -2,6 +2,12 @@
 
 ## [Unreleased]
 
+### Marca y dominio
+- Marca visible y logotipo de cabecera actualizados a TodoPlásticos.
+- Enlaces, SEO, sitemap, robots, analítica y documentación preparados para `todoplásticos.com`.
+- Contacto público y remitente de soporte actualizados a `contacto@todoplásticos.es`; dominio IDN codificado para correo y analítica.
+- Pendiente confirmar si dominio y correo deben llevar tilde antes de desplegar; actualizar DNS, URL pública del hosting, Supabase Auth y verificar el dominio de correo en Resend.
+
 ### Moderación
 - Los anuncios nuevos, editados o reactivados quedan en revisión sin llamar automáticamente a OpenAI.
 - La valoración con IA solo puede iniciarla un administrador desde la cola y nunca publica ni rechaza: la decisión final continúa siendo humana.

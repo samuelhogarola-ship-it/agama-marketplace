@@ -14,6 +14,6 @@ test("el build sin variables públicas carga el tracker Agama", async ({ page })
   );
   await expect(tracker).toHaveAttribute(
     "data-domains",
-    "todo-plastico.com,www.todo-plastico.com",
+    "xn--todoplsticos-hbb.com,www.xn--todoplsticos-hbb.com",
   );
 });

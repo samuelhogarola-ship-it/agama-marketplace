@@ -63,14 +63,14 @@ async function ensureAuthUser(email, metadata = {}) {
 }
 
 async function seedAgamaSampleListing() {
-  const email = "demo-agama-envases@todo-plastico.com";
+  const email = "demo-agama-envases@todoplásticos.com";
   const user = await ensureAuthUser(email, { company_name: "AGAMA Envases Industriales Demo" });
 
   const company = {
     id: user.id,
     name: "AGAMA Envases Industriales Demo",
     slug: "agama-envases-industriales-demo",
-    description: "Empresa ficticia usada como modelo de anuncio para TodoPlastico. Publica productos plasticos permitidos con informacion clara, contacto externo y enlace propio.",
+    description: "Empresa ficticia usada como modelo de anuncio para TodoPlasticos. Publica productos plasticos permitidos con informacion clara, contacto externo y enlace propio.",
     location: "Ciudad de Mexico",
     website: "https://agama-envases.com",
     logo_url: "/agama-logo.png",
@@ -172,7 +172,7 @@ const { error: companyError } = await supabase.from("mkt_companies").upsert({
   id: user.id,
   name: "AGAMA Pigmentos y Masterbatch",
   slug: "agama-pigmentos-y-masterbatch",
-  description: "Patrocinador principal de TodoPlástico y proveedor especializado para la industria plástica.",
+  description: "Patrocinador principal de TodoPlásticos y proveedor especializado para la industria plástica.",
   location: "México",
   categories: ["patrocinador"],
   plan: "pro",

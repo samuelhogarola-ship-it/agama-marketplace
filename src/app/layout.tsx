@@ -9,10 +9,10 @@ import CategoryBrowseBar from "@/components/CategoryBrowseBar";
 import MobileNav from "@/components/MobileNav";
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "https://todo-plastico.com"),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "https://todoplásticos.com"),
   title: {
-    default: "TodoPlástico — Mercado para comprar productos plásticos en México",
-    template: "%s | TodoPlástico",
+    default: "TodoPlásticos — Mercado para comprar productos plásticos en México",
+    template: "%s | TodoPlásticos",
   },
   description:
     "Mercado B2B gratuito para comprar productos plásticos en México: envases, bolsas, tarimas, cubetas, muebles, empaques y más. Impulsado por AGAMA.",
@@ -23,7 +23,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "es_MX",
-    siteName: "TodoPlástico",
+    siteName: "TodoPlásticos",
   },
   twitter: {
     card: "summary_large_image",
@@ -39,10 +39,10 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       <body className="min-h-screen flex flex-col">
         <header className="border-b border-slate-200 bg-white sticky top-0 z-40">
           <div className="relative mx-auto flex min-h-16 max-w-7xl items-center justify-between gap-4 px-4 py-2 md:py-4">
-            <Link href="/" className="flex shrink-0 items-center gap-2.5" aria-label="TodoPlástico, inicio">
-              <Image src="/todoplastico-symbol.png" alt="TodoPlástico" width={42} height={26} priority className="h-[26px] w-[42px] object-contain" />
+            <Link href="/" className="flex shrink-0 items-center gap-2.5" aria-label="TodoPlásticos, inicio">
+              <Image src="/todoplastico-symbol.png" alt="TodoPlásticos" width={42} height={26} priority className="h-[26px] w-[42px] object-contain" />
               <span className="text-lg font-bold leading-none text-brand-dark sm:text-xl">
-                TodoPlástico
+                TodoPlásticos
                 <span className="mt-1 block text-[9px] font-medium uppercase tracking-[0.14em] text-brand-sky sm:text-[10px]">Mercado para la industria plástica</span>
               </span>
             </Link>
@@ -80,16 +80,17 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             <div>
               <div className="flex items-center gap-2.5">
                 <Image src="/agama-logo.png" alt="AGAMA" width={36} height={36} className="rounded-full" />
-                <p className="font-bold text-lg">TodoPlástico</p>
+                <p className="font-bold text-lg">TodoPlásticos</p>
               </div>
               <p className="mt-3 text-slate-300">
                 Directorio B2B gratuito para la industria del plástico en México.
               </p>
+              <p className="mt-3"><a href="mailto:contacto@xn--todoplsticos-hbb.es" className="text-slate-300 hover:text-white">contacto@todoplásticos.es</a></p>
               <p className="mt-5 text-xs uppercase tracking-[0.16em] text-white/60">Patrocinador</p>
               <Link href="/sponsor/agama" className="mt-1 block font-semibold text-white hover:text-brand-sky">AGAMA Pigmentos y Masterbatch</Link>
             </div>
             <div>
-              <p className="font-semibold text-white/90">TodoPlástico</p>
+              <p className="font-semibold text-white/90">TodoPlásticos</p>
               <ul className="mt-3 space-y-2 text-slate-300">
                 <li><Link href="/categorias" className="hover:text-white">Categorías</Link></li>
                 <li><Link href="/empresas" className="hover:text-white">Directorio de empresas</Link></li>
@@ -110,7 +111,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           </div>
           <div className="border-t border-white/10">
             <div className="mx-auto max-w-7xl px-4 py-4 text-xs text-slate-400 flex flex-col md:flex-row justify-between gap-2">
-              <p>© {new Date().getFullYear()} TodoPlástico. Todos los derechos reservados.</p>
+              <p>© {new Date().getFullYear()} TodoPlásticos. Todos los derechos reservados.</p>
               <p>Productos, servicios y anuncios B2B del sector plástico. Toda publicación pasa por moderación.</p>
             </div>
           </div>

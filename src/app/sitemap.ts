@@ -4,7 +4,7 @@ import { PUBLISHED_ARTICLES } from "@/lib/articles";
 import { createClient } from "@/lib/supabase/server";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const base = process.env.NEXT_PUBLIC_SITE_URL ?? "https://todo-plastico.com";
+  const base = process.env.NEXT_PUBLIC_SITE_URL ?? "https://todoplásticos.com";
   const supabase = await createClient();
 
   const [{ data: products }, { data: profiles }] = await Promise.all([

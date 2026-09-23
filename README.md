@@ -1,4 +1,4 @@
-# TodoPlástico
+# TodoPlásticos
 
 Plataforma B2B gratuita de descubrimiento para la **industria del plástico en México**, impulsada por AGAMA.
 
@@ -30,4 +30,4 @@ Plataforma B2B gratuita de descubrimiento para la **industria del plástico en M
 - [docs/seo.md](docs/seo.md) — estrategia SEO
 - [docs/stack.md](docs/stack.md) — stack técnico propuesto
 - [CLAUDE.md](CLAUDE.md) — reglas de gobernanza del repo
-- [docs/scope-fase1.md](docs/scope-fase1.md) — alcance actual de TodoPlástico Fase 1
+- [docs/scope-fase1.md](docs/scope-fase1.md) — alcance actual de TodoPlásticos Fase 1

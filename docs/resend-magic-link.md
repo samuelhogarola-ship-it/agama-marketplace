@@ -1,21 +1,21 @@
 # Resend + magic link
 
-TodoPlástico queda preparado para acceso sin contraseña. La app usa Supabase Auth con sesión persistente en cookies y confirma los enlaces en el servidor mediante `token_hash`.
+TodoPlásticos queda preparado para acceso sin contraseña. La app usa Supabase Auth con sesión persistente en cookies y confirma los enlaces en el servidor mediante `token_hash`.
 
 ## Supabase Auth
 
 En el proyecto Supabase `tiynnllrcdhsvrzsdsct`, configurar:
 
 - Authentication > URL Configuration:
-  - Site URL: `https://todo-plastico.com`
+  - Site URL: `https://todoplásticos.com`
   - Redirect URL local: `http://localhost:3000/auth/callback`
-  - Redirect URL producción: `https://todo-plastico.com/auth/callback`
+  - Redirect URL producción: `https://todoplásticos.com/auth/callback`
 - Authentication > Providers > Email:
   - Enable Email provider
   - Confirm email: activado
   - Secure email change: activado
 - Authentication > SMTP Settings:
-  - Sender: `TodoPlástico <acceso@todo-plastico.com>`
+  - Sender: `TodoPlásticos <acceso@todoplásticos.com>`
   - Host: `smtp.resend.com`
   - Port: `465`
   - Username: `resend`
@@ -27,7 +27,7 @@ En Authentication > Emails > Templates > Magic Link, el botón debe usar el hash
 
 ```html
 <a href="{{ .RedirectTo }}&token_hash={{ .TokenHash }}&type=email">
-  Ingresar en TodoPlástico
+  Ingresar en TodoPlásticos
 </a>
 ```
 

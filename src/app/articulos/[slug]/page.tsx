@@ -26,9 +26,9 @@ export default async function ArticlePage({ params }: Props) {
   if (!article) notFound();
   const authorSchema = article.author
     ? { "@type": "Person", name: article.author, jobTitle: article.authorTitle }
-    : { "@type": "Organization", name: "TodoPlástico" };
+    : { "@type": "Organization", name: "TodoPlásticos" };
   const jsonLd = { "@context": "https://schema.org", "@type": "Article", headline: article.title, description: article.excerpt, datePublished: article.date, image: article.cover, author: authorSchema };
-  const base = process.env.NEXT_PUBLIC_SITE_URL ?? "https://todo-plastico.com";
+  const base = process.env.NEXT_PUBLIC_SITE_URL ?? "https://todoplásticos.com";
   const breadcrumbJsonLd = {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",

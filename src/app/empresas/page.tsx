@@ -6,7 +6,7 @@ import { createClient } from "@/lib/supabase/server";
 import type { Company } from "@/lib/types";
 
 export const metadata: Metadata = {
-  title: "Empresas de plástico en México — TodoPlástico",
+  title: "Empresas de plástico en México — TodoPlásticos",
   description: "Directorio de fabricantes, distribuidores y servicios profesionales de la industria plástica en México. Contacta directo con cada empresa.",
   alternates: { canonical: "/empresas" },
 };

@@ -22,7 +22,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     if (!data) return {};
     return {
       title: `${data.name} — empresa de la industria plástica`,
-      description: data.description?.slice(0, 160) ?? `Perfil de ${data.name} en TodoPlástico.`,
+      description: data.description?.slice(0, 160) ?? `Perfil de ${data.name} en TodoPlásticos.`,
       alternates: { canonical: `/e/${slug}` },
       openGraph: data.logo_url ? { images: [data.logo_url] } : undefined,
     };
@@ -73,7 +73,7 @@ export default async function CompanyPage({ params }: Props) {
     email: profile.email ?? undefined,
     logo: profile.logo_url ?? undefined,
   };
-  const base = process.env.NEXT_PUBLIC_SITE_URL ?? "https://todo-plastico.com";
+  const base = process.env.NEXT_PUBLIC_SITE_URL ?? "https://todoplásticos.com";
   const breadcrumbJsonLd = {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",

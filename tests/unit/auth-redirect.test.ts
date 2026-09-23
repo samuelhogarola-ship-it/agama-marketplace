@@ -6,12 +6,12 @@ test("production auth links use the configured public site", () => {
   assert.equal(
     resolveAuthOrigin({
       nodeEnv: "production",
-      configuredSiteUrl: "https://todo-plastico.com/",
+      configuredSiteUrl: "https://todoplásticos.com/",
       forwardedHost: "attacker.example",
       forwardedProto: "https",
       host: "attacker.example",
     }),
-    "https://todo-plastico.com",
+    "https://todoplásticos.com",
   );
 });
 
@@ -19,7 +19,7 @@ test("development auth links preserve the localhost request origin", () => {
   assert.equal(
     resolveAuthOrigin({
       nodeEnv: "development",
-      configuredSiteUrl: "https://todo-plastico.com",
+      configuredSiteUrl: "https://todoplásticos.com",
       forwardedHost: null,
       forwardedProto: null,
       host: "localhost:3000",

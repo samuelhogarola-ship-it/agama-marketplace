@@ -1,7 +1,7 @@
 import { ImageResponse } from "next/og";
 
 export const runtime = "edge";
-export const alt = "TodoPlástico — Directorio B2B de la industria plástica en México";
+export const alt = "TodoPlásticos — Directorio B2B de la industria plástica en México";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -44,7 +44,7 @@ export default function OgImage() {
               lineHeight: 1,
             }}
           >
-            TodoPlástico
+            TodoPlásticos
           </div>
 
           <div

@@ -25,7 +25,7 @@
 
 ### Configuración y despliegue
 
-- [ ] Configurar el dominio final `todo-plastico.com` en Vercel/hosting.
+- [ ] Configurar el dominio final `todoplásticos.com` en Vercel/hosting.
 - [ ] Configurar `NEXT_PUBLIC_SITE_URL` con el dominio final.
 - [ ] Configurar SMTP de Supabase Auth con Resend y probar entrega real.
 - [ ] Configurar `TODO_PLASTICO_ADMIN_EMAILS` con los emails reales del equipo.

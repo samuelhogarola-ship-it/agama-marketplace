@@ -1,4 +1,4 @@
-# Estrategia SEO — TodoPlástico
+# Estrategia SEO — TodoPlásticos
 
 ## Objetivo
 
@@ -31,7 +31,7 @@ Cada landing de categoría lleva: H1 con keyword + "CDMX", texto único de 150�
 
 ## Dominio y lanzamiento
 
-El desarrollo/staging vive en `*.vercel.app`, pero ese subdominio **no debe indexarse nunca** (`X-Robots-Tag: noindex` mientras no haya dominio final). El dominio de lanzamiento es `todo-plastico.com`; debe conectarse antes de publicar el catálogo y acompañarse con canonical y redirecciones 301 desde cualquier URL temporal.
+El desarrollo/staging vive en `*.vercel.app`, pero ese subdominio **no debe indexarse nunca** (`X-Robots-Tag: noindex` mientras no haya dominio final). El dominio de lanzamiento es `todoplásticos.com`; debe conectarse antes de publicar el catálogo y acompañarse con canonical y redirecciones 301 desde cualquier URL temporal.
 
 ## Técnico
 
