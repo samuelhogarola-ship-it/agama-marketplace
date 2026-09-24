@@ -2,7 +2,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Company } from "./types";
 
 type CompanyUser = { id: string; email?: string; user_metadata: Record<string, unknown> };
-export type CompanyFields = Pick<Company, "name" | "rfc" | "description" | "location" | "website" | "phone" | "email" | "whatsapp" | "categories"> & Partial<Pick<Company, "logo_url">>;
+export type CompanyFields = Pick<Company, "name" | "rfc" | "description" | "location" | "website" | "phone" | "email" | "whatsapp" | "categories"> & Partial<Pick<Company, "logo_url" | "address">>;
 
 function initialCompany(user: CompanyUser, name: string) {
   const slug = name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")

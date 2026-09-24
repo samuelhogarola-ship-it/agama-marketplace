@@ -113,3 +113,13 @@ test("saving selected contact channels clears disabled public contacts and survi
   assert.equal(twoChannels.whatsapp, "+34612345678");
   assert.equal(twoChannels.email, null);
 });
+
+// Address travels through the same owner-scoped persistence flow as the profile.
+test("structured address round trips without publishing the street as location", async () => {
+  const db = database({ id: user.id, name: "Empresa", slug: "original" });
+  const address = { postalCode: "01000", state: "Ciudad de México", municipality: "Álvaro Obregón", colony: "San Ángel", street: "Revolución", exterior: "12", interior: "2B" };
+  await saveCompany(db.client, user, { ...fields, address, location: "Álvaro Obregón, Ciudad de México" });
+  const reopened = await loadCompany(db.client, user);
+  assert.deepEqual(reopened.address, address);
+  assert.equal(reopened.location, "Álvaro Obregón, Ciudad de México");
+});

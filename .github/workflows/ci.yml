@@ -36,10 +36,12 @@ jobs:
       - run: npm ci
       - run: npm run typecheck
       - run: npm run lint
-      - name: Mount contact component fixture for this test build only
+      - name: Mount component fixtures for this test build only
         run: |
           mkdir -p src/app/checks-contacts
           cp tests/fixtures/contact-form/page.tsx src/app/checks-contacts/page.tsx
+          mkdir -p src/app/checks-address
+          cp tests/fixtures/address-form/page.tsx src/app/checks-address/page.tsx
       - run: npm run build
       - name: Prepare standalone for Playwright
         run: |
