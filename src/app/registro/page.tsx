@@ -4,15 +4,9 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 
+import { companyRfcInput, companyRfcError } from "@/lib/tax-id";
+
 type AuthMethod = "password" | "magic-link";
-
-const RFC_RE = /^[A-ZÑ&]{3,4}\d{6}[A-Z0-9]{3}$/i;
-
-function validateRfc(rfc: string): string | null {
-  if (!rfc) return null;
-  if (!RFC_RE.test(rfc.trim())) return "RFC inválido. Formato: 3-4 letras + fecha (AAMMDD) + 3 caracteres.";
-  return null;
-}
 
 export default function RegistroPage() {
   const [form, setForm] = useState({ company: "", email: "", password: "", rfc: "" });
@@ -35,7 +29,7 @@ export default function RegistroPage() {
       return;
     }
 
-    const rfcError = validateRfc(form.rfc);
+    const rfcError = companyRfcError(form.rfc);
     if (rfcError) {
       setError(rfcError);
       return;
@@ -141,16 +135,17 @@ export default function RegistroPage() {
         </div>
         <div>
           <label htmlFor="reg-rfc" className="block text-sm font-medium text-slate-700 mb-1">
-            RFC <span className="text-slate-400 font-normal">(México)</span> / CIF <span className="text-slate-400 font-normal">(España)</span>
+            RFC de la empresa <span className="text-slate-400 font-normal">(México, 12 caracteres)</span>
             <span className="ml-1 text-xs text-slate-400 font-normal">— recomendado, evita cuentas duplicadas</span>
           </label>
           <input
             id="reg-rfc"
             type="text"
-            placeholder="RFC o CIF de tu empresa"
-            maxLength={13}
+            placeholder="Ej. ABC010203XY9"
+            pattern="[A-ZÑ&]{3}[0-9]{6}[A-Z0-9]{3}"
+            title="RFC de empresa: 12 caracteres"
             value={form.rfc}
-            onChange={(e) => setForm({ ...form, rfc: e.target.value.toUpperCase() })}
+            onChange={(e) => setForm({ ...form, rfc: companyRfcInput(e.target.value) })}
             className="w-full rounded-lg border border-slate-300 px-4 py-2.5 focus:border-brand focus:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-1 font-mono tracking-wide uppercase"
           />
         </div>

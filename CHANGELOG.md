@@ -1,3 +1,7 @@
+## RFC empresarial — 2026-09-24
+
+- Registro y ficha: RFC mexicano de persona moral limitado a 12 caracteres, con formato y fecha validados; letras en mayúscula y sin símbolos ajenos. Sigue siendo opcional hasta publicar.
+
 # Changelog
 
 ## Marca TodoPlásticos — 2026-09-24
