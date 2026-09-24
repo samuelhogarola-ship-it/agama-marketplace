@@ -1,6 +1,6 @@
 # Modelo unico de anuncio
 
-Este es el patron base para todos los anuncios de TodoPlastico. Sirve para mantener consistencia, velocidad de revision y calidad de catalogo.
+Este es el patron base para todos los anuncios de TodoPlásticos. Sirve para mantener consistencia, velocidad de revision y calidad de catalogo.
 
 ## Campos obligatorios
 
@@ -29,7 +29,7 @@ El enlace externo es opcional. Si se usa, debe pertenecer a la web propia del an
 
 ## Disponibilidad
 
-TodoPlastico no usa la accion "marcar como vendido". El catalogo esta pensado para fabricantes y proveedores, no para venta de piezas unicas. Cuando un producto no este disponible temporalmente, el anunciante debe pausarlo; cuando vuelva a estar disponible, debe reactivarlo o reenviarlo a revision si se ha modificado.
+TodoPlásticos no usa la accion "marcar como vendido". El catalogo esta pensado para fabricantes y proveedores, no para venta de piezas unicas. Cuando un producto no este disponible temporalmente, el anunciante debe pausarlo; cuando vuelva a estar disponible, debe reactivarlo o reenviarlo a revision si se ha modificado.
 
 ## Ejemplo AGAMA ficticio
 
