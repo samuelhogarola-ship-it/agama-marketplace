@@ -1,4 +1,4 @@
-# Prompts para generar imágenes de artículos — TodoPlástico
+# Prompts para generar imágenes de artículos — TodoPlásticos
 
 Genera una imagen por cada artículo listado abajo. Cada imagen debe guardarse en `public/articles/` con el nombre indicado.
 
@@ -6,7 +6,7 @@ Genera una imagen por cada artículo listado abajo. Cada imagen debe guardarse e
 
 - **Formato**: PNG, 1200x630px (ratio 1.91:1, ideal para Open Graph y tarjetas)
 - **Estilo**: Fotografía industrial profesional, limpia, bien iluminada. Sin personas reconocibles.
-- **Logo**: Todas las imágenes deben llevar el logo de TodoPlástico (`public/todoplastico-symbol.png`) en la esquina inferior derecha, con opacidad ~70%, tamaño pequeño (~80px), como marca de agua sutil. El logo es el archivo `todoplastico-symbol.png` del proyecto.
+- **Logo**: Todas las imágenes deben llevar el logo de TodoPlásticos (`public/todoplastico-symbol.png`) en la esquina inferior derecha, con opacidad ~70%, tamaño pequeño (~80px), como marca de agua sutil. El logo es el archivo `todoplastico-symbol.png` del proyecto.
 - **Paleta**: Tonos neutros industriales (blancos, grises, azul acero) con acentos del color AGAMA (verde #4CAF50 o azul claro #0EA5E9) donde encaje naturalmente
 - **Contexto**: Ambiente de fábrica, almacén, línea de producción o laboratorio mexicano. Aspecto profesional B2B, no stock genérico.
 
@@ -49,7 +49,7 @@ Después de generar todas las imágenes, actualiza `src/lib/articles.ts` cambian
 **Prompt**: Panel de control de una inyectora de plástico con pantalla digital mostrando parámetros (temperatura, presión, tiempo). Mano de técnico ajustando un dial. Close-up industrial.
 
 ### 9. `public/articles/como-vender-mas-en-todoplastico.png`
-**Artículo**: Cómo vender más en TodoPlástico: guía para proveedores
+**Artículo**: Cómo vender más en TodoPlásticos: guía para proveedores
 **Prompt**: Vista cenital de productos plásticos variados (envases, cubetas, perfiles, tubería) organizados en grid sobre fondo blanco. Composición tipo catálogo profesional.
 
 ### 10. `public/articles/masterbatch-vs-pigmento.png`

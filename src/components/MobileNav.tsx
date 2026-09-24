@@ -81,7 +81,7 @@ export default function MobileNav({ isLoggedIn }: { isLoggedIn: boolean }) {
       {searchOpen && (
         <div className="absolute left-0 right-0 top-full z-40 border-b border-slate-200 bg-white px-4 py-3 shadow-md md:hidden">
           <form action="/buscar" onSubmit={() => setSearchOpen(false)}>
-            <label htmlFor="mobile-search" className="sr-only">Buscar en TodoPlástico</label>
+            <label htmlFor="mobile-search" className="sr-only">Buscar en TodoPlásticos</label>
             <input
               id="mobile-search"
               autoFocus
@@ -107,7 +107,7 @@ export default function MobileNav({ isLoggedIn }: { isLoggedIn: boolean }) {
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between border-b border-slate-200 px-5 py-4">
-              <span className="text-base font-semibold text-brand-dark">TodoPlástico</span>
+              <span className="text-base font-semibold text-brand-dark">TodoPlásticos</span>
               <button
                 type="button"
                 aria-label="Cerrar menú"

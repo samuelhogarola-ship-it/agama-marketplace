@@ -1,4 +1,4 @@
-# TodoPlástico — Definición de Fase 1
+# TodoPlásticos — Definición de Fase 1
 
 > **Documento de alcance** | Dominio: todo-plastico.com | Fecha: 31 de julio de 2026 | Estado: implementado en código; dependencias de producción pendientes
 
@@ -23,7 +23,7 @@
 
 ## 1. Objetivo redefinido
 
-> **Posicionamiento:** TodoPlástico es una plataforma sectorial B2B gratuita orientada a tráfico y visibilidad, no un marketplace transaccional.
+> **Posicionamiento:** TodoPlásticos es una plataforma sectorial B2B gratuita orientada a tráfico y visibilidad, no un marketplace transaccional.
 
 Construir un punto de entrada digital para profesionales, compradores y proveedores de la industria del plástico en México que combine:
 
@@ -32,7 +32,7 @@ Construir un punto de entrada digital para profesionales, compradores y proveedo
 - **Portal de contenido editorial** útil sobre la industria.
 - **Presencia destacada de AGAMA** como impulsor del proyecto.
 
-La conversión se produce fuera de la plataforma: visita a la web del proveedor, llamada, correo, WhatsApp o formulario externo. TodoPlástico no intermedia ni gestiona transacciones.
+La conversión se produce fuera de la plataforma: visita a la web del proveedor, llamada, correo, WhatsApp o formulario externo. TodoPlásticos no intermedia ni gestiona transacciones.
 
 ### Relación con AGAMA
 
@@ -168,8 +168,8 @@ Tres capas secuenciales; si una capa rechaza, las siguientes no se ejecutan.
 La revisión automática no es una validación técnica, legal ni comercial. Solo modera formato y cumplimiento de las normas de la plataforma. Los términos de uso deben reflejar explícitamente que:
 
 - Cada empresa es responsable de sus publicaciones.
-- TodoPlástico no garantiza exactitud de la información.
-- TodoPlástico no interviene en la compraventa.
+- TodoPlásticos no garantiza exactitud de la información.
+- TodoPlásticos no interviene en la compraventa.
 - AGAMA impulsa la plataforma pero no asume responsabilidad sobre anuncios de terceros.
 
 ---

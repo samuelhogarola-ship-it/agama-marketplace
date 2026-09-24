@@ -22,7 +22,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     if (!data) return {};
     return {
       title: `${data.name} — empresa de la industria plástica`,
-      description: data.description?.slice(0, 160) ?? `Perfil de ${data.name} en TodoPlástico.`,
+      description: data.description?.slice(0, 160) ?? `Perfil de ${data.name} en TodoPlásticos.`,
       alternates: { canonical: `/e/${slug}` },
       openGraph: data.logo_url ? { images: [data.logo_url] } : undefined,
     };

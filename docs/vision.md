@@ -1,12 +1,12 @@
-# Visión — TodoPlástico
+# Visión — TodoPlásticos
 
 ## La idea en una frase
 
-Un directorio B2B gratuito donde las empresas del sector plástico publican anuncios, los compradores las encuentran y TodoPlástico se convierte en el punto de referencia del sector, impulsado por AGAMA.
+Un directorio B2B gratuito donde las empresas del sector plástico publican anuncios, los compradores las encuentran y TodoPlásticos se convierte en el punto de referencia del sector, impulsado por AGAMA.
 
 ## Por qué
 
-1. **Visibilidad de marca:** cada proveedor y comprador del sector plástico conoce TodoPlástico y su respaldo de AGAMA.
+1. **Visibilidad de marca:** cada proveedor y comprador del sector plástico conoce TodoPlásticos y su respaldo de AGAMA.
 2. **Datos de valor:** quién vende qué, qué se busca, qué categorías tienen demanda, precios de mercado, leads cualificados para el negocio principal de AGAMA (pigmentos, masterbatch, aditivos).
 3. **Monetización futura:** destacados, publicidad del sector y servicios para empresas.
 

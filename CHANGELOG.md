@@ -1,5 +1,10 @@
 # Changelog
 
+## Marca TodoPlásticos — 2026-09-24
+
+- Se añade la S al nombre y al texto del logo en cabecera, navegación móvil, pie, metadatos, artículos, legales y mensajes de la aplicación.
+- Se actualizan las referencias de marca en documentación y pruebas. Dominios, correos, rutas, archivos e identificadores conservan su configuración actual.
+
 ## Corrección de guardado de empresa — 2026-09-23
 
 - El panel lee la ficha privada mediante la RPC del propietario, evitando errores por columnas restringidas.

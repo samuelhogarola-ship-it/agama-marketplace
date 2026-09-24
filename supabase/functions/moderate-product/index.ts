@@ -89,7 +89,7 @@ async function callClaude(messages: unknown[], maxTokens = 300): Promise<string>
 }
 
 async function classifyText(title: string, description: string, category: string): Promise<ModResult> {
-  const prompt = `Eres el moderador de TodoPlástico, portal B2B de plásticos en México.
+  const prompt = `Eres el moderador de TodoPlásticos, portal B2B de plásticos en México.
 
 Producto:
 Título: ${title}
@@ -120,7 +120,7 @@ async function classifyImages(urls: string[], title: string): Promise<ModResult>
         ...imageBlocks,
         {
           type: "text",
-          text: `Fotos del anuncio "${title}" en TodoPlástico (plásticos B2B, México).
+          text: `Fotos del anuncio "${title}" en TodoPlásticos (plásticos B2B, México).
 
 ¿Muestran pigmentos, masterbatch, aditivos de color, productos ajenos al plástico, o datos de contacto (teléfonos/emails en carteles)?
 
