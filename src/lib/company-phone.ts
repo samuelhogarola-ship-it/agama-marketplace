@@ -53,3 +53,30 @@ export function phoneValue(value: PhoneDraft): string {
   if (error) throw new Error(error);
   return parsePhoneNumberFromString(`+${getCountryCallingCode(value.country as CountryCode)}${value.national}`)!.number;
 }
+
+export type ContactSelection = { phone: boolean; email: boolean; whatsapp: boolean };
+export type ContactDraft = { phone: PhoneDraft; whatsapp: PhoneDraft; email: string };
+
+export function contactError(enabled: ContactSelection, draft: ContactDraft): string | null {
+  if (!enabled.phone && !enabled.email && !enabled.whatsapp) return "Activa y completa al menos una forma de contacto: teléfono, correo electrónico o WhatsApp.";
+  if (enabled.phone) {
+    const error = phoneError(draft.phone, true);
+    if (error) return `Teléfono: ${error}`;
+  }
+  if (enabled.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(draft.email.trim())) return "Correo electrónico: escribe una dirección completa, por ejemplo ventas@tuempresa.com.";
+  if (enabled.whatsapp) {
+    const error = phoneError(draft.whatsapp, true);
+    if (error) return `WhatsApp: ${error}`;
+  }
+  return null;
+}
+
+export function contactValues(enabled: ContactSelection, draft: ContactDraft) {
+  const error = contactError(enabled, draft);
+  if (error) throw new Error(error);
+  return {
+    phone: enabled.phone ? phoneValue(draft.phone) : null,
+    email: enabled.email ? draft.email.trim() : null,
+    whatsapp: enabled.whatsapp ? phoneValue(draft.whatsapp) : null,
+  };
+}

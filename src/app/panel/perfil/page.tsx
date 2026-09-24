@@ -9,8 +9,8 @@ import { DEMO_COMPANY, DEMO_PREVIEW_ENABLED } from "@/lib/demo-data";
 import { saveCompany } from "@/lib/company-profile";
 import { normalizeTaxId, taxIdSaveError, companyRfcInput, companyRfcError } from "@/lib/tax-id";
 
-import PhoneInput from "@/components/PhoneInput";
-import { readPhone, phoneError, phoneValue, type PhoneDraft } from "@/lib/company-phone";
+import CompanyContactFields from "@/components/CompanyContactFields";
+import { readPhone, contactError, contactValues, type PhoneDraft, type ContactSelection } from "@/lib/company-phone";
 
 function PerfilContent() {
   const router = useRouter();
@@ -27,6 +27,7 @@ function PerfilContent() {
     whatsapp: "",
     categories: [] as string[],
   });
+  const [contacts, setContacts] = useState<ContactSelection>({ phone: false, email: false, whatsapp: false });
   const [phone, setPhone] = useState<PhoneDraft>({ country: "", national: "" });
   const [whatsapp, setWhatsapp] = useState<PhoneDraft>({ country: "", national: "" });
   const [logoUrl, setLogoUrl] = useState<string | null>(null);
@@ -52,6 +53,7 @@ function PerfilContent() {
         whatsapp: DEMO_COMPANY.whatsapp ?? "",
         categories: DEMO_COMPANY.categories ?? [],
       });
+      setContacts({ phone: !!DEMO_COMPANY.phone?.trim(), email: !!DEMO_COMPANY.email?.trim(), whatsapp: !!DEMO_COMPANY.whatsapp?.trim() });
       setPhone(readPhone(DEMO_COMPANY.phone));
       setWhatsapp(readPhone(DEMO_COMPANY.whatsapp));
       setLogoUrl(DEMO_COMPANY.logo_url);
@@ -87,6 +89,7 @@ function PerfilContent() {
           whatsapp: data.whatsapp ?? "",
           categories: data.categories ?? [],
         });
+        setContacts({ phone: !!data.phone?.trim(), email: !!data.email?.trim(), whatsapp: !!data.whatsapp?.trim() });
         setPhone(readPhone(data.phone));
         setWhatsapp(readPhone(data.whatsapp));
         setLogoUrl(data.logo_url ?? null);
@@ -143,7 +146,7 @@ function PerfilContent() {
     setSaveMessage(null);
     const rfcError = companyRfcError(form.rfc);
     if (rfcError) { setSaveMessage(rfcError); return; }
-    const numberError = phoneError(phone) || phoneError(whatsapp);
+    const numberError = contactError(contacts, { phone, whatsapp, email: form.email });
     if (numberError) { setSaveMessage(numberError); return; }
     if (previewMode) {
       setSaved(true);
@@ -164,9 +167,7 @@ function PerfilContent() {
         description: form.description,
         location: form.location,
         website: form.website,
-        phone: phoneValue(phone),
-        email: form.email,
-        whatsapp: phoneValue(whatsapp),
+        ...contactValues(contacts, { phone, whatsapp, email: form.email }),
         categories: form.categories,
         logo_url: logoUrl,
       });
@@ -339,18 +340,11 @@ function PerfilContent() {
           <label htmlFor="company-website" className="block text-sm font-medium text-slate-700">Web pública</label>
           <input id="company-website" type="url" value={form.website} onChange={e => setForm({ ...form, website: e.target.value })} placeholder="https://tuempresa.com" className="mt-1 w-full rounded-lg border border-slate-300 px-4 py-2.5" />
         </div>
-        <fieldset className="rounded-xl border border-slate-200 p-4">
-          <legend className="px-1 text-sm font-semibold text-slate-700">Teléfono público</legend>
-          <PhoneInput id="company-phone" label="Teléfono" value={phone} onChange={setPhone} />
-        </fieldset>
-        <div>
-          <label htmlFor="company-email" className="block text-sm font-medium text-slate-700">Correo electrónico público</label>
-          <input id="company-email" type="email" value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} placeholder="ventas@tuempresa.com" className="mt-1 w-full rounded-lg border border-slate-300 px-4 py-2.5" />
-        </div>
-        <fieldset className="rounded-xl border border-slate-200 p-4">
-          <legend className="px-1 text-sm font-semibold text-slate-700">WhatsApp público</legend>
-          <PhoneInput id="company-whatsapp" label="WhatsApp" value={whatsapp} onChange={setWhatsapp} />
-        </fieldset>
+        <CompanyContactFields enabled={contacts} onToggle={setContacts} value={{ phone, whatsapp, email: form.email }} onChange={next => {
+          setPhone(next.phone);
+          setWhatsapp(next.whatsapp);
+          setForm(current => ({ ...current, email: next.email }));
+        }} />
 
         {saveMessage ? (
           <p role="alert" className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">

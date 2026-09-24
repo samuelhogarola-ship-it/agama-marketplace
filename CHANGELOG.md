@@ -1,3 +1,8 @@
+## Contactos independientes — 2026-09-24
+
+- Tres opciones independientes: teléfono, correo electrónico y WhatsApp. Se exige al menos una completa y se validan solo las activadas.
+- Al guardar, los canales desactivados dejan de mostrarse públicamente. Los datos ya existentes se cargan con su canal activado.
+
 ## Prefijos telefónicos — 2026-09-24
 
 - Teléfono y WhatsApp separados en país/prefijo y número; países en español con búsqueda por nombre, código y prefijo.

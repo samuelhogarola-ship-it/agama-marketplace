@@ -96,3 +96,20 @@ test("the first save persists the uploaded company logo", async () => {
   await saveCompany(db.client, user, { ...fields, logo_url: "https://test.supabase.co/storage/v1/object/public/mkt-photos/logos/test.png" });
   assert.equal(db.row()?.logo_url, "https://test.supabase.co/storage/v1/object/public/mkt-photos/logos/test.png");
 });
+
+import { contactValues } from "../../src/lib/company-phone.ts";
+
+test("saving selected contact channels clears disabled public contacts and survives reload", async () => {
+  const db = database({ id: user.id, name: "Empresa", slug: "original", phone: "+525512345678", whatsapp: "+34612345678", email: "anterior@example.com" });
+  const draft = { phone: { country: "MX" as const, national: "5512345678" }, whatsapp: { country: "ES" as const, national: "612345678" }, email: "ventas@example.com" };
+  await saveCompany(db.client, user, { ...fields, ...contactValues({ phone: false, email: true, whatsapp: false }, draft) });
+  const emailOnly = await loadCompany(db.client, user);
+  assert.equal(emailOnly.phone, null);
+  assert.equal(emailOnly.whatsapp, null);
+  assert.equal(emailOnly.email, "ventas@example.com");
+  await saveCompany(db.client, user, { ...fields, ...contactValues({ phone: true, email: false, whatsapp: true }, draft) });
+  const twoChannels = await loadCompany(db.client, user);
+  assert.equal(twoChannels.phone, "+525512345678");
+  assert.equal(twoChannels.whatsapp, "+34612345678");
+  assert.equal(twoChannels.email, null);
+});
