@@ -7,7 +7,7 @@ import { CATEGORIES } from "@/lib/categories";
 import { compressImage } from "@/lib/compress-image";
 import { DEMO_COMPANY, DEMO_PREVIEW_ENABLED } from "@/lib/demo-data";
 import { saveCompany } from "@/lib/company-profile";
-import { normalizeTaxId, taxIdSaveError } from "@/lib/tax-id";
+import { normalizeTaxId, taxIdSaveError, companyRfcInput, companyRfcError } from "@/lib/tax-id";
 
 function PerfilContent() {
   const router = useRouter();
@@ -132,6 +132,8 @@ function PerfilContent() {
     e.preventDefault();
     setSaved(false);
     setSaveMessage(null);
+    const rfcError = companyRfcError(form.rfc);
+    if (rfcError) { setSaveMessage(rfcError); return; }
     if (previewMode) {
       setSaved(true);
       return;
@@ -255,7 +257,7 @@ function PerfilContent() {
         </div>
         <div className="rounded-xl border border-brand/20 bg-brand-light/50 p-4">
           <label htmlFor="company-tax-id" className="block text-sm font-semibold text-brand-dark">
-            RFC/CIF de la empresa
+            RFC de la empresa (México)
           </label>
           <p className="mt-1 text-xs leading-5 text-slate-600">
             Es necesario para publicar anuncios. Solo identifica a tu empresa y evita cuentas duplicadas; no se muestra en la ficha pública.
@@ -263,11 +265,15 @@ function PerfilContent() {
           <input
             id="company-tax-id"
             value={form.rfc}
-            onChange={(e) => setForm({ ...form, rfc: e.target.value.toUpperCase() })}
-            placeholder="Ej. ABC010203XY9 o B12345678"
+            onChange={(e) => setForm({ ...form, rfc: companyRfcInput(e.target.value) })}
+            placeholder="Ej. ABC010203XY9"
+            pattern="[A-ZÑ&]{3}[0-9]{6}[A-Z0-9]{3}"
+            title="RFC de empresa: 12 caracteres (3 letras, 6 números de fecha y 3 de homoclave)"
+            aria-describedby="company-rfc-help"
             autoComplete="off"
             className="mt-3 w-full rounded-lg border border-slate-300 bg-white px-4 py-2.5 font-mono uppercase tracking-wide focus:border-brand focus:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-1"
           />
+          <p id="company-rfc-help" className="mt-2 text-xs text-slate-600">12 caracteres. Escribe el RFC de la empresa, no el de una persona física.</p>
         </div>
         <div>
           <label className="block text-sm font-medium text-slate-700">
