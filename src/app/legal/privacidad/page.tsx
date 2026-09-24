@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-export const metadata: Metadata = { title: "Aviso de privacidad", description: "Aviso de privacidad de TodoPlástico conforme a la LFPDPPP. Cómo protegemos tus datos personales.", alternates: { canonical: "/legal/privacidad" } };
+export const metadata: Metadata = { title: "Aviso de privacidad", description: "Aviso de privacidad de TodoPlásticos conforme a la LFPDPPP. Cómo protegemos tus datos personales.", alternates: { canonical: "/legal/privacidad" } };
 
 export default function PrivacidadPage() {
   return (
@@ -13,7 +13,7 @@ export default function PrivacidadPage() {
       <h2>Responsable</h2>
       <p>
         AGAMA (el «Responsable») es responsable del tratamiento de los datos personales recabados a través de
-        TodoPlástico.
+        TodoPlásticos.
       </p>
 
       <h2>Datos que recabamos</h2>

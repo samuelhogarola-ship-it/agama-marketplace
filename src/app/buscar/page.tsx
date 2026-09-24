@@ -66,7 +66,7 @@ export default async function SearchPage({ searchParams }: Props) {
         resultsCount={resultsCount}
       />
       <h1 className="text-2xl font-bold text-slate-800">
-        {query ? `Resultados para "${query}"` : "Buscar en TodoPlástico"}
+        {query ? `Resultados para "${query}"` : "Buscar en TodoPlásticos"}
       </h1>
 
       <form action="/buscar" className="mt-4 grid gap-3 border-b border-slate-200 pb-5 sm:grid-cols-[1fr_auto_auto_auto]">

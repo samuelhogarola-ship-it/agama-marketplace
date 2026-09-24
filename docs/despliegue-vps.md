@@ -1,4 +1,4 @@
-# Despliegue TodoPlástico en el VPS
+# Despliegue TodoPlásticos en el VPS
 
 ## Arquitectura
 
@@ -30,7 +30,7 @@ La `service role key` solo se usa en servidor y nunca debe empezar por `NEXT_PUB
 
 ## Crear el Supabase nuevo
 
-1. Crear un proyecto independiente para TodoPlástico.
+1. Crear un proyecto independiente para TodoPlásticos.
 2. Ejecutar todas las migraciones en orden: `0001` a `0008`.
 3. Comprobar las tablas `mkt_*` y el bucket `mkt-photos`.
 4. Configurar Auth con Site URL `https://todo-plastico.com` y redirect `https://todo-plastico.com/auth/callback`.
@@ -157,7 +157,7 @@ certbot --nginx -d stats.todo-plastico.com
 
 1. Abre `https://stats.todo-plastico.com` en el navegador.
 2. Login inicial: usuario `admin`, contraseña `umami` — **cámbiala inmediatamente**.
-3. Ajustes → Sitios web → Añadir sitio web: nombre `TodoPlástico`, dominio `todo-plastico.com`.
+3. Ajustes → Sitios web → Añadir sitio web: nombre `TodoPlásticos`, dominio `todo-plastico.com`.
 4. Copia el **Website ID** (UUID) que aparece.
 
 ### 5. Añadir a `.env.production`

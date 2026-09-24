@@ -1,4 +1,4 @@
-# Estrategia SEO — TodoPlástico
+# Estrategia SEO — TodoPlásticos
 
 ## Objetivo
 

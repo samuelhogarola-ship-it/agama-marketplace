@@ -175,7 +175,7 @@ function SummaryPanel({
         <ShareButton title={product.title} url={fullUrl} />
       </div>
       <p className="mt-4 text-xs leading-5 text-slate-400">
-        TodoPlástico no procesa pagos ni intermedia operaciones. El acuerdo se
+        TodoPlásticos no procesa pagos ni intermedia operaciones. El acuerdo se
         realiza directamente entre empresas.
       </p>
     </aside>

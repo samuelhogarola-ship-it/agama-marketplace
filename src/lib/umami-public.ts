@@ -8,7 +8,7 @@ type PublicUmamiEnv = {
 
 export function resolvePublicUmamiConfig(env: PublicUmamiEnv = process.env as PublicUmamiEnv) {
   // Read the public environment only to preserve this resolver's injectable
-  // test boundary. Production tracking always uses the published TodoPlástico
+  // test boundary. Production tracking always uses the published TodoPlásticos
   // pair, including when Coolify leaves either variable unset or stale.
   void env;
 
