@@ -18,7 +18,7 @@ export default function PhoneInput({ id, label, value, onChange, required = fals
   const visible = selected && !options.some(c => c.code === selected.code) ? [selected, ...options] : options;
 
   function changeNumber(raw: string) {
-    if (raw.trim().startsWith("+")) {
+    if (raw.trim().startsWith("+") || raw.trim().startsWith("00")) {
       const pasted = readPhone(raw);
       if (pasted.country && /^\d+$/.test(pasted.national) && pasted.national.length <= phoneLimit(pasted.country)) {
         onChange(pasted); setQuery(""); setInputError(null); return;

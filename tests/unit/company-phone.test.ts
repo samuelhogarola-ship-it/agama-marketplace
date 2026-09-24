@@ -26,6 +26,7 @@ test("foreign phones retain their country code; input keeps only digits", () => 
 
 test("existing international phones reload without losing prefix or digits", () => {
   assert.deepEqual(readPhone("+52 55 1234 5678"), { country: "MX", national: "5512345678" });
+  assert.deepEqual(readPhone("0034 612 345 678"), { country: "ES", national: "612345678" });
   assert.deepEqual(readPhone("+34 612 345 678"), { country: "ES", national: "612345678" });
   assert.deepEqual(readPhone("5512345678"), { country: "", national: "5512345678" });
   assert.deepEqual(readPhone("+9991234567"), { country: "", national: "+9991234567" });
