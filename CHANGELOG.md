@@ -1,3 +1,8 @@
+## Prefijos telefónicos — 2026-09-24
+
+- Teléfono y WhatsApp separados en país/prefijo y número; países en español con búsqueda por nombre, código y prefijo.
+- Solo cifras, prefijo obligatorio al informar número, México con 10 cifras y validación de longitud internacional. Se conservan los valores existentes; los ambiguos requieren elegir prefijo.
+
 ## RFC empresarial — 2026-09-24
 
 - Registro y ficha: RFC mexicano de persona moral limitado a 12 caracteres, con formato y fecha validados; letras en mayúscula y sin símbolos ajenos. Sigue siendo opcional hasta publicar.
