@@ -9,6 +9,9 @@ import { DEMO_COMPANY, DEMO_PREVIEW_ENABLED } from "@/lib/demo-data";
 import { saveCompany } from "@/lib/company-profile";
 import { normalizeTaxId, taxIdSaveError, companyRfcInput, companyRfcError } from "@/lib/tax-id";
 
+import PhoneInput from "@/components/PhoneInput";
+import { readPhone, phoneError, phoneValue, type PhoneDraft } from "@/lib/company-phone";
+
 function PerfilContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -24,6 +27,8 @@ function PerfilContent() {
     whatsapp: "",
     categories: [] as string[],
   });
+  const [phone, setPhone] = useState<PhoneDraft>({ country: "", national: "" });
+  const [whatsapp, setWhatsapp] = useState<PhoneDraft>({ country: "", national: "" });
   const [logoUrl, setLogoUrl] = useState<string | null>(null);
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
   const [uploadingLogo, setUploadingLogo] = useState(false);
@@ -47,6 +52,8 @@ function PerfilContent() {
         whatsapp: DEMO_COMPANY.whatsapp ?? "",
         categories: DEMO_COMPANY.categories ?? [],
       });
+      setPhone(readPhone(DEMO_COMPANY.phone));
+      setWhatsapp(readPhone(DEMO_COMPANY.whatsapp));
       setLogoUrl(DEMO_COMPANY.logo_url);
       setLoading(false);
       return;
@@ -80,6 +87,8 @@ function PerfilContent() {
           whatsapp: data.whatsapp ?? "",
           categories: data.categories ?? [],
         });
+        setPhone(readPhone(data.phone));
+        setWhatsapp(readPhone(data.whatsapp));
         setLogoUrl(data.logo_url ?? null);
       }
       setLoading(false);
@@ -134,6 +143,8 @@ function PerfilContent() {
     setSaveMessage(null);
     const rfcError = companyRfcError(form.rfc);
     if (rfcError) { setSaveMessage(rfcError); return; }
+    const numberError = phoneError(phone) || phoneError(whatsapp);
+    if (numberError) { setSaveMessage(numberError); return; }
     if (previewMode) {
       setSaved(true);
       return;
@@ -153,9 +164,9 @@ function PerfilContent() {
         description: form.description,
         location: form.location,
         website: form.website,
-        phone: form.phone,
+        phone: phoneValue(phone),
         email: form.email,
-        whatsapp: form.whatsapp,
+        whatsapp: phoneValue(whatsapp),
         categories: form.categories,
         logo_url: logoUrl,
       });
@@ -311,7 +322,7 @@ function PerfilContent() {
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
+        <div>
           <div>
             <label className="block text-sm font-medium text-slate-700">
               Ubicación
@@ -323,55 +334,23 @@ function PerfilContent() {
               className="mt-1 w-full rounded-lg border border-slate-300 px-4 py-2.5 focus:border-brand focus:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-1"
             />
           </div>
-          <div>
-            <label className="block text-sm font-medium text-slate-700">
-              Teléfono público
-            </label>
-            <input
-              value={form.phone}
-              onChange={(e) => setForm({ ...form, phone: e.target.value })}
-              placeholder="+52 55 0000 0000"
-              className="mt-1 w-full rounded-lg border border-slate-300 px-4 py-2.5 focus:border-brand focus:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-1"
-            />
-          </div>
         </div>
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-          <div>
-            <label className="block text-sm font-medium text-slate-700">
-              Web pública
-            </label>
-            <input
-              type="url"
-              value={form.website}
-              onChange={(e) => setForm({ ...form, website: e.target.value })}
-              placeholder="https://tuempresa.com"
-              className="mt-1 w-full rounded-lg border border-slate-300 px-4 py-2.5 focus:border-brand focus:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-1"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-slate-700">
-              Email público
-            </label>
-            <input
-              type="email"
-              value={form.email}
-              onChange={(e) => setForm({ ...form, email: e.target.value })}
-              placeholder="ventas@tuempresa.com"
-              className="mt-1 w-full rounded-lg border border-slate-300 px-4 py-2.5 focus:border-brand focus:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-1"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-slate-700">
-              WhatsApp público
-            </label>
-            <input
-              value={form.whatsapp}
-              onChange={(e) => setForm({ ...form, whatsapp: e.target.value })}
-              placeholder="+52 55 0000 0000"
-              className="mt-1 w-full rounded-lg border border-slate-300 px-4 py-2.5 focus:border-brand focus:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-1"
-            />
-          </div>
+        <div>
+          <label htmlFor="company-website" className="block text-sm font-medium text-slate-700">Web pública</label>
+          <input id="company-website" type="url" value={form.website} onChange={e => setForm({ ...form, website: e.target.value })} placeholder="https://tuempresa.com" className="mt-1 w-full rounded-lg border border-slate-300 px-4 py-2.5" />
         </div>
+        <fieldset className="rounded-xl border border-slate-200 p-4">
+          <legend className="px-1 text-sm font-semibold text-slate-700">Teléfono público</legend>
+          <PhoneInput id="company-phone" label="Teléfono" value={phone} onChange={setPhone} />
+        </fieldset>
+        <div>
+          <label htmlFor="company-email" className="block text-sm font-medium text-slate-700">Correo electrónico público</label>
+          <input id="company-email" type="email" value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} placeholder="ventas@tuempresa.com" className="mt-1 w-full rounded-lg border border-slate-300 px-4 py-2.5" />
+        </div>
+        <fieldset className="rounded-xl border border-slate-200 p-4">
+          <legend className="px-1 text-sm font-semibold text-slate-700">WhatsApp público</legend>
+          <PhoneInput id="company-whatsapp" label="WhatsApp" value={whatsapp} onChange={setWhatsapp} />
+        </fieldset>
 
         {saveMessage ? (
           <p role="alert" className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
