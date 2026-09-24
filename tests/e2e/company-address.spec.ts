@@ -29,7 +29,7 @@ test('required fields and unavailable lookup allow complete manual address, neve
   await page.getByRole('button', { name: 'Comprobar dirección' }).click();
   await expect(page.locator('output')).toBeEmpty();
   await page.getByLabel('Código postal *').fill('12345');
-  await expect(page.getByRole('status')).toContainText('manualmente');
+  await expect(page.locator('#address-postal-status')).toContainText('manualmente');
   await page.getByLabel('Estado *', { exact: true }).fill('Estado de prueba');
   await page.getByLabel('Municipio o alcaldía *').fill('Municipio de prueba');
   await page.getByLabel('Colonia o localidad *').fill('Colonia de prueba');
@@ -48,7 +48,7 @@ test('a late lookup cannot replace the zone of a different postal code', async (
   });
   await page.goto('/checks-address');
   await page.getByLabel('Código postal *').fill('01000');
-  await expect(page.getByRole('status')).toContainText('Buscando');
+  await expect(page.locator('#address-postal-status')).toContainText('Buscando');
   await page.getByLabel('Código postal *').fill('64000');
   await expect(page.getByLabel('Estado *', { exact: true })).toHaveValue('Nuevo León');
   release();
