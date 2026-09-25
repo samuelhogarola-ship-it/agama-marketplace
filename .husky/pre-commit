@@ -2,7 +2,7 @@
 
 # ── Gitleaks: escaneo de secretos ─────────────────────────────────────────────
 if command -v gitleaks > /dev/null 2>&1; then
-  gitleaks detect --source . --no-banner --redact
+  gitleaks protect --staged --source . --no-banner --redact
   if [ $? -ne 0 ]; then
     echo ""
     echo "❌  Gitleaks encontró un posible secreto."

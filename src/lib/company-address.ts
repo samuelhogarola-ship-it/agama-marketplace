@@ -23,3 +23,12 @@ export function addressValues(value: CompanyAddress) {
   const address = Object.fromEntries(Object.entries(value).map(([key, text]) => [key, text.trim()])) as CompanyAddress;
   return { address, location: `${address.municipality}, ${address.state}` };
 }
+
+// The owner RPC serializes every actual table column, including null values.
+// An absent key means this deployment still uses the pre-migration schema.
+export function supportsCompanyAddress(company: unknown): boolean {
+  return !!company && typeof company === 'object' && Object.hasOwn(company, 'address');
+}
+export function addressFieldsForSave(supported: boolean, value: CompanyAddress, legacyLocation: string) {
+  return supported ? addressValues(value) : { location: legacyLocation };
+}

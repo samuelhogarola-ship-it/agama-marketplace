@@ -47,3 +47,9 @@ export async function saveCompany(client: SupabaseClient, user: CompanyUser, fie
   if (created.error) throw created.error;
   if (!created.data) throw new Error("No se pudo guardar la ficha de empresa.");
 }
+
+// Opening an editable form must not reserve a registration RFC before the owner
+// can correct it (for example if another company already uses that RFC).
+export function loadCompanyForEditing(client: SupabaseClient, user: CompanyUser) {
+  return loadCompany(client, { ...user, user_metadata: { ...user.user_metadata, rfc: undefined } });
+}

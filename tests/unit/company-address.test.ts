@@ -29,3 +29,17 @@ test('local catalog resolves a leading-zero code and all colonies of a shared co
  assert.equal(await lookupPostalCode('00000'), null);
  assert.equal(await lookupPostalCode('../01000'), null);
 });
+
+test('structured address is enabled only when the owner response contains the migrated field', async () => {
+ const { supportsCompanyAddress } = await import('../../src/lib/company-address.ts');
+ assert.equal(supportsCompanyAddress({name:'Legacy company'}),false);
+ assert.equal(supportsCompanyAddress(null),false);
+ assert.equal(supportsCompanyAddress({address:null}),true);
+ assert.equal(supportsCompanyAddress({address:complete}),true);
+});
+
+test('legacy schema save omits address entirely; migrated schema includes it', async () => {
+ const { addressFieldsForSave } = await import('../../src/lib/company-address.ts');
+ assert.deepEqual(addressFieldsForSave(false, complete, 'CDMX'), { location:'CDMX' });
+ assert.deepEqual(addressFieldsForSave(true, complete, 'CDMX'), addressValues(complete));
+});
