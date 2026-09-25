@@ -1,3 +1,5 @@
+import type { CompanyAddress } from "./company-address";
+
 export type ListingStatus = "draft" | "pending_review" | "published" | "rejected" | "paused" | "blocked";
 export type ListingType = "product" | "service" | "ad";
 export type TicketStatus = "open" | "in_progress" | "resolved" | "closed";
@@ -12,6 +14,7 @@ export type Company = {
   slug: string;
   description: string | null;
   location: string | null;
+  address?: CompanyAddress | null;
   website: string | null;
   phone: string | null;
   email: string | null;

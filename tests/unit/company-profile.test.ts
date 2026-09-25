@@ -1,13 +1,13 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { createClient } from "@supabase/supabase-js";
-import { loadCompany, saveCompany } from "../../src/lib/company-profile.ts";
+import { loadCompany, loadCompanyForEditing, saveCompany } from "../../src/lib/company-profile.ts";
 
 const user = { id: "11111111-1111-4111-8111-111111111111", email: "test@example.com", user_metadata: { company_name: "Envases Prueba", accepted_terms_at: "2026-09-23T00:00:00Z" } };
 const fields = { name: "Envases Actualizados", rfc: "B12345678", description: "Envases industriales", location: "México", website: "", phone: "", email: "", whatsapp: "", categories: null };
 
 // HTTP boundary: real Supabase client, controlled PostgREST responses.
-function database(initial: Record<string, unknown> | null, failure?: "read" | "write" | "zero") {
+function database(initial: Record<string, unknown> | null, failure?: "read" | "write" | "zero" | "duplicate-rfc") {
   let row = initial;
   const client = createClient("https://test.supabase.co", "test-key", {
     auth: { persistSession: false, autoRefreshToken: false },
@@ -23,6 +23,7 @@ function database(initial: Record<string, unknown> | null, failure?: "read" | "w
       if (url.searchParams.has("select") && url.searchParams.get("select") !== "id") return reply({ code: "42501", message: "permission denied for table mkt_companies" }, 403);
       if (failure === "write") return reply({ code: "23505", message: "duplicate key mkt_companies_rfc_uidx" }, 409);
       const body = JSON.parse(String(init?.body));
+      if (failure === "duplicate-rfc" && body.rfc) return reply({ code: "23505", message: "duplicate RFC" }, 409);
       if (body.categories === null) return reply({ code: "23502", message: "null value in column categories violates not-null constraint" }, 400);
       if (method === "POST") {
         if (row) return reply({ code: "23505", message: "duplicate primary key" }, 409);
@@ -112,4 +113,24 @@ test("saving selected contact channels clears disabled public contacts and survi
   assert.equal(twoChannels.phone, "+525512345678");
   assert.equal(twoChannels.whatsapp, "+34612345678");
   assert.equal(twoChannels.email, null);
+});
+
+// Address travels through the same owner-scoped persistence flow as the profile.
+test("structured address round trips without publishing the street as location", async () => {
+  const db = database({ id: user.id, name: "Empresa", slug: "original" });
+  const address = { postalCode: "01000", state: "Ciudad de México", municipality: "Álvaro Obregón", colony: "San Ángel", street: "Revolución", exterior: "12", interior: "2B" };
+  await saveCompany(db.client, user, { ...fields, address, location: "Álvaro Obregón, Ciudad de México" });
+  const reopened = await loadCompany(db.client, user);
+  assert.deepEqual(reopened.address, address);
+  assert.equal(reopened.location, "Álvaro Obregón, Ciudad de México");
+});
+
+test("opening an editable first profile does not reserve a conflicting registration RFC", async () => {
+  const registeredUser = { ...user, user_metadata: { ...user.user_metadata, rfc: "ABC010203XY9" } };
+  const db = database(null, "duplicate-rfc");
+  const company = await loadCompanyForEditing(db.client, registeredUser);
+  assert.equal(company.id, user.id);
+  assert.equal(company.rfc, undefined);
+  await saveCompany(db.client, user, { ...fields, rfc: null });
+  assert.equal((await loadCompany(db.client, user)).rfc, null);
 });

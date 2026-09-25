@@ -59,7 +59,7 @@ La conversión se produce fuera de la plataforma: visita a la web del proveedor,
 ### Acceso autenticado
 
 - Registro e inicio de sesión (email + contraseña; magic link).
-- Panel privado de empresa: editar perfil, gestionar anuncios.
+- Panel privado de empresa: editar perfil, gestionar anuncios. Dirección separada en código postal mexicano obligatorio, estado, municipio, colonia, calle y número exterior; interior opcional. Autocompletado postal con selección de colonia y alternativa manual. La dirección completa es privada; la ubicación pública muestra municipio y estado.
 - Crear, editar y eliminar anuncios (hasta 5 activos, hasta 5 fotos por anuncio).
 - Enlace a web propia de la empresa y datos de contacto externos visibles.
 - Gestión de categorías y etiquetas en cada anuncio.

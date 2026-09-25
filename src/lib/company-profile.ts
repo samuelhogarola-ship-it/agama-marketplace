@@ -2,7 +2,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Company } from "./types";
 
 type CompanyUser = { id: string; email?: string; user_metadata: Record<string, unknown> };
-export type CompanyFields = Pick<Company, "name" | "rfc" | "description" | "location" | "website" | "phone" | "email" | "whatsapp" | "categories"> & Partial<Pick<Company, "logo_url">>;
+export type CompanyFields = Pick<Company, "name" | "rfc" | "description" | "location" | "website" | "phone" | "email" | "whatsapp" | "categories"> & Partial<Pick<Company, "logo_url" | "address">>;
 
 function initialCompany(user: CompanyUser, name: string) {
   const slug = name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")
@@ -46,4 +46,10 @@ export async function saveCompany(client: SupabaseClient, user: CompanyUser, fie
     .insert({ ...initialCompany(user, fields.name), ...values }).select("id").single();
   if (created.error) throw created.error;
   if (!created.data) throw new Error("No se pudo guardar la ficha de empresa.");
+}
+
+// Opening an editable form must not reserve a registration RFC before the owner
+// can correct it (for example if another company already uses that RFC).
+export function loadCompanyForEditing(client: SupabaseClient, user: CompanyUser) {
+  return loadCompany(client, { ...user, user_metadata: { ...user.user_metadata, rfc: undefined } });
 }

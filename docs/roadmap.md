@@ -22,6 +22,7 @@ Estado: **completa en código**.
 
 - [x] Registro y login por magic link con callback PKCE.
 - [x] Onboarding y edición de ficha profesional de empresa.
+- [ ] Publicar dirección separada con código postal obligatorio y autocompletado local: aplicar primero la migración aditiva `0016_company_address.sql` y verificar guardado.
 - [x] Directorio `/empresas` con búsqueda, categoría, ubicación y perfiles públicos.
 - [x] Catálogo por categoría, buscador general y fichas públicas de anuncios.
 - [x] CRUD de anuncios: publicar, editar, pausar, reactivar y eliminar.

@@ -21,7 +21,7 @@ El marketplace **no compite** con el negocio principal: pigmentos, masterbatch y
 ## Alcance funcional v1 (MVP)
 
 1. Registro/login de perfil profesional (email + verificación).
-2. Ficha de empresa pública (logo, descripción, ubicación, categorías).
+2. Ficha de empresa pública (logo, descripción, municipio/estado, categorías). Dirección privada en campos separados con código postal mexicano obligatorio y autocompletado de zona.
 3. Publicar producto: título, descripción, categoría, precio (u "a consultar"), hasta 5 fotos, ubicación.
 4. Límite de 5 productos activos por cuenta (free).
 5. Catálogo público con búsqueda y filtros (categoría, zona, precio).

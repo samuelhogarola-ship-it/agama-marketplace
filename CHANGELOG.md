@@ -1,3 +1,12 @@
+## Verificación de commits — 2026-09-25
+
+- Husky escanea con Gitleaks los archivos del commit, evitando descargar todo el historial en clones parciales. CI conserva el escaneo del historial.
+
+## Dirección de empresa por código postal — 2026-09-25
+
+- Dirección en campos separados con código postal mexicano obligatorio de 5 cifras. Autocompletado de estado, municipio y colonia desde catálogo local; selección de colonia cuando hay varias y captura manual disponible.
+- Calle y número exterior obligatorios, interior opcional. Dirección completa privada; municipio y estado en la ubicación pública. Se activa al detectar la migración aditiva 0016. Antes de aplicarla, conserva el formulario anterior y omite la columna nueva al guardar para permitir un despliegue compatible.
+
 ## Contactos independientes — 2026-09-24
 
 - Tres opciones independientes: teléfono, correo electrónico y WhatsApp. Se exige al menos una completa y se validan solo las activadas.

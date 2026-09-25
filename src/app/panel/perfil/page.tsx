@@ -6,8 +6,11 @@ import { createClient } from "@/lib/supabase/client";
 import { CATEGORIES } from "@/lib/categories";
 import { compressImage } from "@/lib/compress-image";
 import { DEMO_COMPANY, DEMO_PREVIEW_ENABLED } from "@/lib/demo-data";
-import { saveCompany } from "@/lib/company-profile";
+import { loadCompanyForEditing, saveCompany } from "@/lib/company-profile";
 import { normalizeTaxId, taxIdSaveError, companyRfcInput, companyRfcError } from "@/lib/tax-id";
+
+import CompanyAddressFields from "@/components/CompanyAddressFields";
+import { EMPTY_ADDRESS, addressError, addressFieldsForSave, supportsCompanyAddress, type CompanyAddress } from "@/lib/company-address";
 
 import CompanyContactFields from "@/components/CompanyContactFields";
 import { readPhone, contactError, contactValues, type PhoneDraft, type ContactSelection } from "@/lib/company-phone";
@@ -27,6 +30,8 @@ function PerfilContent() {
     whatsapp: "",
     categories: [] as string[],
   });
+  const [addressSupported, setAddressSupported] = useState(previewMode);
+  const [address, setAddress] = useState<CompanyAddress>({ ...EMPTY_ADDRESS });
   const [contacts, setContacts] = useState<ContactSelection>({ phone: false, email: false, whatsapp: false });
   const [phone, setPhone] = useState<PhoneDraft>({ country: "", national: "" });
   const [whatsapp, setWhatsapp] = useState<PhoneDraft>({ country: "", national: "" });
@@ -53,6 +58,7 @@ function PerfilContent() {
         whatsapp: DEMO_COMPANY.whatsapp ?? "",
         categories: DEMO_COMPANY.categories ?? [],
       });
+      setAddress({ ...EMPTY_ADDRESS, ...DEMO_COMPANY.address });
       setContacts({ phone: !!DEMO_COMPANY.phone?.trim(), email: !!DEMO_COMPANY.email?.trim(), whatsapp: !!DEMO_COMPANY.whatsapp?.trim() });
       setPhone(readPhone(DEMO_COMPANY.phone));
       setWhatsapp(readPhone(DEMO_COMPANY.whatsapp));
@@ -70,13 +76,16 @@ function PerfilContent() {
         router.replace("/ingresar?next=/panel/perfil");
         return;
       }
-      const { data, error } = await supabase.rpc("mkt_my_company");
-      if (error) {
+      let data;
+      try {
+        data = await loadCompanyForEditing(supabase, user);
+      } catch {
         setLoadFailed(true);
         setSaveMessage("No se pudo cargar tu ficha. Recarga la página antes de guardar.");
         setLoading(false);
         return;
       }
+      setAddressSupported(supportsCompanyAddress(data));
       if (data) {
         setForm({
           name: data.name ?? "",
@@ -89,6 +98,7 @@ function PerfilContent() {
           whatsapp: data.whatsapp ?? "",
           categories: data.categories ?? [],
         });
+        setAddress({ ...EMPTY_ADDRESS, ...data.address });
         setContacts({ phone: !!data.phone?.trim(), email: !!data.email?.trim(), whatsapp: !!data.whatsapp?.trim() });
         setPhone(readPhone(data.phone));
         setWhatsapp(readPhone(data.whatsapp));
@@ -146,6 +156,8 @@ function PerfilContent() {
     setSaveMessage(null);
     const rfcError = companyRfcError(form.rfc);
     if (rfcError) { setSaveMessage(rfcError); return; }
+    const locationError = addressSupported ? addressError(address) : null;
+    if (locationError) { setSaveMessage(locationError); return; }
     const numberError = contactError(contacts, { phone, whatsapp, email: form.email });
     if (numberError) { setSaveMessage(numberError); return; }
     if (previewMode) {
@@ -165,7 +177,7 @@ function PerfilContent() {
         name: form.name.trim(),
         rfc: normalizeTaxId(form.rfc),
         description: form.description,
-        location: form.location,
+        ...addressFieldsForSave(addressSupported, address, form.location),
         website: form.website,
         ...contactValues(contacts, { phone, whatsapp, email: form.email }),
         categories: form.categories,
@@ -323,19 +335,10 @@ function PerfilContent() {
           </div>
         </div>
 
-        <div>
-          <div>
-            <label className="block text-sm font-medium text-slate-700">
-              Ubicación
-            </label>
-            <input
-              value={form.location}
-              onChange={(e) => setForm({ ...form, location: e.target.value })}
-              placeholder="Iztapalapa, CDMX"
-              className="mt-1 w-full rounded-lg border border-slate-300 px-4 py-2.5 focus:border-brand focus:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-1"
-            />
-          </div>
-        </div>
+        {addressSupported ? <CompanyAddressFields value={address} onChange={setAddress} previousLocation={form.location} /> : <div>
+          <label htmlFor="company-location" className="block text-sm font-medium text-slate-700">Ubicación</label>
+          <input id="company-location" value={form.location} onChange={e => setForm(current => ({ ...current, location: e.target.value }))} placeholder="Iztapalapa, CDMX" className="mt-1 w-full rounded-lg border border-slate-300 px-4 py-2.5" />
+        </div>}
         <div>
           <label htmlFor="company-website" className="block text-sm font-medium text-slate-700">Web pública</label>
           <input id="company-website" type="url" value={form.website} onChange={e => setForm({ ...form, website: e.target.value })} placeholder="https://tuempresa.com" className="mt-1 w-full rounded-lg border border-slate-300 px-4 py-2.5" />
