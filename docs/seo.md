@@ -1,51 +1,23 @@
-# Estrategia SEO — TodoPlásticos
+# SEO — TodoPlásticos
 
-## Objetivo
+## Objetivo y contenido
+Descubrimiento B2B de fabricantes y productos plásticos a escala nacional en México. Sin landings por ciudad ni segmentación editorial por alimentación, cosmética, limpieza o logística.
+Programa de dos meses: mes 1, envases/botellas, bolsas/película, tarimas/contenedores y cubetas/bidones; mes 2, perfiles/láminas, tubería/conexiones, empaques/embalaje y productos terminados. Estas ocho familias son la prioridad editorial; las demás categorías existentes se conservan.
+Cuatro artículos previstos, dos por mes: elección de envases, bolsas/película, tarimas y empaques. Cada guía debe enlazar a su categoría y a proveedores reales. Su redacción pertenece al programa de contenido, no a este arreglo técnico.
 
-Capturar búsquedas transaccionales del sector plástico en CDMX: "tarimas de plástico cdmx", "venta de plástico molido", "cubetas de plástico mayoreo", "proveedores de envases de plástico ciudad de méxico".
+## URLs e indexación
+- Dominio actual: https://todo-plastico.com. No se cambia por el nombre comercial.
+- Categorías `/c/{categoria}`, anuncios `/p/{slug}-{id}`, empresas `/e/{slug}`, artículos `/articulos/{slug}`.
+- Cada página de paginación tiene canonical propio; página 1 y parámetros de seguimiento se normalizan a la URL limpia.
+- Variantes de búsqueda, filtros y orden distinto del predeterminado: `noindex, follow`, canonical propio normalizado. No bloquearlas en robots: Google necesita leer el noindex.
+- No crear redirecciones masivas de anuncios retirados hacia páginas irrelevantes. Mantener 404 cuando ya no hay contenido público equivalente.
+- Sitemap: todas las filas públicas mediante paginación estable; lastmod solo con fechas reales. Si falla la base de datos, fallar la respuesta en vez de anunciar un sitemap incompleto como válido.
+- Un sitemap XML admite 50.000 URLs: antes de alcanzar ese volumen, separar mediante índice de sitemaps. El arreglo actual elimina el recorte de la consulta a 5.000 filas; no implementa aún particiones XML.
 
-## Arquitectura de URLs (el SEO se decide aquí)
-
-```
-/                                → home (directorio B2B de plásticos)
-/c/{categoria}                   → landing de categoría (ej. /c/tarimas-y-contenedores)
-/p/{slug-anuncio}-{id}           → ficha de anuncio
-/e/{slug-empresa}                → ficha de proveedor
-/blog/{slug}                     → contenido editorial (fase 4+)
-```
-
-- Todo renderizado en servidor (SSR/SSG) — nada de catálogo client-side-only.
-- Slugs en español, sin acentos, con guiones.
-- Anuncios despublicados → `410` o redirect a su categoría (no 404 masivos).
-
-## Páginas de categoría = arma principal
-
-Cada landing de categoría lleva: H1 con keyword + "CDMX", texto único de 150–300 palabras (qué es, usos, cómo comprar), listado de productos, FAQ corta. Son las páginas que posicionan; las fichas de producto rotan demasiado.
-
-## Datos estructurados (JSON-LD)
-
-- Ficha de anuncio: `Product` + `Offer` (precio o `priceSpecification` omitido si "a consultar") + `ItemList` en categorías.
-- Ficha de empresa: `LocalBusiness` con dirección y zona.
-- Home: `WebSite` + `SearchAction` (sitelinks searchbox).
-- Blog: `Article` + `FAQPage` donde aplique.
-
-## Dominio y lanzamiento
-
-El desarrollo/staging vive en `*.vercel.app`, pero ese subdominio **no debe indexarse nunca** (`X-Robots-Tag: noindex` mientras no haya dominio final). El dominio de lanzamiento es `todo-plastico.com`; debe conectarse antes de publicar el catálogo y acompañarse con canonical y redirecciones 301 desde cualquier URL temporal.
-
-## Técnico
-
-- `sitemap.xml` dinámico segmentado (categorías / productos / empresas), ping en publicación.
-- `robots.txt`: bloquear `/admin`, `/panel`, parámetros de filtro; permitir el resto.
-- Canonical en fichas y categorías (los filtros no generan URLs indexables).
-- Imágenes: WebP + `alt` generado desde título/categoría, lazy-load, tamaños fijos (CLS).
-- Core Web Vitals presupuesto: LCP < 2.5s móvil en fichas y categorías.
-- Idioma: solo `es-MX` en v1 — sin hreflang hasta que haya EN.
-
-## Contenido (fase 4+)
-
-Blog orientado a demanda: guías de compra ("cómo elegir tarimas de plástico"), precios de mercado, directorio por zona. Cada artículo enlaza a su categoría. Los datos de `search_queries` sin resultados dictan el calendario editorial.
+## Datos estructurados
+Anuncios Product, Service o CreativeWork según su tipo. Solo productos con precio numérico válido incluyen Offer. No se declara inventario sin un dato real de stock. Empresas como Organization con ubicación pública de texto; sin convertirla artificialmente en dirección postal ni publicar campos privados.
 
 ## Medición
+Umami: visitas al perfil/anuncios y contactos atribuibles a cada empresa. Search Console complementa consultas, impresiones, clics e indexación; no son métricas disponibles por arte de magia en Umami. No se prometen posiciones ni volúmenes sin línea base.
 
-Search Console desde el día 1 + panel con: clics/impresiones por categoría, páginas indexadas, búsquedas internas sin resultado. KPI: 1.000 clics orgánicos/mes a los 6 meses del lanzamiento.
+Referencia: https://developers.google.com/search/docs/specialty/ecommerce/pagination-and-incremental-page-loading

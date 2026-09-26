@@ -115,3 +115,9 @@
 - Definición del proyecto: visión, roadmap por fases, especificación del watcher IA, estrategia SEO y stack propuesto (`docs/`).
 - Gobernanza del repo (`CLAUDE.md`): ramas + PR, límites de producto no negociables, seguridad.
 - Tooling base: `.pre-commit-config.yaml` (gitleaks, no-commit-to-main), `playwright.config.ts`, workflow de CI.
+
+### SEO técnico (septiembre 2026)
+- Canonical propio para páginas del catálogo y directorio; variantes filtradas noindex/follow y paginación validada.
+- Datos estructurados acordes al anuncio y empresa, sin inventar existencias ni precios.
+- Sitemap paginado sin recorte a 5.000 filas ni fechas de modificación ficticias; error explícito ante fallo de datos.
+- Estrategia documentada para México completo y ocho familias durante dos meses.

@@ -1,3 +1,4 @@
+import { listingStructuredData } from "@/lib/structured-data";
 import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
@@ -241,22 +242,7 @@ export default async function ProductPage({ params }: Props) {
       .limit(4),
   ]);
 
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@type": "Product",
-    name: product.title,
-    description: product.description,
-    image: photos.map((p) => photoUrl(p.storage_path)),
-    category: cat?.name,
-    offers: {
-      "@type": "Offer",
-      availability: "https://schema.org/InStock",
-      areaServed: "México",
-      price: product.price_mxn,
-      priceCurrency: "MXN",
-      seller: { "@type": "Organization", name: product.company?.name },
-    },
-  };
+  const jsonLd = listingStructuredData(product, photos.map((p) => photoUrl(p.storage_path)), cat?.name);
 
   return (
     <main className="mx-auto w-full max-w-7xl px-5 py-8 sm:px-8 lg:px-12">
