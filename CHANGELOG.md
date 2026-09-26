@@ -38,6 +38,13 @@
 
 ## [Unreleased]
 
+### Atribución de estadísticas Umami
+- Contactos limitados al perfil y anuncios de la empresa autenticada, sin sumar contactos ajenos.
+- Comparativa anterior real de anuncios y consulta completa sin truncar a 20 fichas.
+- Periodos válidos entre 1 y 90 días; errores de datos diferenciados de actividad cero.
+- Visitantes únicos del perfil sin sumar personas repetidas entre páginas.
+
+
 ### Moderación
 - Los anuncios nuevos, editados o reactivados quedan en revisión sin llamar automáticamente a OpenAI.
 - La valoración con IA solo puede iniciarla un administrador desde la cola y nunca publica ni rechaza: la decisión final continúa siendo humana.

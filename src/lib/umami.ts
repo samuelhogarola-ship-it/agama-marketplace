@@ -93,3 +93,14 @@ export async function getPageviews(
 export function isConfigured(): boolean {
   return !!(UMAMI_USER && UMAMI_PASS);
 }
+
+/** Exact page and event filters prevent site-wide contacts leaking into company totals. */
+export async function getContactClicks(startAt: number, endAt: number, url: string): Promise<number | null> {
+  const metrics = await umamiGet<UmamiMetric[]>("/metrics", {
+    type: "event", event: "contact_click", url,
+    startAt: String(startAt), endAt: String(endAt), limit: "1",
+  });
+  if (!metrics) return null;
+  const count = metrics.find((metric) => metric.x === "contact_click")?.y ?? 0;
+  return Number.isFinite(count) && count >= 0 ? count : null;
+}
