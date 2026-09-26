@@ -16,9 +16,11 @@ for (const [file, type, destination] of [
     const url = new URL(href.replaceAll('{{ .SiteURL }}','https://todo-plastico.com').replaceAll('{{ .TokenHash }}','test-hash').replaceAll('&amp;','&'));
     assert.equal(url.origin,'https://todo-plastico.com');
     assert.equal(url.pathname,'/auth/confirm');
-    assert.equal(url.searchParams.get('next'),destination);
+    assert.equal(url.search, '');
+    const params = new URLSearchParams(url.hash.slice(1));
+    assert.equal(params.get('next'),destination);
     let verified = false;
-    const result = await authenticateAuthCallback(url.searchParams, {
+    const result = await authenticateAuthCallback(params, {
       exchangeCodeForSession:async()=>{throw new Error('PKCE should not be required');},
       verifyOtp:async(input)=>{assert.deepEqual(input,{type,token_hash:'test-hash'}); verified = true; return {error:null};},
     });

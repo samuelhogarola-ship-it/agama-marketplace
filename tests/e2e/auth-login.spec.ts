@@ -16,7 +16,7 @@ test('login and recovery present Spanish actions',async({page})=>{
   await expect(page.getByRole('heading',{level:1})).toContainText('contraseña');
 });
 test('opening an email link repeatedly only displays a confirmation form',async({request})=>{
-  const url='/auth/confirm?token_hash=test-hash&type=email&next=%2Fpanel';
+  const url='/auth/confirm';
   for (let attempt=0; attempt<2; attempt++) {
     const response=await request.get(url);
     expect(response.status()).toBe(200);
@@ -26,7 +26,8 @@ test('opening an email link repeatedly only displays a confirmation form',async(
     const html=await response.text();
     expect(html).toContain('method="post"');
     expect(html).toContain('Continuar en TodoPlásticos');
-    expect(html).not.toMatch(/<script|<img|<iframe/);
+    expect(html).not.toMatch(/<script src|<img|<iframe/);
+    expect(response.headers()['content-security-policy']).toContain("script-src 'sha256-");
   }
 });
 test('confirmation rejects cross-origin submissions',async({request})=>{
@@ -39,7 +40,8 @@ test('invalid confirmation submission returns to the Spanish login error',async(
   expect(response.headers().location).toBe(`${baseURL}/ingresar?error=enlace-invalido`);
 });
 test('the same-origin confirmation button submits successfully without exposing the token in the referrer',async({page})=>{
-  await page.goto('/auth/confirm?token_hash=invalid-test-hash&type=email&next=%2Fpanel',{waitUntil:'domcontentloaded'});
+  await page.goto('/auth/confirm#token_hash=invalid-test-hash&type=email&next=%2Fpanel',{waitUntil:'domcontentloaded'});
+  await expect(page).toHaveURL(/\/auth\/confirm$/);
   const submitted = page.waitForRequest(request => request.method() === 'POST' && new URL(request.url()).pathname === '/auth/confirm');
   await page.getByRole('button',{name:'Continuar en TodoPlásticos'}).click();
   const request = await submitted;
@@ -48,4 +50,14 @@ test('the same-origin confirmation button submits successfully without exposing 
   expect(request.headers().referer).toBe(`${origin}/`);
   await expect(page).toHaveURL(/\/ingresar\?error=enlace-invalido/);
   await expect(page.getByText('El enlace expiró o ya fue usado. Solicita uno nuevo.')).toBeVisible();
+});
+
+test('missing or unsupported email fragments do not expose a submit button',async({page})=>{
+  for (const suffix of ['', '#token_hash=test-hash&type=unsupported']) {
+    await page.goto('about:blank');
+    await page.goto('/auth/confirm'+suffix);
+    await expect(page.getByRole('button',{name:'Continuar en TodoPlásticos'})).toBeHidden();
+    await expect(page.getByText('Enlace no válido. Solicita un nuevo enlace para continuar.')).toBeVisible();
+    await expect(page).toHaveURL(/\/auth\/confirm$/);
+  }
 });

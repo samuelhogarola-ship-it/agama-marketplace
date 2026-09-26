@@ -48,4 +48,6 @@ node scripts/seed-launch-data.mjs
 Desde `/ingresar` se admite contraseña o enlace de acceso por correo.
 
 ## Aperturas automáticas del correo
-Los enlaces nuevos abren `/auth/confirm`: GET muestra un botón y no consume el token. Solo el POST del botón verifica el código y crea la sesión. Esta respuesta no incluye analítica ni recursos externos y usa no-store, noindex y no-referrer. El callback anterior se conserva para enlaces antiguos y PKCE. Publicar esta ruta antes de activar las plantillas.
+Los enlaces nuevos abren `/auth/confirm`: GET muestra un botón y no consume el token. Solo el POST del botón verifica el código y crea la sesión. Esta respuesta no incluye analítica ni recursos externos y usa no-store, noindex y strict-origin. El callback anterior se conserva para enlaces antiguos y PKCE. Publicar esta ruta antes de activar las plantillas.
+
+El token viaja en el fragmento del enlace (`#`), no en la consulta enviada al servidor. La página lo retira de la barra de direcciones y prepara el formulario; requiere JavaScript y un clic explícito. La política CSP solo permite el script propio identificado por su hash.
