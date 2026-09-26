@@ -68,7 +68,7 @@ function LoginForm() {
         <div className="text-5xl mb-4">📬</div>
         <p className="text-slate-700 font-medium">Revisa tu correo</p>
         <p className="mt-2 text-sm text-slate-500">
-          Enviamos un enlace a <strong>{email}</strong>. Ábrelo desde este mismo navegador.
+          Enviamos un enlace a <strong>{email}</strong>. Abre el enlace para acceder a tu cuenta.
         </p>
         <p className="mt-2 text-xs text-slate-400">¿No lo ves? Revisa la carpeta de spam.</p>
         <button onClick={() => setSent(false)} className="mt-6 text-sm text-brand font-medium hover:underline">

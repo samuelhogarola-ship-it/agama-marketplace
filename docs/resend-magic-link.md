@@ -21,33 +21,11 @@ En el proyecto Supabase `tiynnllrcdhsvrzsdsct`, configurar:
   - Username: `resend`
   - Password: API key de Resend
 
-### Plantilla Magic Link
+### Plantillas en español
 
-En Authentication > Emails > Templates > Magic Link, el botón debe usar el hash directamente y no `{{ .ConfirmationURL }}`:
+Los HTML versionados y los asuntos están en `supabase/email-templates/`. La guía vigente de activación y costes es [auth-email-setup.md](auth-email-setup.md). Un merge no activa automáticamente las plantillas en el proyecto alojado.
 
-```html
-<a href="{{ .RedirectTo }}&token_hash={{ .TokenHash }}&type=email">
-  Ingresar en TodoPlásticos
-</a>
-```
-
-La aplicación siempre envía un `emailRedirectTo` que ya contiene `?next=...`, por eso la plantilla añade los parámetros con `&`. El callback `/auth/callback` valida el hash mediante `verifyOtp` y guarda la sesión en cookies.
-
-No usar `{{ .ConfirmationURL }}` para este flujo SSR: genera un `code` PKCE que depende del verificador almacenado en el navegador donde se solicitó el correo y falla con `pkce_code_verifier_not_found` si el enlace se abre en otro contexto.
-
-### Plantilla de recuperación
-
-La plantilla Reset Password debe seguir el mismo patrón, usando el tipo `recovery`:
-
-```html
-<a href="{{ .RedirectTo }}&token_hash={{ .TokenHash }}&type=recovery">
-  Cambiar mi contraseña
-</a>
-```
-
-El formulario envía como destino `/auth/callback?next=/panel/ajustes`, donde el usuario puede establecer la contraseña nueva después de que el callback valide el hash.
-
-En Resend, desactivar el seguimiento de enlaces para los correos de autenticación. Los enlaces reescritos o prefetched pueden consumir tokens de un solo uso.
+Los botones usan `{{ .SiteURL }}/auth/callback` y `{{ .TokenHash }}` para verificar en servidor sin depender del verificador PKCE de otro navegador. Site URL debe coincidir con el dominio HTTPS de producción y no terminar en slash. Los enlaces de acceso llevan al panel; recuperación e invitación llevan a los ajustes de cuenta. Mantener desactivado el seguimiento de enlaces del proveedor.
 
 ## Variables locales
 
@@ -67,4 +45,4 @@ Para sembrar categorías y la empresa AGAMA:
 node scripts/seed-launch-data.mjs
 ```
 
-El usuario admin entra desde `/ingresar` con magic link. No se usa contraseña en la interfaz.
+Desde `/ingresar` se admite contraseña o enlace de acceso por correo.
