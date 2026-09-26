@@ -128,3 +128,11 @@
 - Datos estructurados acordes al anuncio y empresa, sin inventar existencias ni precios.
 - Sitemap paginado sin recorte a 5.000 filas ni fechas de modificación ficticias; error explícito ante fallo de datos.
 - Estrategia documentada para México completo y ocho familias durante dos meses.
+
+### Correos de autenticación en español
+- Seis plantillas y asuntos versionados con marca TodoPlásticos y enlaces al dominio configurado de la web.
+- Pruebas de compatibilidad de enlaces con el callback y navegación de login/recuperación.
+- Guía de SMTP, verificación DNS y costes. Activación de plantillas y remitente pendiente de acceso al panel de Supabase y dominio confirmado; el merge no cambia la configuración alojada.
+- La confirmación por correo requiere pulsar un botón antes de consumir el token; se evita la validación al abrir el enlace automáticamente y se endurecen los destinos locales del login.
+
+- Los tokens de correo nuevos viajan en fragmentos y se eliminan de la URL antes de confirmar; cabeceras de la ruta protegidas frente a la configuración general.

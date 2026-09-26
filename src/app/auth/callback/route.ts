@@ -1,4 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server";
+import { sanitizeAuthNext } from "@/lib/auth-redirect";
 import { authenticateAuthCallback } from "@/lib/auth-callback";
 import { createRouteClient } from "@/lib/supabase/server";
 
@@ -7,7 +8,7 @@ export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const origin = process.env.NEXT_PUBLIC_SITE_URL ?? request.nextUrl.origin;
   const next = searchParams.get("next") ?? "/panel";
-  const safeNext = next.startsWith("/") && !next.startsWith("//") ? next : "/panel";
+  const safeNext = sanitizeAuthNext(next, "/panel");
 
   const successResponse = NextResponse.redirect(`${origin}${safeNext}`);
   const supabase = createRouteClient(request, successResponse);
