@@ -196,7 +196,7 @@ export default function EstadisticasPage() {
                 delta: delta(stats.profile.pageviews, stats.prevPeriod.profilePageviews),
               },
               { label: "Visitas anuncios", value: stats.listings.totalPageviews, delta: null },
-              { label: "Visitantes únicos", value: stats.profile.visitors + stats.listings.totalVisitors, delta: null },
+              { label: "Visitantes únicos del perfil", value: stats.profile.visitors, delta: null },
               { label: "Clics de contacto", value: stats.contactClicks, delta: null },
             ] as const).map((m) => (
               <div key={m.label} className="rounded-xl border border-slate-200 bg-white px-5 py-5">
