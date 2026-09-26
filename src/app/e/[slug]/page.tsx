@@ -1,3 +1,4 @@
+import { companyStructuredData } from "@/lib/structured-data";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
@@ -59,21 +60,8 @@ export default async function CompanyPage({ params }: Props) {
     ? CATEGORIES.filter((c) => (profile.categories as string[]).includes(c.slug))
     : [];
 
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@type": "LocalBusiness",
-    name: profile.name,
-    description: profile.description ?? undefined,
-    areaServed: "México",
-    address: profile.location
-      ? { "@type": "PostalAddress", addressLocality: profile.location, addressCountry: "MX" }
-      : undefined,
-    url: profile.website ?? undefined,
-    telephone: profile.phone ?? undefined,
-    email: profile.email ?? undefined,
-    logo: profile.logo_url ?? undefined,
-  };
   const base = process.env.NEXT_PUBLIC_SITE_URL ?? "https://todo-plastico.com";
+  const jsonLd = companyStructuredData(profile, `${base}/e/${slug}`);
   const breadcrumbJsonLd = {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",

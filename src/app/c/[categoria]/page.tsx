@@ -8,6 +8,7 @@ import ProductCard from "@/components/ProductCard";
 import type { Product } from "@/lib/types";
 import { safeJsonLd } from "@/lib/jsonld";
 import CategoryFilters from "@/components/CategoryFilters";
+import { catalogMetadata, pageNumber } from "@/lib/catalog-seo";
 import SortSelect from "@/components/SortSelect";
 
 export const revalidate = 300;
@@ -36,14 +37,14 @@ export function generateStaticParams() {
   return CATEGORIES.map((c) => ({ categoria: c.slug }));
 }
 
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
+export async function generateMetadata({ params, searchParams }: Props): Promise<Metadata> {
   const { categoria } = await params;
   const cat = categoryBySlug(categoria);
   if (!cat) return {};
   return {
     title: `Comprar ${cat.name} de plástico en México — Proveedores B2B`,
     description: `${cat.description} Contacta directo a empresas y proveedores del sector plástico en México. ${cat.keywords.slice(0, 3).join(", ")}.`,
-    alternates: { canonical: `/c/${cat.slug}` },
+    ...catalogMetadata(`/c/${cat.slug}`, await searchParams, ["location", "subcategory", "date", "type", "minPrice", "maxPrice", "sort"]),
   };
 }
 
@@ -54,7 +55,7 @@ export default async function CategoryPage({ params, searchParams }: Props) {
   if (!cat) notFound();
 
   const PAGE_SIZE = 24;
-  const page = Math.max(1, Number(first(filters.page) ?? 1));
+  const page = pageNumber(filters.page);
   const offset = (page - 1) * PAGE_SIZE;
   const location = first(filters.location)?.trim().slice(0, 80) || "";
   const subcategory = first(filters.subcategory)?.trim().slice(0, 50) || "";

@@ -90,7 +90,10 @@ test.describe("smoke — páginas públicas", () => {
     expect(robots.status()).toBe(200);
     expect(await robots.text()).toContain("sitemap");
     const sitemap = await request.get("/sitemap.xml");
-    expect(sitemap.status()).toBe(200);
+    // CI deliberately points Supabase at an unavailable endpoint. An outage must
+    // fail rather than publish a successful but incomplete sitemap.
+    const offline = process.env.NEXT_PUBLIC_SUPABASE_URL === "http://127.0.0.1:9";
+    expect(sitemap.status()).toBe(offline ? 500 : 200);
   });
 
   test("SEO: JSON-LD en landing de categoría", async ({ page }) => {

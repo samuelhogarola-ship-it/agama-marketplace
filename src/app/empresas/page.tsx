@@ -5,22 +5,26 @@ import { CATEGORIES } from "@/lib/categories";
 import { createClient } from "@/lib/supabase/server";
 import type { Company } from "@/lib/types";
 
-export const metadata: Metadata = {
-  title: "Empresas de plástico en México — TodoPlásticos",
+import { catalogMetadata, firstParam, pageNumber, type SearchParams } from "@/lib/catalog-seo";
+
+export async function generateMetadata({ searchParams }: Props): Promise<Metadata> {
+  return {
+  title: "Empresas de plástico en México",
   description: "Directorio de fabricantes, distribuidores y servicios profesionales de la industria plástica en México. Contacta directo con cada empresa.",
-  alternates: { canonical: "/empresas" },
-};
+  ...catalogMetadata("/empresas", await searchParams, ["q", "category", "location"]),
+  };
+}
 
 const PAGE_SIZE = 30;
 
-type Props = { searchParams: Promise<{ q?: string; category?: string; location?: string; page?: string }> };
+type Props = { searchParams: Promise<SearchParams> };
 
 export default async function EmpresasPage({ searchParams }: Props) {
   const params = await searchParams;
-  const query = (params.q ?? "").trim().slice(0, 80);
-  const category = params.category ?? "";
-  const location = (params.location ?? "").trim().slice(0, 80);
-  const page = Math.max(1, Number(params.page ?? 1));
+  const query = (firstParam(params.q) ?? "").trim().slice(0, 80);
+  const category = firstParam(params.category) ?? "";
+  const location = (firstParam(params.location) ?? "").trim().slice(0, 80);
+  const page = pageNumber(params.page);
   const offset = (page - 1) * PAGE_SIZE;
   const supabase = await createClient();
   let request = supabase
