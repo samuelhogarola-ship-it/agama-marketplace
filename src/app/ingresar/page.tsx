@@ -3,6 +3,7 @@
 import { Suspense, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
+import { sanitizeAuthNext } from "@/lib/auth-redirect";
 import { sendMagicLink } from "./actions";
 import { createClient } from "@/lib/supabase/client";
 
@@ -22,7 +23,7 @@ function LoginForm() {
   const [sent, setSent] = useState(false);
   const [loading, setLoading] = useState(false);
   const rawNext = params.get("next") ?? "/panel";
-  const next = rawNext.startsWith("/") && !rawNext.startsWith("//") ? rawNext : "/panel";
+  const next = sanitizeAuthNext(rawNext, "/panel");
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();

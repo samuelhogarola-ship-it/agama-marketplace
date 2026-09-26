@@ -1,5 +1,5 @@
 export function sanitizeAuthNext(value: string | null, fallback: string) {
-  return value?.startsWith("/") && !value.startsWith("//") ? value : fallback;
+  return value?.startsWith("/") && !value.startsWith("//") && !/[\\\u0000-\u001f\u007f]/.test(value) ? value : fallback;
 }
 
 export function resolveAuthOrigin(input: {

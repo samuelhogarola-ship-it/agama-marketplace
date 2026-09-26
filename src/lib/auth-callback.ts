@@ -23,6 +23,13 @@ const EMAIL_OTP_TYPES = new Set<EmailOtpType>([
   "signup",
 ]);
 
+export function getEmailConfirmation(params: URLSearchParams) {
+  const token_hash = params.get("token_hash");
+  const type = params.get("type") as EmailOtpType | null;
+  if (!token_hash || token_hash.length > 512 || !type || !EMAIL_OTP_TYPES.has(type)) return null;
+  return { token_hash, type };
+}
+
 export async function authenticateAuthCallback(
   searchParams: URLSearchParams,
   auth: AuthCallbackClient,
@@ -33,10 +40,9 @@ export async function authenticateAuthCallback(
     return { ok: !error, method: "code" as const, error };
   }
 
-  const tokenHash = searchParams.get("token_hash");
-  const type = searchParams.get("type") as EmailOtpType | null;
-  if (tokenHash && type && EMAIL_OTP_TYPES.has(type)) {
-    const { error } = await auth.verifyOtp({ token_hash: tokenHash, type });
+  const confirmation = getEmailConfirmation(searchParams);
+  if (confirmation) {
+    const { error } = await auth.verifyOtp(confirmation);
     return { ok: !error, method: "token_hash" as const, error };
   }
 

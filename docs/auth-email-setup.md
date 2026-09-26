@@ -7,7 +7,7 @@ Proyecto: `tiynnllrcdhsvrzsdsct`. Dominio web vigente: `https://todo-plastico.co
 ## Aplicación
 1. Abrir Authentication > Emails > Templates en el proyecto correcto. Guardar una copia privada de las plantillas actuales antes de sustituirlas.
 2. Copiar el asunto de `supabase/email-templates/subjects.json` y el HTML correspondiente: confirmation (Confirm sign up), magic-link (Magic link), recovery (Reset password), invite (Invite user), email-change (Change email address), reauthentication.
-3. Comprobar Authentication > URL Configuration: Site URL debe ser el origen HTTPS definitivo, sin slash final. Los botones usan esa URL y el callback existente con `token_hash`; recuperación dirige a `/panel/ajustes`. El acceso por correo dirige al panel.
+3. Comprobar Authentication > URL Configuration: Site URL debe ser el origen HTTPS definitivo, sin slash final. Los botones usan esa URL y la pantalla de confirmación `/auth/confirm` con `token_hash`; recuperación dirige a `/panel/ajustes`. El acceso por correo dirige al panel.
 4. Configurar SMTP personalizado. Para Resend: host `smtp.resend.com`, puerto `465`, usuario `resend`, contraseña = clave del proveedor. Introducirla solo en Supabase, nunca en el repositorio.
 5. Remitente propuesto si se confirma el dominio actual: `TodoPlásticos <acceso@todo-plastico.com>`. Verificar ese dominio en Resend con los registros DNS exactos que proporcione el panel. Mantener los registros MX de buzones existentes; no sustituirlos a ciegas. Revisar SPF, DKIM y alineación DMARC del correo recibido.
 6. Desactivar seguimiento de enlaces en el proveedor para los correos de autenticación. Confirmar guardado con una nueva lectura de SMTP y plantillas.
@@ -30,3 +30,6 @@ Fuentes oficiales:
 - https://supabase.com/pricing
 - https://resend.com/pricing
 - https://resend.com/pricing.md
+
+## Aperturas automáticas del correo
+Los enlaces nuevos abren `/auth/confirm`: GET muestra un botón y no consume el token. Solo el POST del botón verifica el código y crea la sesión. Esta respuesta no incluye analítica ni recursos externos y usa no-store, noindex y strict-origin. El callback anterior se conserva para enlaces antiguos y PKCE. Publicar esta ruta antes de activar las plantillas.

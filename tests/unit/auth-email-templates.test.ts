@@ -15,7 +15,7 @@ for (const [file, type, destination] of [
     assert.ok(href);
     const url = new URL(href.replaceAll('{{ .SiteURL }}','https://todo-plastico.com').replaceAll('{{ .TokenHash }}','test-hash').replaceAll('&amp;','&'));
     assert.equal(url.origin,'https://todo-plastico.com');
-    assert.equal(url.pathname,'/auth/callback');
+    assert.equal(url.pathname,'/auth/confirm');
     assert.equal(url.searchParams.get('next'),destination);
     let verified = false;
     const result = await authenticateAuthCallback(url.searchParams, {

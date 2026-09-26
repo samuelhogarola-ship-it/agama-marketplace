@@ -25,7 +25,7 @@ En el proyecto Supabase `tiynnllrcdhsvrzsdsct`, configurar:
 
 Los HTML versionados y los asuntos están en `supabase/email-templates/`. La guía vigente de activación y costes es [auth-email-setup.md](auth-email-setup.md). Un merge no activa automáticamente las plantillas en el proyecto alojado.
 
-Los botones usan `{{ .SiteURL }}/auth/callback` y `{{ .TokenHash }}` para verificar en servidor sin depender del verificador PKCE de otro navegador. Site URL debe coincidir con el dominio HTTPS de producción y no terminar en slash. Los enlaces de acceso llevan al panel; recuperación e invitación llevan a los ajustes de cuenta. Mantener desactivado el seguimiento de enlaces del proveedor.
+Los botones usan `{{ .SiteURL }}/auth/confirm` y `{{ .TokenHash }}` para verificar en servidor sin depender del verificador PKCE de otro navegador. Site URL debe coincidir con el dominio HTTPS de producción y no terminar en slash. Los enlaces de acceso llevan al panel; recuperación e invitación llevan a los ajustes de cuenta. Mantener desactivado el seguimiento de enlaces del proveedor.
 
 ## Variables locales
 
@@ -46,3 +46,6 @@ node scripts/seed-launch-data.mjs
 ```
 
 Desde `/ingresar` se admite contraseña o enlace de acceso por correo.
+
+## Aperturas automáticas del correo
+Los enlaces nuevos abren `/auth/confirm`: GET muestra un botón y no consume el token. Solo el POST del botón verifica el código y crea la sesión. Esta respuesta no incluye analítica ni recursos externos y usa no-store, noindex y no-referrer. El callback anterior se conserva para enlaces antiguos y PKCE. Publicar esta ruta antes de activar las plantillas.
