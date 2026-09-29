@@ -3,7 +3,7 @@
 ## Objetivo y contenido
 Descubrimiento B2B de fabricantes y productos plásticos a escala nacional en México. Sin landings por ciudad ni segmentación editorial por alimentación, cosmética, limpieza o logística.
 Programa de dos meses: mes 1, envases/botellas, bolsas/película, tarimas/contenedores y cubetas/bidones; mes 2, perfiles/láminas, tubería/conexiones, empaques/embalaje y productos terminados. Estas ocho familias son la prioridad editorial; las demás categorías existentes se conservan.
-Cuatro artículos previstos, dos por mes: elección de envases, bolsas/película, tarimas y empaques. Cada guía debe enlazar a su categoría y a proveedores reales. Su redacción pertenece al programa de contenido, no a este arreglo técnico.
+Cuatro guías actualizadas el 29/09/2026 sobre sus URLs existentes: elección de envases, bolsas/película, tarimas y empaques/termoformado. Incluyen secciones, fuentes y enlaces al catálogo. Las ocho familias incorporan su enfoque editorial. Implementación y pendientes de medición en docs/seo-programa-medicion.md; los dos cortes de resultados se mantienen al cierre de cada mes.
 
 ## URLs e indexación
 - Dominio actual: https://todo-plastico.com. No se cambia por el nombre comercial.

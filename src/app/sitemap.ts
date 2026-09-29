@@ -40,7 +40,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     })),
     ...PUBLISHED_ARTICLES.map((article) => ({
       url: `${base}/articulos/${article.slug}`,
-      lastModified: article.date,
+      lastModified: article.updatedAt ?? article.date,
       priority: 0.6,
     })),
   ];

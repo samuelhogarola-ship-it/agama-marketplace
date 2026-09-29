@@ -3,6 +3,8 @@ import Link from "next/link";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import { PUBLISHED_ARTICLES, articleBySlug } from "@/lib/articles";
+import { categoryBySlug } from "@/lib/categories";
+import TrackedCatalogLink from "@/components/TrackedCatalogLink";
 import { safeJsonLd } from "@/lib/jsonld";
 
 type Props = { params: Promise<{ slug: string }> };
@@ -27,7 +29,7 @@ export default async function ArticlePage({ params }: Props) {
   const authorSchema = article.author
     ? { "@type": "Person", name: article.author, jobTitle: article.authorTitle }
     : { "@type": "Organization", name: "TodoPlásticos" };
-  const jsonLd = { "@context": "https://schema.org", "@type": "Article", headline: article.title, description: article.excerpt, datePublished: article.date, image: article.cover, author: authorSchema };
+  const jsonLd = { "@context": "https://schema.org", "@type": "Article", headline: article.title, description: article.excerpt, datePublished: article.date, dateModified: article.updatedAt ?? article.date, image: article.cover, author: authorSchema };
   const base = process.env.NEXT_PUBLIC_SITE_URL ?? "https://todo-plastico.com";
   const breadcrumbJsonLd = {
     "@context": "https://schema.org",
@@ -49,6 +51,7 @@ export default async function ArticlePage({ params }: Props) {
         <p className="mt-6 text-xl leading-8 text-slate-600">{article.excerpt}</p>
         <div className="mt-6 flex items-center gap-3 text-sm text-slate-500">
           <time dateTime={article.date} suppressHydrationWarning>{new Date(article.date + "T12:00:00").toLocaleDateString("es-MX", { year: "numeric", month: "long", day: "numeric" })}</time>
+          {article.updatedAt && <span>Actualizado: <time dateTime={article.updatedAt}>{new Date(article.updatedAt + "T12:00:00").toLocaleDateString("es-MX", { year: "numeric", month: "long", day: "numeric" })}</time></span>}
           {article.author && (
             <>
               <span aria-hidden="true">·</span>
@@ -59,7 +62,23 @@ export default async function ArticlePage({ params }: Props) {
         </div>
       </header>
       <div className="relative mt-10 aspect-[16/8] overflow-hidden rounded-[4px] bg-slate-100"><Image src={article.cover} alt={article.title} fill sizes="(min-width: 1024px) 896px, 100vw" className="object-cover" /></div>
-      <div className="mx-auto mt-10 max-w-2xl space-y-6 text-lg leading-8 text-slate-700">{article.paragraphs.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}</div>
+      <div className="mx-auto mt-10 max-w-2xl space-y-8 text-lg leading-8 text-slate-700">
+        {article.paragraphs.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}
+        {article.sections?.map(section => <section key={section.heading}>
+          <h2 className="mb-4 text-2xl font-semibold text-brand-dark">{section.heading}</h2>
+          <div className="space-y-4">{section.paragraphs.map(paragraph => <p key={paragraph}>{paragraph}</p>)}</div>
+        </section>)}
+        {article.familySlugs && <nav aria-label="Consultar productos" className="rounded-xl bg-slate-50 p-6">
+          <h2 className="text-xl font-semibold text-brand-dark">Consulta productos y proveedores</h2>
+          <p className="mt-2 text-base">Revisa los anuncios disponibles y contacta directamente con cada empresa.</p>
+          <div className="mt-4 flex flex-col gap-3">{article.familySlugs.map(slug => <TrackedCatalogLink key={slug} href={`/c/${slug}`} eventName="content_catalog_click" category={slug} article={article.slug} className="font-semibold text-brand-dark underline underline-offset-4">{categoryBySlug(slug)?.name}</TrackedCatalogLink>)}</div>
+        </nav>}
+        {article.sources && <section className="border-t border-slate-200 pt-6 text-sm leading-6">
+          <h2 className="font-semibold text-brand-dark">Referencias técnicas</h2>
+          <ul className="mt-3 space-y-2">{article.sources.map(source => <li key={source.url}><a href={source.url} className="underline underline-offset-4" rel="noreferrer">{source.label}</a></li>)}</ul>
+          <p className="mt-3">Consulta la ficha del modelo concreto con su fabricante. Estas referencias no acreditan a los anunciantes del directorio.</p>
+        </section>}
+      </div>
     </article>
   );
 }

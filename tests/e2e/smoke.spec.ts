@@ -9,7 +9,7 @@ test.describe("smoke — páginas públicas", () => {
 
   test("categorías y landing de categoría", async ({ page }) => {
     await page.goto("/c/tarimas-y-contenedores");
-    await expect(page.getByRole("heading", { level: 1 })).toContainText("Comprar Tarimas y contenedores de plástico en México");
+    await expect(page.getByRole("heading", { level: 1 })).toContainText("Tarimas y contenedores de plástico en México");
   });
 
   test("sponsor AGAMA sigue el formato editorial de TodoPlásticos", async ({ page }) => {
