@@ -136,3 +136,9 @@
 - La confirmación por correo requiere pulsar un botón antes de consumir el token; se evita la validación al abrir el enlace automáticamente y se endurecen los destinos locales del login.
 
 - Los tokens de correo nuevos viajan en fragmentos y se eliminan de la URL antes de confirmar; cabeceras de la ruta protegidas frente a la configuración general.
+
+## 2026-09-29 — Programa SEO y contenidos
+- Ocho familias con metadatos, criterios de cotización y enlaces relacionados.
+- Cuatro guías actualizadas conservando URLs y fechas originales; fecha de revisión en página, marcado y sitemap.
+- Eventos Umami content_catalog_click y catalog_listing_click sin datos personales.
+- Dominio activo conservado: sin redirecciones ni cambios DNS; correo y Supabase aplazados.

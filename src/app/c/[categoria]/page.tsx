@@ -9,6 +9,8 @@ import type { Product } from "@/lib/types";
 import { safeJsonLd } from "@/lib/jsonld";
 import CategoryFilters from "@/components/CategoryFilters";
 import { catalogMetadata, pageNumber } from "@/lib/catalog-seo";
+import { FAMILY_EDITORIAL } from "@/lib/family-editorial";
+import { articleBySlug } from "@/lib/articles";
 import SortSelect from "@/components/SortSelect";
 
 export const revalidate = 300;
@@ -41,9 +43,10 @@ export async function generateMetadata({ params, searchParams }: Props): Promise
   const { categoria } = await params;
   const cat = categoryBySlug(categoria);
   if (!cat) return {};
+  const editorial = FAMILY_EDITORIAL[cat.slug];
   return {
-    title: `Comprar ${cat.name} de plástico en México — Proveedores B2B`,
-    description: `${cat.description} Contacta directo a empresas y proveedores del sector plástico en México. ${cat.keywords.slice(0, 3).join(", ")}.`,
+    title: editorial?.title ?? `Comprar ${cat.name} de plástico en México — Proveedores B2B`,
+    description: editorial?.description ?? `${cat.description} Contacta directo a empresas y proveedores del sector plástico en México. ${cat.keywords.slice(0, 3).join(", ")}.`,
     ...catalogMetadata(`/c/${cat.slug}`, await searchParams, ["location", "subcategory", "date", "type", "minPrice", "maxPrice", "sort"]),
   };
 }
@@ -54,6 +57,8 @@ export default async function CategoryPage({ params, searchParams }: Props) {
   const cat = categoryBySlug(categoria);
   if (!cat) notFound();
 
+  const editorial = FAMILY_EDITORIAL[cat.slug];
+  const guide = editorial ? articleBySlug(editorial.article) : undefined;
   const PAGE_SIZE = 24;
   const page = pageNumber(filters.page);
   const offset = (page - 1) * PAGE_SIZE;
@@ -97,8 +102,8 @@ export default async function CategoryPage({ params, searchParams }: Props) {
   const collectionJsonLd = {
     "@context": "https://schema.org",
     "@type": "CollectionPage",
-    name: `Comprar ${cat.name} de plástico en México`,
-    description: cat.description,
+    name: editorial?.title ?? `Comprar ${cat.name} de plástico en México`,
+    description: editorial?.description ?? cat.description,
     mainEntity: {
       "@type": "ItemList",
       itemListElement: (products ?? []).slice(0, 20).map((p, i) => ({
@@ -132,9 +137,9 @@ export default async function CategoryPage({ params, searchParams }: Props) {
       </nav>
       <div className="mt-8 flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between sm:gap-8">
         <div>
-          <h1 className="text-3xl font-bold text-slate-800">Comprar {cat.name} de plástico en México</h1>
+          <h1 className="text-3xl font-bold text-slate-800">{editorial?.title ?? `Comprar ${cat.name} de plástico en México`}</h1>
           <p className="mt-2 max-w-2xl text-slate-600">
-            {cat.description} Contacta directamente a empresas profesionales por sus canales públicos.
+            {editorial?.introduction ?? `${cat.description} Contacta directamente a empresas profesionales por sus canales públicos.`}
           </p>
         </div>
         <div className="flex shrink-0 items-center gap-2 text-xs text-slate-400 sm:pt-1 sm:text-right">
@@ -193,6 +198,17 @@ export default async function CategoryPage({ params, searchParams }: Props) {
           )}
         </section>
       </div>
+      {editorial && page === 1 && ![location, subcategory, date, type, minPrice, maxPrice].some(Boolean) && sort === "newest" && (
+        <section aria-labelledby="family-guide" className="mt-14 border-t border-slate-200 pt-10">
+          <h2 id="family-guide" className="text-2xl font-semibold text-brand-dark">Qué comparar en {cat.name.toLowerCase()}</h2>
+          <p className="mt-4 max-w-3xl leading-7 text-slate-600">{editorial.variants}</p>
+          <h3 className="mt-6 text-lg font-semibold text-brand-dark">Datos para pedir una cotización</h3>
+          <ul className="mt-3 list-disc space-y-2 pl-5 text-slate-600">{editorial.checklist.map(item => <li key={item}>{item}</li>)}</ul>
+          {guide && <Link href={`/articulos/${guide.slug}`} className="mt-6 inline-block font-semibold text-brand-dark underline underline-offset-4">Guía: {guide.title}</Link>}
+          <nav aria-label="Familias relacionadas" className="mt-6 flex flex-wrap gap-4">{editorial.related.map(slug => <Link key={slug} href={`/c/${slug}`} className="text-brand-dark underline underline-offset-4">{categoryBySlug(slug)?.name}</Link>)}</nav>
+          <p className="mt-6 text-sm text-slate-500">La oferta depende de los anuncios publicados. Confirma especificaciones, disponibilidad y condiciones directamente con cada empresa.</p>
+        </section>
+      )}
     </div>
   );
 }

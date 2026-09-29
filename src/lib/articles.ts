@@ -9,41 +9,128 @@ export type Article = {
   authorTitle?: string;
   published: boolean;
   paragraphs: string[];
+  updatedAt?: string;
+  familySlugs?: string[];
+  sections?: { heading: string; paragraphs: string[] }[];
+  sources?: { label: string; url: string }[];
 };
 
 export const ARTICLES: Article[] = [
   // ── 1 ──
   {
-    slug: "como-elegir-un-envase-plastico-para-tu-producto",
-    title: "Cómo elegir un envase plástico para tu producto",
-    excerpt: "Una guía práctica para comparar formato, resistencia, cierre y aplicación antes de pedir cotizaciones.",
-    category: "Guías de compra",
-    date: "2026-07-31",
-    cover: "/category-envases.png",
-    published: true,
-    paragraphs: [
-      "Elegir un envase empieza por entender el uso final. El producto, la forma de llenado, el transporte y la exposición del envase determinan qué solución conviene buscar.",
-      "Para comparar proveedores, prepara una ficha sencilla con capacidad, dimensiones, color, tipo de cierre, cantidades aproximadas y mercado de destino. Esa información reduce iteraciones y hace más comparables las propuestas.",
-      "También conviene pedir muestras antes de cerrar una producción. Una muestra permite revisar ergonomía, apilado, compatibilidad con la línea y calidad visual en condiciones reales.",
-      "Presta atención al material: PET, HDPE, PP y PVC tienen propiedades distintas de barrera, resistencia química y reciclabilidad. El material correcto depende del contenido y del canal de distribución.",
-      "Por último, pregunta por cantidades mínimas, tiempos de entrega y condiciones de recompra. Un buen envase es el que funciona técnicamente y encaja en la operación comercial de tu empresa.",
-    ],
+      "slug": "como-elegir-un-envase-plastico-para-tu-producto",
+      "date": "2026-07-31",
+      "cover": "/category-envases.png",
+      "category": "Guías de compra",
+      "title": "Envases y botellas de plástico: qué comparar antes de cotizar",
+      "excerpt": "Prepara una solicitud clara con material, capacidad, dimensiones y cierre para comparar fabricantes y proveedores de envases en México.",
+      "published": true,
+      "paragraphs": [],
+      "updatedAt": "2026-09-29",
+      "familySlugs": [
+          "envases-y-botellas",
+          "cubetas-y-bidones"
+      ],
+      "sections": [
+          {
+              "heading": "Empieza por una ficha del envase",
+              "paragraphs": [
+                  "Buscar una botella por su apariencia no basta para comparar cotizaciones. Anota la capacidad útil, las dimensiones máximas, el uso previsto y la cantidad por pedido. Si ya tienes una referencia que funciona, aporta su plano o una muestra e indica qué necesitas conservar y qué puede cambiar.",
+                  "Distingue el envase estándar de un desarrollo propio. Pregunta si el formato existe en catálogo, si admite personalización y si el presupuesto incluye pruebas o un molde nuevo."
+              ]
+          },
+          {
+              "heading": "Material y condiciones de uso",
+              "paragraphs": [
+                  "PET, PEAD y PP son nombres de materiales, no garantías de que cualquier envase servirá para tu producto. Explica al fabricante qué contendrá, cómo se llenará y qué condiciones de temperatura y manipulación tendrá. Pide la ficha técnica y una muestra del conjunto propuesto.",
+                  "Evita dar por confirmada la compatibilidad a partir de una fotografía o del nombre de la resina. El proveedor debe indicar qué ensayos o documentación corresponden a la referencia que ofrece."
+              ]
+          },
+          {
+              "heading": "Comprueba botella, cuello y tapa juntos",
+              "paragraphs": [
+                  "Solicita la referencia del cuello y la del cierre: el diámetro por sí solo no describe toda la unión. Confirma si tapa, sello, liner u otros accesorios están incluidos o se cotizan por separado.",
+                  "Revisa apertura, cierre y posibles fugas con una muestra del conjunto. Si usarás equipo de llenado o etiquetado, valida también las dimensiones que necesita esa operación."
+              ]
+          },
+          {
+              "heading": "Haz comparables las condiciones comerciales",
+              "paragraphs": [
+                  "Envía la misma ficha a cada empresa. Pide precio para una cantidad concreta, pedido mínimo, unidades por empaque, plazo y condiciones de entrega en México. Separa personalización, moldes, muestras y transporte del precio por pieza.",
+                  "Una propuesta más barata puede incluir un formato o cierre distinto. Antes de elegir, comprueba que todas las ofertas responden a la misma especificación y que el proveedor ha confirmado disponibilidad o fecha de fabricación."
+              ]
+          },
+          {
+              "heading": "Qué enviar para solicitar una cotización",
+              "paragraphs": [
+                  "Incluye producto buscado, capacidad, material solicitado o por definir, dimensiones, cierre, color, cantidad inicial y frecuencia estimada de compra. Añade plano o muestra cuando exista. Consulta los anuncios de la familia y contacta con cada empresa por sus canales públicos; TodoPlásticos facilita el descubrimiento y el contacto, sin tramitar la compra."
+              ]
+          }
+      ],
+      "sources": [
+          {
+              "label": "Berry Global: catálogo de tapas y cierres",
+              "url": "https://www.berryglobal.com/en/product/caps-closures"
+          }
+      ]
   },
   // ── 2 ──
   {
-    slug: "que-revisar-en-una-tarima-de-plastico",
-    title: "Qué revisar en una tarima de plástico",
-    excerpt: "Carga, entradas, medidas y condiciones de uso: los puntos que realmente cambian una decisión industrial.",
-    category: "Operación industrial",
-    date: "2026-07-29",
-    cover: "/category-tarimas.png",
-    published: true,
-    paragraphs: [
-      "Una tarima debe evaluarse con la carga estática y dinámica que tendrá en operación, no solo con una cifra aislada del catálogo.",
-      "Revisa las dimensiones, el número de entradas para montacargas, la posibilidad de anidado y la estabilidad cuando se apilan unidades o cajas.",
-      "La mejor comparación es una prueba con tu propia mercancía y recorrido. Así se valida el desempeño sin confundir una especificación comercial con una garantía de operación.",
-      "Las tarimas de plástico tienen ventajas sobre las de madera en higiene, durabilidad y cumplimiento de normas fitosanitarias para exportación. Sin embargo, su costo inicial es mayor, por lo que conviene calcular el retorno por ciclo de uso.",
-    ],
+      "slug": "que-revisar-en-una-tarima-de-plastico",
+      "date": "2026-07-29",
+      "cover": "/category-tarimas.png",
+      "category": "Operación industrial",
+      "title": "Tarimas y contenedores de plástico: medidas y carga a revisar",
+      "excerpt": "Compara dimensiones, apilado, entradas y condiciones de carga antes de solicitar tarimas o contenedores a proveedores en México.",
+      "published": true,
+      "paragraphs": [],
+      "updatedAt": "2026-09-29",
+      "familySlugs": [
+          "tarimas-y-contenedores",
+          "productos-terminados"
+      ],
+      "sections": [
+          {
+              "heading": "Define el espacio y la operación",
+              "paragraphs": [
+                  "Anota las dimensiones de la unidad que manejarás, el peso del contenido y el espacio disponible. Para un contenedor, diferencia medidas interiores y exteriores: una capacidad comercial no describe necesariamente el espacio útil que necesitas.",
+                  "En tarimas, comprueba entradas, altura y compatibilidad con el equipo que realmente se utilizará. Aporta un esquema si el recorrido exige medidas concretas."
+              ]
+          },
+          {
+              "heading": "No compares cifras de carga sin contexto",
+              "paragraphs": [
+                  "Pide al fabricante que identifique la carga estática, dinámica y en rack cuando corresponda. Una cifra declarada para apoyo continuo sobre piso no debe trasladarse sin comprobación a una situación con apoyos distintos.",
+                  "Pregunta cómo se distribuye la carga, qué apoyos se utilizaron y bajo qué condiciones se obtuvo el dato. La comparación útil es entre referencias ensayadas para condiciones compatibles con tu operación."
+              ]
+          },
+          {
+              "heading": "Apilar, anidar y cerrar son requisitos distintos",
+              "paragraphs": [
+                  "Confirma si el contenedor permite apilado cargado, anidado vacío o ambos mediante una posición concreta. Solicita las instrucciones de uso y comprueba si requiere tapa, refuerzos u otros accesorios.",
+                  "Revisa la compatibilidad entre modelos. Que dos cajas tengan dimensiones parecidas no confirma que encajen de forma estable al apilarlas."
+              ]
+          },
+          {
+              "heading": "Solicita documentación y una prueba",
+              "paragraphs": [
+                  "Pide material, peso, ficha técnica y condiciones de uso de la referencia concreta. Si el proveedor ofrece material reciclado o una propiedad especial, solicita la información que respalda esa afirmación para ese producto.",
+                  "Antes de un pedido amplio, valida una muestra con el contenido y equipo previstos. Acuerda los criterios de aceptación; no sustituyas esa revisión por una promesa general sobre resistencia."
+              ]
+          },
+          {
+              "heading": "Prepara una cotización comparable",
+              "paragraphs": [
+                  "Incluye dimensiones, tipo de pieza, condiciones de carga, apilado o anidado, equipo de manejo y cantidad. Pide que tapas y accesorios aparezcan desglosados y confirma plazo de fabricación o disponibilidad. Consulta los anuncios de tarimas y contenedores y revisa la ficha de cada proveedor antes de contactar."
+              ]
+          }
+      ],
+      "sources": [
+          {
+              "label": "Uline: especificaciones de tarimas y condiciones de capacidad",
+              "url": "https://www.uline.mx/PDF/IH-1264-SPFR.PDF"
+          }
+      ]
   },
   // ── 3 ──
   {
@@ -412,20 +499,61 @@ export const ARTICLES: Article[] = [
     ],
   },
   {
-    slug: "termoformado-vs-inyeccion-que-conviene",
-    title: "Termoformado vs inyección: qué conviene para tu producto",
-    excerpt: "Dos procesos, dos lógicas de costo. Cuándo cada uno es la mejor opción.",
-    category: "Materiales y procesos",
-    date: "2026-06-15",
-    cover: "/category-maquinaria.png",
-    published: true,
-    paragraphs: [
-      "El termoformado calienta una lámina plástica y la moldea sobre un molde con vacío o presión de aire. La inyección funde resina y la inyecta a presión dentro de un molde cerrado. La diferencia de proceso define cuándo conviene cada uno.",
-      "El molde de termoformado es notablemente más económico que uno de inyección, porque no soporta la misma presión. Esto lo hace atractivo para volúmenes bajos o medios, prototipos y productos de gran tamaño como charolas o carcasas.",
-      "La inyección tiene un costo de molde alto, pero un costo por pieza muy bajo en volúmenes grandes, gracias a ciclos cortos y alta repetibilidad. Para producción masiva y piezas con detalles finos, la inyección es superior.",
-      "En términos de resistencia, las piezas inyectadas suelen tener mejor definición estructural y espesores más uniformes. El termoformado tiende a adelgazar el material en las zonas de mayor estiramiento, lo cual debe considerarse en el diseño.",
-      "La regla práctica: si tu volumen anual es bajo o tu pieza es de gran tamaño, evalúa termoformado. Si tu volumen es alto y necesitas piezas complejas o con múltiples inserciones, la inyección amortiza mejor el costo de molde.",
-    ],
+      "slug": "termoformado-vs-inyeccion-que-conviene",
+      "date": "2026-06-15",
+      "cover": "/category-maquinaria.png",
+      "category": "Materiales y procesos",
+      "title": "Empaques termoformados: formatos y comparación con inyección",
+      "excerpt": "Charolas, blíster y clamshell: define medidas, cavidades, cierre y herramental para comparar propuestas de fabricación en México.",
+      "published": true,
+      "paragraphs": [],
+      "updatedAt": "2026-09-29",
+      "familySlugs": [
+          "empaques-y-embalaje",
+          "perfiles-y-laminas"
+      ],
+      "sections": [
+          {
+              "heading": "Describe primero la pieza que irá dentro",
+              "paragraphs": [
+                  "Para cotizar un empaque, aporta dimensiones y una muestra o plano del producto que debe contener. Indica cuántas unidades irán en cada empaque, cómo se colocarán y qué holguras deben mantenerse.",
+                  "Charola, blíster y clamshell orientan sobre el formato, pero no definen todas sus características. Confirma cavidades, borde, cierre y presentación antes de comparar ofertas."
+              ]
+          },
+          {
+              "heading": "Termoformado e inyección responden a diseños distintos",
+              "paragraphs": [
+                  "El termoformado parte de una lámina calentada que se conforma sobre un molde; la inyección introduce material fundido en un molde. Pide al fabricante que explique por qué propone un proceso para tu geometría, volumen y acabado.",
+                  "No elijas únicamente por una regla de cantidad de piezas. Solicita coste de herramental, precio por pieza, tolerancias y plazo para el mismo diseño funcional, aclarando los cambios que cada proceso requiere."
+              ]
+          },
+          {
+              "heading": "Material y espesor de la pieza terminada",
+              "paragraphs": [
+                  "Consulta qué material y espesor de partida se proponen. Durante el termoformado, la geometría y el estiramiento influyen en el espesor resultante; pide que se revisen las zonas críticas de la pieza final.",
+                  "Define qué dimensiones y características deben comprobarse en la muestra. Un aspecto visual correcto no confirma por sí solo que la pieza encaje, cierre o proteja como necesitas."
+              ]
+          },
+          {
+              "heading": "Aclara el alcance del molde y la personalización",
+              "paragraphs": [
+                  "Separa en el presupuesto diseño, prototipo, molde, pruebas y producción. Pregunta quién conserva el herramental, qué cambios están incluidos y cómo se aprobará la muestra antes de fabricar el lote.",
+                  "Si buscas un formato estándar, confirma qué medidas y acabados ya existen. La personalización puede cambiar el mínimo y el plazo; pide esos datos para la opción exacta que vas a evaluar."
+              ]
+          },
+          {
+              "heading": "Información para enviar al fabricante",
+              "paragraphs": [
+                  "Prepara plano o muestra del contenido, dimensiones, número de cavidades, cierre, material solicitado o por definir, cantidad inicial y repetición estimada. Compara las propuestas con esos mismos datos. En la familia de empaques puedes consultar anuncios y contactar directamente con sus empresas."
+              ]
+          }
+      ],
+      "sources": [
+          {
+              "label": "Plaskolite: guía técnica de termoformado",
+              "url": "https://plaskolite.com/docs/default-source/fab/fab004_opx_extruded.pdf"
+          }
+      ]
   },
   {
     slug: "tendencias-plasticos-2026-mexico",
@@ -723,21 +851,61 @@ export const ARTICLES: Article[] = [
     ],
   },
   {
-    slug: "como-elegir-proveedor-bolsas-plasticas",
-    title: "Cómo elegir un proveedor de bolsas plásticas",
-    excerpt: "Calibre, material, impresión y cantidades: los criterios que definen una buena compra.",
-    category: "Guías de compra",
-    date: "2026-07-17",
-    cover: "/category-bolsas.png",
-    published: true,
-    paragraphs: [
-      "El calibre de la bolsa, medido en micras o en el sistema de calibre local, determina su resistencia. Confirma con el proveedor el calibre exacto y no solo una descripción como 'bolsa gruesa', que varía de interpretación entre fabricantes.",
-      "El material cambia el comportamiento: LDPE para bolsas flexibles y transparentes, HDPE para bolsas más económicas y crujientes, y LLDPE para mayor resistencia al rasgado en el mismo calibre.",
-      "Si necesitas impresión, define con anticipación el número de colores, la resolución del diseño y si requieres flexografía o algún otro método. Más colores y mayor detalle elevan tanto el costo como el tiempo de entrega.",
-      "Las cantidades mínimas varían mucho entre proveedores según si producen bolsa estándar de inventario o bolsa a medida con impresión. Pregunta explícitamente por el mínimo de producción, no solo por el precio unitario a distintos volúmenes.",
-      "Pide una muestra física antes de comprometer un pedido grande, especialmente si es la primera vez que trabajas con ese proveedor. La sensación al tacto y la resistencia real solo se validan con producto físico en mano.",
-      "Si tu bolsa tiene un uso específico (alimentos, basura industrial, empaque de producto pesado), verifica que el proveedor entienda esa aplicación y no solo venda bolsa genérica sin considerar el esfuerzo mecánico que soportará.",
-    ],
+      "slug": "como-elegir-proveedor-bolsas-plasticas",
+      "date": "2026-07-17",
+      "cover": "/category-bolsas.png",
+      "category": "Guías de compra",
+      "title": "Bolsas industriales, playo y película stretch: datos para cotizar",
+      "excerpt": "Ancho, espesor, fuelle, longitud y presentación: prepara pedidos comparables de bolsas y película con proveedores en México.",
+      "published": true,
+      "paragraphs": [],
+      "updatedAt": "2026-09-29",
+      "familySlugs": [
+          "bolsas-y-pelicula",
+          "empaques-y-embalaje"
+      ],
+      "sections": [
+          {
+              "heading": "Distingue bolsa terminada y película en rollo",
+              "paragraphs": [
+                  "Antes de pedir precio, indica si buscas bolsas listas para usar, sacos o película en rollo. En una bolsa especifica ancho, largo, fuelle si existe y tipo de cierre. En un rollo indica ancho, longitud, diámetro del núcleo y forma de aplicación prevista.",
+                  "Playo y película stretch pueden usarse como nombres comerciales relacionados. Confirma con el proveedor la referencia exacta y si la presentación corresponde a uso manual o con máquina."
+              ]
+          },
+          {
+              "heading": "Acuerda unidades y tolerancias",
+              "paragraphs": [
+                  "Evita pedir solo una película gruesa o resistente. Solicita el espesor con una unidad clara y su tolerancia. Si la oferta utiliza calibre, pide que el proveedor confirme su equivalencia en micras antes de comparar con otra propuesta.",
+                  "El espesor no sustituye una prueba de desempeño: el material, la fabricación y las condiciones de uso también importan. Describe el peso, la forma y los bordes de lo que envolverás o introducirás en la bolsa."
+              ]
+          },
+          {
+              "heading": "Compara cuánto producto recibes",
+              "paragraphs": [
+                  "Pregunta cuántas piezas incluye cada paquete y cuántos paquetes forman el pedido. Para película, distingue peso neto de película y peso del rollo con núcleo. Confirma longitud y ancho para comparar presentaciones.",
+                  "No compares únicamente el precio por rollo si cambian metros, espesor o peso neto. Pide al proveedor que desglosen esas variables y mantén una misma especificación en todas las solicitudes."
+              ]
+          },
+          {
+              "heading": "Impresión, muestras y fabricación a medida",
+              "paragraphs": [
+                  "Para bolsas impresas, prepara el arte, el tamaño y la posición de impresión. Consulta cantidades mínimas, coste de preparación, aprobación de muestra y plazo de producción. No asumas que una referencia de inventario admite cambios al mismo precio.",
+                  "Prueba una muestra en las condiciones reales de uso y con el equipo previsto. Acuerda qué comprobarán ambas partes y conserva la referencia aprobada para pedidos posteriores."
+              ]
+          },
+          {
+              "heading": "Solicitud breve para proveedores",
+              "paragraphs": [
+                  "Envía tipo de bolsa o película, medidas, espesor y unidades, presentación, cantidad, uso manual o en máquina e impresión requerida. Añade una muestra o fotografía de referencia y pide confirmación de entrega. Desde la categoría puedes revisar anuncios y continuar la consulta con cada empresa."
+              ]
+          }
+      ],
+      "sources": [
+          {
+              "label": "Uline México: guía de película elástica",
+              "url": "https://www.uline.mx/pdf/es-MX/StretchWrapGuide_ESMX.pdf"
+          }
+      ]
   },
   {
     slug: "automatizacion-planta-plasticos-por-donde-empezar",
