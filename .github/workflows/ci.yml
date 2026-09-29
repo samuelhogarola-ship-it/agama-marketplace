@@ -42,6 +42,8 @@ jobs:
           cp tests/fixtures/contact-form/page.tsx src/app/checks-contacts/page.tsx
           mkdir -p src/app/checks-address
           cp tests/fixtures/address-form/page.tsx src/app/checks-address/page.tsx
+          mkdir -p src/app/checks-editorial
+          cp tests/fixtures/editorial/page.tsx src/app/checks-editorial/page.tsx
       - run: npm run build
       - name: Prepare standalone for Playwright
         run: |

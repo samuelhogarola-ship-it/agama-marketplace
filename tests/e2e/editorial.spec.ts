@@ -36,3 +36,15 @@ test('paginated families do not repeat the extended editorial section',async({pa
   await page.goto('/c/envases-y-botellas?page=2');
   await expect(page.getByRole('heading',{name:'Datos para pedir una cotización'})).toHaveCount(0);
 });
+
+test('a catalogue card records its actual listing and category while navigating',async({page})=>{
+  await page.route('https://analytics.2.24.10.239.sslip.io/script.js', route=>route.abort());
+  await page.addInitScript(()=>{
+    window.umami={track:(name,data)=>sessionStorage.setItem('listing-event',JSON.stringify({name,data}))};
+  });
+  await page.goto('/checks-editorial');
+  await page.getByRole('link',{name:/Tarima de prueba/}).click();
+  // The fixture ID deliberately does not create a production or test database row.
+  await expect(page).toHaveURL(/\/p\/fixture-editorial-123456$/);
+  expect(await page.evaluate(()=>JSON.parse(sessionStorage.getItem('listing-event')!))).toEqual({name:'catalog_listing_click',data:{category:'tarimas-y-contenedores',listing_id:123456}});
+});
