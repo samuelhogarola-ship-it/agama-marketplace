@@ -1,3 +1,8 @@
+## Cabecera adaptable — 2026-10-01
+
+- La marca se ajusta al ancho disponible en móvil para mantener visibles los botones de búsqueda y menú, sin desplazamiento horizontal.
+- El buscador de escritorio incorpora una etiqueta accesible. Comprobación de cabecera y menú a 320, 390, 768 y 1440 píxeles.
+
 ## Verificación de commits — 2026-09-25
 
 - Husky escanea con Gitleaks los archivos del commit, evitando descargar todo el historial en clones parciales. CI conserva el escaneo del historial.
