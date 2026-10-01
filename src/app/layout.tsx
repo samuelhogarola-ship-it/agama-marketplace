@@ -39,15 +39,17 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       <body className="min-h-screen flex flex-col">
         <header className="border-b border-slate-200 bg-white sticky top-0 z-40">
           <div className="relative mx-auto flex min-h-16 max-w-7xl items-center justify-between gap-4 px-4 py-2 md:py-4">
-            <Link href="/" className="flex shrink-0 items-center gap-2.5" aria-label="TodoPlásticos, inicio">
+            <Link href="/" className="flex min-w-0 items-center gap-2.5" aria-label="TodoPlásticos, inicio">
               <Image src="/todoplastico-symbol.png" alt="TodoPlásticos" width={42} height={26} priority className="h-[26px] w-[42px] object-contain" />
-              <span className="text-lg font-bold leading-none text-brand-dark sm:text-xl">
+              <span className="min-w-0 text-lg font-bold leading-none text-brand-dark sm:text-xl">
                 TodoPlásticos
                 <span className="mt-1 block text-[9px] font-medium uppercase tracking-[0.14em] text-brand-sky sm:text-[10px]">Mercado para la industria plástica</span>
               </span>
             </Link>
-            <form action="/buscar" className="hidden md:flex flex-1 max-w-md items-center gap-0">
+            <form action="/buscar" className="hidden md:flex min-w-0 flex-1 max-w-md items-center gap-0">
+              <label htmlFor="header-search" className="sr-only">Buscar en TodoPlásticos</label>
               <input
+                id="header-search"
                 type="search"
                 name="q"
                 placeholder="Buscar empresas, productos o servicios…"
@@ -57,7 +59,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
               </button>
             </form>
-            <nav aria-label="Navegación principal" className="flex items-center gap-4 text-sm font-medium">
+            <nav aria-label="Navegación principal" className="flex shrink-0 items-center gap-4 text-sm font-medium">
               <Link href="/empresas" className="hidden text-slate-700 hover:text-brand lg:block">Empresas</Link>
               <Link href="/articulos" className="hidden text-slate-700 hover:text-brand lg:block">Contenido</Link>
               <Link href="/categorias" className="hidden text-slate-700 hover:text-brand md:block">Categorías</Link>
