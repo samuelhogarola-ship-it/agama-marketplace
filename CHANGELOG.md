@@ -1,3 +1,8 @@
+## Metadatos editoriales — 2026-10-05
+
+- Artículos con título, descripción, URL e imagen propios al compartir, tipo artículo y fechas reales. Datos estructurados con imagen absoluta y referencia a la página canónica.
+- El índice de categorías deja de repetir la marca en el título.
+
 ## Cabecera adaptable — 2026-10-01
 
 - La marca se ajusta al ancho disponible en móvil para mantener visibles los botones de búsqueda y menú, sin desplazamiento horizontal.
