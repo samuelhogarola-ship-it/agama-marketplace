@@ -36,3 +36,11 @@ Los agregados por página no prueban un recorrido individual completo. Search Co
 Registro confirmado y primera publicación aprobada: pendientes del bloque autenticado. Requieren una fuente de estado confirmada y deduplicación persistente; un clic en registrarse, una visita al panel o aprobar nuevamente un anuncio no son equivalentes. No se modifica la migración aplazada ni se simulan esos eventos.
 
 Fuentes de instrumentación: https://docs.umami.is/docs/tracker-functions y https://docs.umami.is/docs/event-data.
+
+## Ampliación técnica — 05/10/2026
+
+Dentro del programa nacional de dos meses, se completa la presentación de artículos en buscadores y al compartir: título, descripción, imagen absoluta, URL y fechas procedentes del mismo contenido. Sin fechas inventadas, nuevas URLs ni cambio de dominio. Se corrige también la marca duplicada en el título del índice de categorías.
+
+Siguiente prioridad editorial: ampliar la cobertura de guías para familias cuya guía actual trata solo una parte de sus productos, usando fichas técnicas verificables. No se considera desarrollada esa ampliación de contenido ni se añaden nuevas piezas automáticamente al alcance de cuatro guías sin concretarlo. Los enlaces categoría-guía y BreadcrumbList ya existen; no se duplican.
+
+Referencia técnica: https://developers.google.com/search/docs/appearance/structured-data/article y https://developers.google.com/search/docs/appearance/title-link.

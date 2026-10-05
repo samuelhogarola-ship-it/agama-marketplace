@@ -6,6 +6,7 @@ import { PUBLISHED_ARTICLES, articleBySlug } from "@/lib/articles";
 import { categoryBySlug } from "@/lib/categories";
 import TrackedCatalogLink from "@/components/TrackedCatalogLink";
 import { safeJsonLd } from "@/lib/jsonld";
+import { articleSeo } from "@/lib/article-seo";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -14,23 +15,15 @@ export function generateStaticParams() { return PUBLISHED_ARTICLES.map((article)
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const article = articleBySlug((await params).slug);
   return article
-    ? {
-        title: article.title,
-        description: article.excerpt,
-        openGraph: { images: [article.cover] },
-        alternates: { canonical: `/articulos/${article.slug}` },
-      }
+    ? articleSeo(article, process.env.NEXT_PUBLIC_SITE_URL ?? "https://todo-plastico.com").metadata
     : {};
 }
 
 export default async function ArticlePage({ params }: Props) {
   const article = articleBySlug((await params).slug);
   if (!article) notFound();
-  const authorSchema = article.author
-    ? { "@type": "Person", name: article.author, jobTitle: article.authorTitle }
-    : { "@type": "Organization", name: "TodoPlásticos" };
-  const jsonLd = { "@context": "https://schema.org", "@type": "Article", headline: article.title, description: article.excerpt, datePublished: article.date, dateModified: article.updatedAt ?? article.date, image: article.cover, author: authorSchema };
   const base = process.env.NEXT_PUBLIC_SITE_URL ?? "https://todo-plastico.com";
+  const { jsonLd } = articleSeo(article, base);
   const breadcrumbJsonLd = {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
