@@ -11,7 +11,7 @@ for (const [slug, content] of Object.entries(FAMILY_EDITORIAL)) {
     await expect(page.locator(`a[href="/articulos/${content.article}"]`)).toBeVisible();
   });
 }
-for (const article of PUBLISHED_ARTICLES.filter(a=>a.updatedAt==='2026-09-29')) {
+for (const article of PUBLISHED_ARTICLES.filter(a=>a.sections && a.familySlugs && a.sources)) {
   test(`guide ${article.slug} exposes updated copy and a catalogue destination`,async({page})=>{
     await page.goto(`/articulos/${article.slug}`);
     await expect(page.getByRole('heading',{level:1})).toHaveText(article.title);

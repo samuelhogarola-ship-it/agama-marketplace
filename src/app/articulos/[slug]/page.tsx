@@ -42,12 +42,12 @@ export default async function ArticlePage({ params }: Props) {
         <p className="text-xs font-semibold uppercase tracking-[0.24em] text-brand-sky">{article.category}</p>
         <h1 className="mt-4 text-4xl font-semibold leading-[1.05] tracking-[-0.045em] text-brand-dark sm:text-6xl">{article.title}</h1>
         <p className="mt-6 text-xl leading-8 text-slate-600">{article.excerpt}</p>
-        <div className="mt-6 flex items-center gap-3 text-sm text-slate-500">
+        <div className="mt-6 flex flex-col gap-2 text-sm text-slate-500 sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-4">
           <time dateTime={article.date} suppressHydrationWarning>{new Date(article.date + "T12:00:00").toLocaleDateString("es-MX", { year: "numeric", month: "long", day: "numeric" })}</time>
           {article.updatedAt && <span>Actualizado: <time dateTime={article.updatedAt}>{new Date(article.updatedAt + "T12:00:00").toLocaleDateString("es-MX", { year: "numeric", month: "long", day: "numeric" })}</time></span>}
           {article.author && (
             <>
-              <span aria-hidden="true">·</span>
+              <span aria-hidden="true" className="hidden sm:inline">·</span>
               <span className="font-medium text-brand-dark">{article.author}</span>
               {article.authorTitle && <span className="text-slate-400">— {article.authorTitle}</span>}
             </>

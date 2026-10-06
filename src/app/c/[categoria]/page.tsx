@@ -204,7 +204,11 @@ export default async function CategoryPage({ params, searchParams }: Props) {
           <p className="mt-4 max-w-3xl leading-7 text-slate-600">{editorial.variants}</p>
           <h3 className="mt-6 text-lg font-semibold text-brand-dark">Datos para pedir una cotización</h3>
           <ul className="mt-3 list-disc space-y-2 pl-5 text-slate-600">{editorial.checklist.map(item => <li key={item}>{item}</li>)}</ul>
-          {guide && <Link href={`/articulos/${guide.slug}`} className="mt-6 inline-block font-semibold text-brand-dark underline underline-offset-4">Guía: {guide.title}</Link>}
+          {guide && <div className="mt-6 max-w-3xl">
+            <h3 className="text-lg font-semibold text-brand-dark">Lectura relacionada</h3>
+            {editorial.guideContext && <p className="mt-2 leading-7 text-slate-600">{editorial.guideContext}</p>}
+            <Link href={`/articulos/${guide.slug}`} className="mt-3 inline-block font-semibold text-brand-dark underline underline-offset-4">{guide.title}</Link>
+          </div>}
           <nav aria-label="Familias relacionadas" className="mt-6 flex flex-wrap gap-4">{editorial.related.map(slug => <Link key={slug} href={`/c/${slug}`} className="text-brand-dark underline underline-offset-4">{categoryBySlug(slug)?.name}</Link>)}</nav>
           <p className="mt-6 text-sm text-slate-500">La oferta depende de los anuncios publicados. Confirma especificaciones, disponibilidad y condiciones directamente con cada empresa.</p>
         </section>
