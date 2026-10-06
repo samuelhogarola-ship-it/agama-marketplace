@@ -1,3 +1,9 @@
+## Revisión editorial y formato — 2026-10-06
+
+- Fechas de las guías en líneas separadas en móvil y con ajuste de línea en escritorio.
+- Las lecturas relacionadas de perfiles, tubería y productos terminados explican qué parte de la familia cubren.
+- Correcciones de concordancia, vocabulario para México y aclaración de liner. Fechas de revisión actualizadas solo en las guías modificadas.
+
 ## Metadatos editoriales — 2026-10-05
 
 - Artículos con título, descripción, URL e imagen propios al compartir, tipo artículo y fechas reales. Datos estructurados con imagen absoluta y referencia a la página canónica.

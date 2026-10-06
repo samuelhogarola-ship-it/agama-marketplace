@@ -13,7 +13,7 @@ test('eight families link to published guides and existing related categories',(
   }
 });
 test('four updated guides retain original publication dates and have category destinations',()=>{
-  const revised=PUBLISHED_ARTICLES.filter(a=>a.updatedAt==='2026-09-29');
+  const revised=PUBLISHED_ARTICLES.filter(a=>a.sections && a.familySlugs && a.sources);
   assert.equal(revised.length,4);
   for (const article of revised) {
     assert.ok(article.date < article.updatedAt!);

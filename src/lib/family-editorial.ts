@@ -5,6 +5,7 @@ type FamilyEditorial = {
   variants: string;
   checklist: string[];
   article: string;
+  guideContext?: string;
   related: string[];
 };
 
@@ -53,6 +54,7 @@ export const FAMILY_EDITORIAL: Record<string, FamilyEditorial> = {
     variants: 'Perfiles extruidos, láminas, placas y planchas de materiales como acrílico o policarbonato, según los anuncios disponibles. Confirma acabado, transparencia, protección superficial y formato de suministro.',
     checklist: ['Material, largo, ancho o sección y espesor.', 'Tolerancias del plano, acabado y cortes requeridos.', 'Condiciones de uso, ficha técnica y cantidad mínima.'],
     article: 'termoformado-vs-inyeccion-que-conviene',
+    guideContext: 'Si buscas láminas para fabricar un empaque, esta guía te ayuda a preparar la consulta sobre termoformado.',
     related: ['empaques-y-embalaje','productos-terminados'],
   },
   'tuberia-y-conexiones': {
@@ -62,13 +64,14 @@ export const FAMILY_EDITORIAL: Record<string, FamilyEditorial> = {
     variants: 'Tubería PVC, PEAD y CPVC, codos, uniones y otras conexiones según el catálogo publicado. El nombre del material o el diámetro nominal por sí solos no garantizan que dos piezas sean compatibles.',
     checklist: ['Diámetro nominal y exterior, espesor y longitud.', 'Sistema de unión y serie o especificación del fabricante.', 'Presión y temperatura de trabajo previstas, documentación y cantidades.'],
     article: 'diferencias-pvc-rigido-flexible',
+    guideContext: 'Para empezar por el material: diferencias entre PVC rígido y flexible. Confirma las especificaciones del sistema de tubería con su fabricante.',
     related: ['perfiles-y-laminas','productos-terminados'],
   },
   'empaques-y-embalaje': {
     title: 'Empaques plásticos y termoformados en México',
     description: 'Consulta charolas, blíster, clamshell y empaques plásticos. Compara formatos, medidas, moldes y personalización con proveedores en México.',
     introduction: 'Busca empaques a partir de la pieza que deben contener o proteger. Prepara sus dimensiones, una muestra o un plano y la cantidad prevista para distinguir formatos estándar de desarrollos a medida.',
-    variants: 'Charolas, blíster, clamshell y piezas termoformadas. Confirma cavidades, cierre, borde y presentación final; separa el coste del herramental del precio por pieza cuando corresponda.',
+    variants: 'Charolas, blíster, clamshell y piezas termoformadas. Confirma cavidades, cierre, borde y presentación final; separa el costo del herramental del precio por pieza cuando corresponda.',
     checklist: ['Medidas de la pieza, holguras y número de cavidades.', 'Material, espesor, acabado y forma de cierre.', 'Muestra, propiedad del molde, mínimo de producción y entregas.'],
     article: 'termoformado-vs-inyeccion-que-conviene',
     related: ['envases-y-botellas','perfiles-y-laminas'],
@@ -80,6 +83,7 @@ export const FAMILY_EDITORIAL: Record<string, FamilyEditorial> = {
     variants: 'Cajas, cestas, botes y accesorios. Algunas referencias admiten colores, impresión o cambios de presentación: pregunta qué opciones existen y desde qué cantidad pueden fabricarse.',
     checklist: ['Modelo, medidas interiores y exteriores y material.', 'Unidades por empaque, colores y accesorios incluidos.', 'Disponibilidad confirmada, pedido mínimo y condiciones de entrega.'],
     article: 'que-revisar-en-una-tarima-de-plastico',
+    guideContext: 'Si buscas cajas o contenedores, revisa cómo comparar sus medidas y condiciones de apilado en esta guía.',
     related: ['tarimas-y-contenedores','cubetas-y-bidones'],
   },
 };

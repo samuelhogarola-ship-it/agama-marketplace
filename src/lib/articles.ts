@@ -26,7 +26,7 @@ export const ARTICLES: Article[] = [
       "excerpt": "Prepara una solicitud clara con material, capacidad, dimensiones y cierre para comparar fabricantes y proveedores de envases en México.",
       "published": true,
       "paragraphs": [],
-      "updatedAt": "2026-09-29",
+      "updatedAt": "2026-10-06",
       "familySlugs": [
           "envases-y-botellas",
           "cubetas-y-bidones"
@@ -49,7 +49,7 @@ export const ARTICLES: Article[] = [
           {
               "heading": "Comprueba botella, cuello y tapa juntos",
               "paragraphs": [
-                  "Solicita la referencia del cuello y la del cierre: el diámetro por sí solo no describe toda la unión. Confirma si tapa, sello, liner u otros accesorios están incluidos o se cotizan por separado.",
+                  "Solicita la referencia del cuello y la del cierre: el diámetro por sí solo no describe toda la unión. Confirma si tapa, sello, revestimiento interior (liner) u otros accesorios están incluidos o se cotizan por separado.",
                   "Revisa apertura, cierre y posibles fugas con una muestra del conjunto. Si usarás equipo de llenado o etiquetado, valida también las dimensiones que necesita esa operación."
               ]
           },
@@ -507,7 +507,7 @@ export const ARTICLES: Article[] = [
       "excerpt": "Charolas, blíster y clamshell: define medidas, cavidades, cierre y herramental para comparar propuestas de fabricación en México.",
       "published": true,
       "paragraphs": [],
-      "updatedAt": "2026-09-29",
+      "updatedAt": "2026-10-06",
       "familySlugs": [
           "empaques-y-embalaje",
           "perfiles-y-laminas"
@@ -524,7 +524,7 @@ export const ARTICLES: Article[] = [
               "heading": "Termoformado e inyección responden a diseños distintos",
               "paragraphs": [
                   "El termoformado parte de una lámina calentada que se conforma sobre un molde; la inyección introduce material fundido en un molde. Pide al fabricante que explique por qué propone un proceso para tu geometría, volumen y acabado.",
-                  "No elijas únicamente por una regla de cantidad de piezas. Solicita coste de herramental, precio por pieza, tolerancias y plazo para el mismo diseño funcional, aclarando los cambios que cada proceso requiere."
+                  "No elijas únicamente por una regla de cantidad de piezas. Solicita costo de herramental, precio por pieza, tolerancias y plazo para el mismo diseño funcional, aclarando los cambios que cada proceso requiere."
               ]
           },
           {
@@ -859,7 +859,7 @@ export const ARTICLES: Article[] = [
       "excerpt": "Ancho, espesor, fuelle, longitud y presentación: prepara pedidos comparables de bolsas y película con proveedores en México.",
       "published": true,
       "paragraphs": [],
-      "updatedAt": "2026-09-29",
+      "updatedAt": "2026-10-06",
       "familySlugs": [
           "bolsas-y-pelicula",
           "empaques-y-embalaje"
@@ -883,13 +883,13 @@ export const ARTICLES: Article[] = [
               "heading": "Compara cuánto producto recibes",
               "paragraphs": [
                   "Pregunta cuántas piezas incluye cada paquete y cuántos paquetes forman el pedido. Para película, distingue peso neto de película y peso del rollo con núcleo. Confirma longitud y ancho para comparar presentaciones.",
-                  "No compares únicamente el precio por rollo si cambian metros, espesor o peso neto. Pide al proveedor que desglosen esas variables y mantén una misma especificación en todas las solicitudes."
+                  "No compares únicamente el precio por rollo si cambian metros, espesor o peso neto. Pide al proveedor que desglose esas variables y mantén una misma especificación en todas las solicitudes."
               ]
           },
           {
               "heading": "Impresión, muestras y fabricación a medida",
               "paragraphs": [
-                  "Para bolsas impresas, prepara el arte, el tamaño y la posición de impresión. Consulta cantidades mínimas, coste de preparación, aprobación de muestra y plazo de producción. No asumas que una referencia de inventario admite cambios al mismo precio.",
+                  "Para bolsas impresas, prepara el arte, el tamaño y la posición de impresión. Consulta cantidades mínimas, costo de preparación, aprobación de muestra y plazo de producción. No asumas que una referencia de inventario admite cambios al mismo precio.",
                   "Prueba una muestra en las condiciones reales de uso y con el equipo previsto. Acuerda qué comprobarán ambas partes y conserva la referencia aprobada para pedidos posteriores."
               ]
           },
