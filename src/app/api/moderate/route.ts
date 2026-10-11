@@ -1,8 +1,10 @@
+import { randomUUID } from "node:crypto";
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { createAdminClient } from "@/lib/supabase/admin";
+import { createAdminClient, isAdminUser } from "@/lib/supabase/admin";
 import { isRateLimited } from "@/lib/rate-limit";
 import { checkOrigin } from "@/lib/csrf";
+import { canRequestAiReview, combineAiReview, isReusableAiReview, runWithAiReviewClaim, type AiReviewResult } from "@/lib/moderation-workflow";
 
 const MODEL = "gpt-4o-mini";
 
@@ -11,12 +13,7 @@ const BANNED_RE =
 const CONTACT_RE =
   /\b\d{10}\b|\+?52[\s.-]?\d{10}|[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}|(wa\.me|whats\s*app)/i;
 
-interface ModResult {
-  verdict: "approve" | "reject" | "review";
-  violations: string[];
-  confidence: number;
-  reason_es: string | null;
-}
+type ModResult = AiReviewResult;
 
 async function callOpenAI(messages: { role: string; content: unknown }[], maxTokens = 300): Promise<string> {
   const key = process.env.OPENAI_API_KEY;
@@ -33,6 +30,7 @@ async function callOpenAI(messages: { role: string; content: unknown }[], maxTok
       temperature: 0,
       messages,
     }),
+    signal: AbortSignal.timeout(60_000),
   });
   if (!res.ok) throw new Error(`OpenAI ${res.status}`);
   const data = await res.json();
@@ -43,7 +41,7 @@ async function classifyText(title: string, description: string, category: string
   const raw = await callOpenAI([
     {
       role: "system",
-      content: `Eres el moderador de TodoPlástico, plataforma B2B gratuita de la industria plástica en México, impulsada por AGAMA.
+      content: `Eres el moderador de TodoPlásticos, plataforma B2B gratuita de la industria plástica en México, impulsada por AGAMA.
 
 PERMITIDO: plásticos (envases, tarimas, bolsas, tubería, perfiles, láminas, maquinaria, resinas PET/PE/PP/PVC/PS/ABS, molido, pacas), servicios de transformación plástica.
 PROHIBIDO:
@@ -72,7 +70,7 @@ async function classifyImages(urls: string[], title: string): Promise<ModResult>
           ...urls.map((url) => ({ type: "image_url", image_url: { url } })),
           {
             type: "text",
-            text: `Fotos de "${title}" en TodoPlástico (plásticos B2B México). ¿Muestran pigmentos, masterbatch, aditivos, productos ajenos al plástico, o datos de contacto incrustados en la imagen?
+            text: `Fotos de "${title}" en TodoPlásticos (plásticos B2B México). ¿Muestran pigmentos, masterbatch, aditivos, productos ajenos al plástico, o datos de contacto incrustados en la imagen?
 Devuelve SOLO JSON: {"verdict":"approve","violations":[],"confidence":0.95,"reason_es":null}`,
           },
         ],
@@ -92,95 +90,174 @@ export async function POST(req: NextRequest) {
 
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return NextResponse.json({ error: "No autenticado" }, { status: 401 });
-  if (isRateLimited({ key: `moderate:${user.id}`, max: 5, windowMs: 60_000 }))
+  if (!user || !isAdminUser(user)) return NextResponse.json({ error: "No autorizado" }, { status: 403 });
+  if (isRateLimited({ key: `admin-ai-review:${user.id}`, max: 5, windowMs: 60_000 }))
     return NextResponse.json({ error: "Demasiadas solicitudes. Espera un minuto." }, { status: 429 });
   const admin = createAdminClient();
   if (!admin) return NextResponse.json({ error: "Moderación no configurada" }, { status: 503 });
 
-  const { data: product } = await supabase
+  const { data: product } = await admin
     .from("mkt_listings")
     .select("*, photos:mkt_listing_photos(storage_path, position)")
     .eq("id", listing_id)
-    .eq("company_id", user.id)
     .single();
 
   if (!product) return NextResponse.json({ error: "Anuncio no encontrado" }, { status: 404 });
-  if (product.status === "blocked") return NextResponse.json({ error: "Anuncio bloqueado" }, { status: 403 });
+  if (!canRequestAiReview({ isAdmin: true, status: product.status }))
+    return NextResponse.json({ error: "El anuncio no está pendiente de revisión" }, { status: 409 });
 
-  const fullText = `${product.title} ${product.description}`;
-
-  // Layer 1: hard regex
-  const hardViolations: string[] = [];
-  if (BANNED_RE.test(fullText)) hardViolations.push("competencia_pigmentos_masterbatch_aditivos");
-  if (CONTACT_RE.test(fullText)) hardViolations.push("datos_contacto");
-
-  if (hardViolations.length > 0) {
-    const reason = hardViolations.includes("competencia_pigmentos_masterbatch_aditivos")
-      ? "No se permiten pigmentos, masterbatch, aditivos ni colorantes."
-      : "No se permiten teléfonos, emails ni WhatsApp en la publicación.";
-    await admin.rpc("mkt_submit_listing", { p_listing_id: listing_id, p_verdict: "reject", p_reason: reason });
-    await admin.from("mkt_moderation_events").insert({ listing_id, verdict: "reject", violations: hardViolations, reason, source: "rules", confidence: 1.0 });
-    return NextResponse.json({ verdict: "reject", reason });
+  const { data: previousReview } = await admin
+    .from("mkt_moderation_events")
+    .select("verdict, violations, confidence, reason, created_at, reviewed_listing_updated_at")
+    .eq("listing_id", listing_id)
+    .eq("source", "ai")
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  if (previousReview && isReusableAiReview({
+    listingUpdatedAt: product.updated_at,
+    reviewCreatedAt: previousReview.created_at,
+    reviewedListingUpdatedAt: previousReview.reviewed_listing_updated_at,
+  })) {
+    return NextResponse.json({
+      verdict: previousReview.verdict,
+      violations: previousReview.violations ?? [],
+      confidence: Number(previousReview.confidence ?? 0),
+      reason_es: previousReview.reason,
+      cached: true,
+    });
   }
 
-  // Sin IA configurada: queda pendiente para revision humana.
-  if (!process.env.OPENAI_API_KEY) {
-    await admin.rpc("mkt_submit_listing", { p_listing_id: listing_id, p_verdict: "pending" });
-    await admin.from("mkt_moderation_events").insert({ listing_id, verdict: "review", violations: [], reason: "Revisión IA pendiente de configuración", source: "rules", confidence: 0 });
-    return NextResponse.json({ verdict: "review", reason: "Tu publicación está pendiente de revisión." });
-  }
-
-  let textResult: ModResult;
+  const claimOwner = randomUUID();
   try {
-    textResult = await classifyText(product.title, product.description, product.category);
-  } catch {
-    await admin.rpc("mkt_submit_listing", { p_listing_id: listing_id, p_verdict: "pending" });
-    await admin.from("mkt_moderation_events").insert({ listing_id, verdict: "review", violations: [], reason: "Error en clasificador IA", source: "ai", confidence: 0 });
-    return NextResponse.json({ verdict: "review", reason: "Tu publicación está pendiente de revisión." });
-  }
+    const claimedReview = await runWithAiReviewClaim({
+      claim: async () => {
+        const { data, error } = await admin.rpc("mkt_claim_ai_review", {
+          p_listing_id: listing_id,
+          p_listing_updated_at: product.updated_at,
+          p_owner_token: claimOwner,
+        });
+        if (error) throw error;
+        return data === true;
+      },
+      release: async () => {
+        const { error } = await admin.rpc("mkt_release_ai_review_claim", {
+          p_listing_id: listing_id,
+          p_listing_updated_at: product.updated_at,
+          p_owner_token: claimOwner,
+        });
+        if (error) console.error("Could not release AI review claim", error);
+      },
+      run: async () => {
+        const renewClaim = async () => {
+          const { data, error } = await admin.rpc("mkt_renew_ai_review_claim", {
+            p_listing_id: listing_id,
+            p_listing_updated_at: product.updated_at,
+            p_owner_token: claimOwner,
+          });
+          if (error) throw error;
+          return data === true;
+        };
 
-  if (textResult.verdict === "reject" && textResult.confidence >= 0.8) {
-    await admin.rpc("mkt_submit_listing", { p_listing_id: listing_id, p_verdict: "reject", p_reason: textResult.reason_es });
-    await admin.from("mkt_moderation_events").insert({ listing_id, verdict: "reject", violations: textResult.violations, reason: textResult.reason_es, source: "ai", confidence: textResult.confidence, model: MODEL });
-    return NextResponse.json({ verdict: "reject", reason: textResult.reason_es });
-  }
+        // Otra petición puede haber terminado entre la primera lectura y la reserva.
+        const { data: reviewAfterClaim } = await admin
+          .from("mkt_moderation_events")
+          .select("verdict, violations, confidence, reason, created_at, reviewed_listing_updated_at")
+          .eq("listing_id", listing_id)
+          .eq("source", "ai")
+          .order("created_at", { ascending: false })
+          .limit(1)
+          .maybeSingle();
+        if (reviewAfterClaim && isReusableAiReview({
+          listingUpdatedAt: product.updated_at,
+          reviewCreatedAt: reviewAfterClaim.created_at,
+          reviewedListingUpdatedAt: reviewAfterClaim.reviewed_listing_updated_at,
+        })) {
+          return NextResponse.json({
+            verdict: reviewAfterClaim.verdict,
+            violations: reviewAfterClaim.violations ?? [],
+            confidence: Number(reviewAfterClaim.confidence ?? 0),
+            reason_es: reviewAfterClaim.reason,
+            cached: true,
+          });
+        }
 
-  if (textResult.verdict !== "approve" || textResult.confidence < 0.75) {
-    await admin.rpc("mkt_submit_listing", { p_listing_id: listing_id, p_verdict: "pending" });
-    await admin.from("mkt_moderation_events").insert({ listing_id, verdict: "review", violations: textResult.violations, reason: textResult.reason_es, source: "ai", confidence: textResult.confidence, model: MODEL });
-    return NextResponse.json({ verdict: "review", reason: "Tu publicación está siendo revisada." });
-  }
+        const fullText = `${product.title} ${product.description}`;
+        const hardViolations: string[] = [];
+        if (BANNED_RE.test(fullText)) hardViolations.push("competencia_pigmentos_masterbatch_aditivos");
+        if (CONTACT_RE.test(fullText)) hardViolations.push("datos_contacto");
 
-  // Layer 3: GPT-4o-mini vision
-  const photos = ((product.photos ?? []) as { storage_path: string; position: number }[])
-    .sort((a, b) => a.position - b.position)
-    .slice(0, 5);
-  const photoUrls = photos.map(
-    (p) => `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/mkt-photos/${p.storage_path}`,
-  );
+        if (hardViolations.length > 0) {
+          const reason = hardViolations.includes("competencia_pigmentos_masterbatch_aditivos")
+            ? "No se permiten pigmentos, masterbatch, aditivos ni colorantes."
+            : "No se permiten teléfonos, emails ni WhatsApp en la publicación.";
+          await admin.from("mkt_moderation_events").insert({ listing_id, verdict: "reject", violations: hardViolations, reason, source: "rules", confidence: 1.0 });
+          return NextResponse.json({ verdict: "reject", violations: hardViolations, confidence: 1, reason_es: reason });
+        }
 
-  if (photoUrls.length > 0) {
-    try {
-      const visionResult = await classifyImages(photoUrls, product.title);
-      if (visionResult.verdict === "reject" && visionResult.confidence >= 0.8) {
-        await admin.rpc("mkt_submit_listing", { p_listing_id: listing_id, p_verdict: "reject", p_reason: visionResult.reason_es });
-        await admin.from("mkt_moderation_events").insert({ listing_id, verdict: "reject", violations: visionResult.violations, reason: visionResult.reason_es, source: "ai", confidence: visionResult.confidence, model: MODEL });
-        return NextResponse.json({ verdict: "reject", reason: visionResult.reason_es });
-      }
-      if (visionResult.verdict === "review") {
-        await admin.rpc("mkt_submit_listing", { p_listing_id: listing_id, p_verdict: "pending" });
-        await admin.from("mkt_moderation_events").insert({ listing_id, verdict: "review", violations: visionResult.violations, reason: visionResult.reason_es, source: "ai", confidence: visionResult.confidence, model: MODEL });
-        return NextResponse.json({ verdict: "review", reason: "Las imágenes están siendo revisadas." });
-      }
-    } catch {
-      await admin.rpc("mkt_submit_listing", { p_listing_id: listing_id, p_verdict: "pending" });
-      await admin.from("mkt_moderation_events").insert({ listing_id, verdict: "review", violations: [], reason: "Error en revisión visual", source: "ai", confidence: 0, model: MODEL });
-      return NextResponse.json({ verdict: "review", reason: "Las imágenes están pendientes de revisión." });
+        if (!process.env.OPENAI_API_KEY) {
+          return NextResponse.json({ error: "Valoración IA no configurada" }, { status: 503 });
+        }
+
+        let textResult: ModResult;
+        try {
+          if (!(await renewClaim())) {
+            return NextResponse.json({ error: "La reserva de valoración IA ha caducado" }, { status: 409 });
+          }
+          textResult = await classifyText(product.title, product.description, product.category);
+        } catch {
+          return NextResponse.json({ error: "No se pudo completar la valoración IA" }, { status: 502 });
+        }
+
+        const photos = ((product.photos ?? []) as { storage_path: string; position: number }[])
+          .sort((a, b) => a.position - b.position)
+          .slice(0, 5);
+        const photoUrls = photos.map(
+          (p) => `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/mkt-photos/${p.storage_path}`,
+        );
+
+        let imageResult: ModResult | null = null;
+        if (photoUrls.length > 0) {
+          try {
+            if (!(await renewClaim())) {
+              return NextResponse.json({ error: "La reserva de valoración IA ha caducado" }, { status: 409 });
+            }
+            imageResult = await classifyImages(photoUrls, product.title);
+          } catch {
+            return NextResponse.json({ error: "No se pudo completar la valoración de imágenes" }, { status: 502 });
+          }
+        }
+
+        const recommendation = combineAiReview({ text: textResult, image: imageResult });
+        const { data: saveStatus, error: saveError } = await admin.rpc("mkt_save_ai_review", {
+          p_listing_id: listing_id,
+          p_listing_updated_at: product.updated_at,
+          p_owner_token: claimOwner,
+          p_verdict: recommendation.verdict,
+          p_violations: recommendation.violations,
+          p_reason: recommendation.reason_es,
+          p_confidence: recommendation.confidence,
+          p_model: MODEL,
+        });
+        if (saveError) {
+          return NextResponse.json({ error: "No se pudo guardar la valoración IA" }, { status: 500 });
+        }
+        if (saveStatus !== "saved") {
+          return NextResponse.json(
+            { error: "El anuncio cambió durante la valoración. Vuelve a solicitarla." },
+            { status: 409 },
+          );
+        }
+        return NextResponse.json(recommendation);
+      },
+    });
+
+    if (!claimedReview.claimed) {
+      return NextResponse.json({ error: "Ya hay una valoración IA en curso" }, { status: 409 });
     }
+    return claimedReview.value;
+  } catch (error) {
+    console.error("Could not coordinate AI review", error);
+    return NextResponse.json({ error: "No se pudo iniciar la valoración IA" }, { status: 500 });
   }
-
-  await admin.rpc("mkt_submit_listing", { p_listing_id: listing_id, p_verdict: "approve" });
-  await admin.from("mkt_moderation_events").insert({ listing_id, verdict: "approve", violations: [], reason: null, source: "ai", confidence: textResult.confidence, model: MODEL });
-  return NextResponse.json({ verdict: "approve" });
 }

@@ -6,6 +6,14 @@ import { createClient } from "@/lib/supabase/client";
 import { CATEGORIES } from "@/lib/categories";
 import { compressImage } from "@/lib/compress-image";
 import { DEMO_COMPANY, DEMO_PREVIEW_ENABLED } from "@/lib/demo-data";
+import { loadCompanyForEditing, saveCompany } from "@/lib/company-profile";
+import { normalizeTaxId, taxIdSaveError, companyRfcInput, companyRfcError } from "@/lib/tax-id";
+
+import CompanyAddressFields from "@/components/CompanyAddressFields";
+import { EMPTY_ADDRESS, addressError, addressFieldsForSave, supportsCompanyAddress, type CompanyAddress } from "@/lib/company-address";
+
+import CompanyContactFields from "@/components/CompanyContactFields";
+import { readPhone, contactError, contactValues, type PhoneDraft, type ContactSelection } from "@/lib/company-phone";
 
 function PerfilContent() {
   const router = useRouter();
@@ -13,6 +21,7 @@ function PerfilContent() {
   const previewMode = DEMO_PREVIEW_ENABLED && searchParams.get("preview") === "1";
   const [form, setForm] = useState({
     name: "",
+    rfc: "",
     description: "",
     location: "",
     website: "",
@@ -21,17 +30,26 @@ function PerfilContent() {
     whatsapp: "",
     categories: [] as string[],
   });
+  const [addressSupported, setAddressSupported] = useState(previewMode);
+  const [address, setAddress] = useState<CompanyAddress>({ ...EMPTY_ADDRESS });
+  const [contacts, setContacts] = useState<ContactSelection>({ phone: false, email: false, whatsapp: false });
+  const [phone, setPhone] = useState<PhoneDraft>({ country: "", national: "" });
+  const [whatsapp, setWhatsapp] = useState<PhoneDraft>({ country: "", national: "" });
   const [logoUrl, setLogoUrl] = useState<string | null>(null);
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
   const [uploadingLogo, setUploadingLogo] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [loadFailed, setLoadFailed] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [saveMessage, setSaveMessage] = useState<string | null>(null);
   const logoInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (previewMode) {
       setForm({
         name: DEMO_COMPANY.name,
+        rfc: DEMO_COMPANY.rfc ?? "",
         description: DEMO_COMPANY.description ?? "",
         location: DEMO_COMPANY.location ?? "",
         website: DEMO_COMPANY.website ?? "",
@@ -40,6 +58,10 @@ function PerfilContent() {
         whatsapp: DEMO_COMPANY.whatsapp ?? "",
         categories: DEMO_COMPANY.categories ?? [],
       });
+      setAddress({ ...EMPTY_ADDRESS, ...DEMO_COMPANY.address });
+      setContacts({ phone: !!DEMO_COMPANY.phone?.trim(), email: !!DEMO_COMPANY.email?.trim(), whatsapp: !!DEMO_COMPANY.whatsapp?.trim() });
+      setPhone(readPhone(DEMO_COMPANY.phone));
+      setWhatsapp(readPhone(DEMO_COMPANY.whatsapp));
       setLogoUrl(DEMO_COMPANY.logo_url);
       setLoading(false);
       return;
@@ -54,10 +76,20 @@ function PerfilContent() {
         router.replace("/ingresar?next=/panel/perfil");
         return;
       }
-      const { data } = await supabase.rpc("mkt_my_company");
+      let data;
+      try {
+        data = await loadCompanyForEditing(supabase, user);
+      } catch {
+        setLoadFailed(true);
+        setSaveMessage("No se pudo cargar tu ficha. Recarga la página antes de guardar.");
+        setLoading(false);
+        return;
+      }
+      setAddressSupported(supportsCompanyAddress(data));
       if (data) {
         setForm({
           name: data.name ?? "",
+          rfc: data.rfc ?? "",
           description: data.description ?? "",
           location: data.location ?? "",
           website: data.website ?? "",
@@ -66,10 +98,18 @@ function PerfilContent() {
           whatsapp: data.whatsapp ?? "",
           categories: data.categories ?? [],
         });
+        setAddress({ ...EMPTY_ADDRESS, ...data.address });
+        setContacts({ phone: !!data.phone?.trim(), email: !!data.email?.trim(), whatsapp: !!data.whatsapp?.trim() });
+        setPhone(readPhone(data.phone));
+        setWhatsapp(readPhone(data.whatsapp));
         setLogoUrl(data.logo_url ?? null);
       }
       setLoading(false);
-    })();
+    })().catch(() => {
+      setLoadFailed(true);
+      setSaveMessage("No se pudo cargar tu ficha. Recarga la página antes de guardar.");
+      setLoading(false);
+    });
   }, [previewMode, router]);
 
   async function onLogoChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -80,31 +120,25 @@ function PerfilContent() {
     if (previewMode) return;
 
     setUploadingLogo(true);
-    const supabase = createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    if (!user) return;
-
-    const compressed = await compressImage(file);
-    const ext =
-      { "image/jpeg": "jpg", "image/png": "png", "image/webp": "webp" }[
-        compressed.type
-      ] ?? "jpg";
-    const path = `logos/${user.id}.${ext}`;
-    const { error: upErr } = await supabase.storage
-      .from("mkt-photos")
-      .upload(path, compressed, { upsert: true });
-
-    if (!upErr) {
-      const url = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/mkt-photos/${path}`;
-      await supabase
-        .from("mkt_companies")
-        .update({ logo_url: url })
-        .eq("id", user.id);
-      setLogoUrl(url);
+    setSaved(false);
+    setSaveMessage(null);
+    try {
+      const supabase = createClient();
+      const { data: { user }, error: authError } = await supabase.auth.getUser();
+      if (authError || !user) throw new Error("session");
+      const compressed = await compressImage(file);
+      const ext = { "image/jpeg": "jpg", "image/png": "png", "image/webp": "webp" }[compressed.type] ?? "jpg";
+      const path = `${user.id}/logos/${crypto.randomUUID()}.${ext}`;
+      const { error } = await supabase.storage.from("mkt-photos").upload(path, compressed);
+      if (error) throw error;
+      // Persist with the form, including when this is the company's first save.
+      setLogoUrl(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/mkt-photos/${path}`);
+    } catch {
+      setLogoPreview(null);
+      setSaveMessage("No se pudo subir el logo. Vuelve a intentarlo antes de guardar.");
+    } finally {
+      setUploadingLogo(false);
     }
-    setUploadingLogo(false);
   }
 
   function toggleCategory(slug: string) {
@@ -118,47 +152,57 @@ function PerfilContent() {
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
+    setSaved(false);
+    setSaveMessage(null);
+    const rfcError = companyRfcError(form.rfc);
+    if (rfcError) { setSaveMessage(rfcError); return; }
+    const locationError = addressSupported ? addressError(address) : null;
+    if (locationError) { setSaveMessage(locationError); return; }
+    const numberError = contactError(contacts, { phone, whatsapp, email: form.email });
+    if (numberError) { setSaveMessage(numberError); return; }
     if (previewMode) {
       setSaved(true);
       return;
     }
-    const supabase = createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    if (!user) return;
-    const { error: saveError } = await supabase
-      .from("mkt_companies")
-      .update({
-        name: form.name,
+    if (saving || uploadingLogo || loadFailed) return;
+    setSaving(true);
+    try {
+      const supabase = createClient();
+      const { data: { user }, error: authError } = await supabase.auth.getUser();
+      if (authError || !user) {
+        setSaveMessage("Tu sesión ha caducado. Vuelve a ingresar para guardar tu empresa.");
+        return;
+      }
+      await saveCompany(supabase, user, {
+        name: form.name.trim(),
+        rfc: normalizeTaxId(form.rfc),
         description: form.description,
-        location: form.location,
+        ...addressFieldsForSave(addressSupported, address, form.location),
         website: form.website,
-        phone: form.phone,
-        email: form.email,
-        whatsapp: form.whatsapp,
-        categories: form.categories.length > 0 ? form.categories : null,
-      })
-      .eq("id", user.id);
-    if (saveError) {
-      setSaved(false);
-      return;
+        ...contactValues(contacts, { phone, whatsapp, email: form.email }),
+        categories: form.categories,
+        logo_url: logoUrl,
+      });
+      setSaved(true);
+      setTimeout(() => router.push("/panel"), 800);
+    } catch (error) {
+      setSaveMessage(taxIdSaveError(error && typeof error === "object" ? error : {}));
+    } finally {
+      setSaving(false);
     }
-    setSaved(true);
-    setTimeout(() => router.push("/panel"), 800);
   }
 
   const currentLogo = logoPreview ?? logoUrl;
 
   if (loading)
     return (
-      <div className="mx-auto max-w-2xl px-4 py-16 text-slate-400">
+      <div className="mx-auto max-w-2xl py-12 text-slate-400">
         Cargando…
       </div>
     );
 
   return (
-    <div className="mx-auto max-w-2xl px-4 py-12">
+    <div className="mx-auto max-w-2xl py-4 lg:py-0">
       {previewMode ? (
         <div className="mb-8 rounded-2xl border border-brand/20 bg-brand-light px-5 py-4 text-sm text-slate-700">
           <span className="font-semibold text-brand-dark">
@@ -235,6 +279,26 @@ function PerfilContent() {
             className="mt-1 w-full rounded-lg border border-slate-300 px-4 py-2.5 focus:border-brand focus:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-1"
           />
         </div>
+        <div className="rounded-xl border border-brand/20 bg-brand-light/50 p-4">
+          <label htmlFor="company-tax-id" className="block text-sm font-semibold text-brand-dark">
+            RFC de la empresa (México)
+          </label>
+          <p className="mt-1 text-xs leading-5 text-slate-600">
+            Es necesario para publicar anuncios. Solo identifica a tu empresa y evita cuentas duplicadas; no se muestra en la ficha pública.
+          </p>
+          <input
+            id="company-tax-id"
+            value={form.rfc}
+            onChange={(e) => setForm({ ...form, rfc: companyRfcInput(e.target.value) })}
+            placeholder="Ej. ABC010203XY9"
+            pattern="[A-ZÑ&]{3}[0-9]{6}[A-Z0-9]{3}"
+            title="RFC de empresa: 12 caracteres (3 letras, 6 números de fecha y 3 de homoclave)"
+            aria-describedby="company-rfc-help"
+            autoComplete="off"
+            className="mt-3 w-full rounded-lg border border-slate-300 bg-white px-4 py-2.5 font-mono uppercase tracking-wide focus:border-brand focus:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-1"
+          />
+          <p id="company-rfc-help" className="mt-2 text-xs text-slate-600">12 caracteres. Escribe el RFC de la empresa, no el de una persona física.</p>
+        </div>
         <div>
           <label className="block text-sm font-medium text-slate-700">
             Descripción
@@ -271,70 +335,28 @@ function PerfilContent() {
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-slate-700">
-              Ubicación
-            </label>
-            <input
-              value={form.location}
-              onChange={(e) => setForm({ ...form, location: e.target.value })}
-              placeholder="Iztapalapa, CDMX"
-              className="mt-1 w-full rounded-lg border border-slate-300 px-4 py-2.5 focus:border-brand focus:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-1"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-slate-700">
-              Teléfono público
-            </label>
-            <input
-              value={form.phone}
-              onChange={(e) => setForm({ ...form, phone: e.target.value })}
-              placeholder="+52 55 0000 0000"
-              className="mt-1 w-full rounded-lg border border-slate-300 px-4 py-2.5 focus:border-brand focus:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-1"
-            />
-          </div>
+        {addressSupported ? <CompanyAddressFields value={address} onChange={setAddress} previousLocation={form.location} /> : <div>
+          <label htmlFor="company-location" className="block text-sm font-medium text-slate-700">Ubicación</label>
+          <input id="company-location" value={form.location} onChange={e => setForm(current => ({ ...current, location: e.target.value }))} placeholder="Iztapalapa, CDMX" className="mt-1 w-full rounded-lg border border-slate-300 px-4 py-2.5" />
+        </div>}
+        <div>
+          <label htmlFor="company-website" className="block text-sm font-medium text-slate-700">Web pública</label>
+          <input id="company-website" type="url" value={form.website} onChange={e => setForm({ ...form, website: e.target.value })} placeholder="https://tuempresa.com" className="mt-1 w-full rounded-lg border border-slate-300 px-4 py-2.5" />
         </div>
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-          <div>
-            <label className="block text-sm font-medium text-slate-700">
-              Web pública
-            </label>
-            <input
-              type="url"
-              value={form.website}
-              onChange={(e) => setForm({ ...form, website: e.target.value })}
-              placeholder="https://tuempresa.com"
-              className="mt-1 w-full rounded-lg border border-slate-300 px-4 py-2.5 focus:border-brand focus:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-1"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-slate-700">
-              Email público
-            </label>
-            <input
-              type="email"
-              value={form.email}
-              onChange={(e) => setForm({ ...form, email: e.target.value })}
-              placeholder="ventas@tuempresa.com"
-              className="mt-1 w-full rounded-lg border border-slate-300 px-4 py-2.5 focus:border-brand focus:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-1"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-slate-700">
-              WhatsApp público
-            </label>
-            <input
-              value={form.whatsapp}
-              onChange={(e) => setForm({ ...form, whatsapp: e.target.value })}
-              placeholder="+52 55 0000 0000"
-              className="mt-1 w-full rounded-lg border border-slate-300 px-4 py-2.5 focus:border-brand focus:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-1"
-            />
-          </div>
-        </div>
+        <CompanyContactFields enabled={contacts} onToggle={setContacts} value={{ phone, whatsapp, email: form.email }} onChange={next => {
+          setPhone(next.phone);
+          setWhatsapp(next.whatsapp);
+          setForm(current => ({ ...current, email: next.email }));
+        }} />
 
-        <button className="rounded-full bg-brand px-8 py-3 text-sm font-semibold text-white hover:bg-brand-dark">
-          {saved
+        {saveMessage ? (
+          <p role="alert" className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+            {saveMessage}
+          </p>
+        ) : null}
+
+        <button disabled={saving || uploadingLogo || loadFailed} className="rounded-full bg-brand px-8 py-3 text-sm font-semibold text-white hover:bg-brand-dark disabled:opacity-50">
+          {saving ? "Guardando…" : saved
             ? previewMode
               ? "Cambios de demo guardados ✓"
               : "Guardado ✓"
@@ -349,7 +371,7 @@ export default function PerfilPage() {
   return (
     <Suspense
       fallback={
-        <div className="mx-auto max-w-2xl px-4 py-16 text-slate-400">
+        <div className="mx-auto max-w-2xl py-12 text-slate-400">
           Cargando ficha…
         </div>
       }

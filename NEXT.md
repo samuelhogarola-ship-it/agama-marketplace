@@ -1,4 +1,4 @@
-# NEXT — TodoPlástico
+# NEXT — TodoPlásticos
 
 ## Comprobación final pre-lanzamiento (2026-08-25)
 

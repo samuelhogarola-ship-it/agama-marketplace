@@ -1,4 +1,4 @@
-# CLAUDE.md — Reglas para TodoPlástico
+# CLAUDE.md — Reglas para TodoPlásticos
 
 ## Gobernanza
 
@@ -10,8 +10,8 @@
 
 ## Reglas de producto no negociables
 
-- TodoPlástico es una **plataforma B2B gratuita de descubrimiento**, no un marketplace transaccional.
-- La marca visible es **TodoPlástico**, con texto **"Impulsado por AGAMA"**.
+- TodoPlásticos es una **plataforma B2B gratuita de descubrimiento**, no un marketplace transaccional.
+- La marca visible es **TodoPlásticos**, con texto **"Impulsado por AGAMA"**.
 - Límites free: **5 anuncios activos, 5 fotos por anuncio** — aplicados en BD (constraint/trigger), no solo en UI.
 - **Pigmentos, masterbatch y aditivos prohibidos** en la plataforma (competencia de AGAMA). La lista de prohibidos vive en `docs/moderacion-ia.md` y en la config del watcher; mantenerlas sincronizadas.
 - Nada se publica sin pasar por el pipeline de moderación (`pending_review` primero).

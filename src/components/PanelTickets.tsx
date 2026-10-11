@@ -267,7 +267,7 @@ export default function PanelTickets({ userId }: { userId: string }) {
                   className={`rounded-xl px-4 py-3 text-sm max-w-[85%] ${isOwn ? "bg-brand/10 text-brand-dark ml-auto" : "bg-slate-100 text-slate-800"}`}
                 >
                   <p className="whitespace-pre-wrap">{msg.body}</p>
-                  <p className="mt-1.5 text-[10px] text-slate-400">{isOwn ? "Tú" : "Soporte TodoPlástico"} · {fmt(msg.created_at)}</p>
+                  <p className="mt-1.5 text-[10px] text-slate-400">{isOwn ? "Tú" : "Soporte TodoPlásticos"} · {fmt(msg.created_at)}</p>
                 </div>
               );
             })}

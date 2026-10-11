@@ -1,6 +1,83 @@
+## Revisión editorial y formato — 2026-10-06
+
+- Fechas de las guías en líneas separadas en móvil y con ajuste de línea en escritorio.
+- Las lecturas relacionadas de perfiles, tubería y productos terminados explican qué parte de la familia cubren.
+- Correcciones de concordancia, vocabulario para México y aclaración de liner. Fechas de revisión actualizadas solo en las guías modificadas.
+
+## Metadatos editoriales — 2026-10-05
+
+- Artículos con título, descripción, URL e imagen propios al compartir, tipo artículo y fechas reales. Datos estructurados con imagen absoluta y referencia a la página canónica.
+- El índice de categorías deja de repetir la marca en el título.
+
+## Cabecera adaptable — 2026-10-01
+
+- La marca se ajusta al ancho disponible en móvil para mantener visibles los botones de búsqueda y menú, sin desplazamiento horizontal.
+- El buscador de escritorio incorpora una etiqueta accesible. Comprobación de cabecera y menú a 320, 390, 768 y 1440 píxeles.
+
+## Verificación de commits — 2026-09-25
+
+- Husky escanea con Gitleaks los archivos del commit, evitando descargar todo el historial en clones parciales. CI conserva el escaneo del historial.
+
+## Dirección de empresa por código postal — 2026-09-25
+
+- Dirección en campos separados con código postal mexicano obligatorio de 5 cifras. Autocompletado de estado, municipio y colonia desde catálogo local; selección de colonia cuando hay varias y captura manual disponible.
+- Calle y número exterior obligatorios, interior opcional. Dirección completa privada; municipio y estado en la ubicación pública. Se activa al detectar la migración aditiva 0016. Antes de aplicarla, conserva el formulario anterior y omite la columna nueva al guardar para permitir un despliegue compatible.
+
+## Contactos independientes — 2026-09-24
+
+- Tres opciones independientes: teléfono, correo electrónico y WhatsApp. Se exige al menos una completa y se validan solo las activadas.
+- Al guardar, los canales desactivados dejan de mostrarse públicamente. Los datos ya existentes se cargan con su canal activado.
+
+## Prefijos telefónicos — 2026-09-24
+
+- Teléfono y WhatsApp separados en país/prefijo y número; países en español con búsqueda por nombre, código y prefijo.
+- Solo cifras, prefijo obligatorio al informar número, México con 10 cifras y validación de longitud internacional. Se conservan los valores existentes; los ambiguos requieren elegir prefijo.
+
+## RFC empresarial — 2026-09-24
+
+- Registro y ficha: RFC mexicano de persona moral limitado a 12 caracteres, con formato y fecha validados; letras en mayúscula y sin símbolos ajenos. Sigue siendo opcional hasta publicar.
+
 # Changelog
 
+## Marca TodoPlásticos — 2026-09-24
+
+- Se añade la S al nombre y al texto del logo en cabecera, navegación móvil, pie, metadatos, artículos, legales y mensajes de la aplicación.
+- Se actualizan las referencias de marca en documentación y pruebas. Dominios, correos, rutas, archivos e identificadores conservan su configuración actual.
+
+## Corrección de guardado de empresa — 2026-09-23
+
+- El panel lee la ficha privada mediante la RPC del propietario, evitando errores por columnas restringidas.
+- El primer guardado crea la empresa si todavía no existe y confirma la fila escrita antes de mostrar éxito.
+- Se guardan las categorías vacías como lista y el logo junto con la primera ficha.
+- Los errores de carga, sesión y guardado se muestran sin perder los campos introducidos.
+- Pruebas de regresión para creación, edición, permisos, RFC duplicado y actualizaciones sin filas.
+
 ## [Unreleased]
+
+### Atribución de estadísticas Umami
+- Contactos limitados al perfil y anuncios de la empresa autenticada, sin sumar contactos ajenos.
+- Comparativa anterior real de anuncios y consulta completa sin truncar a 20 fichas.
+- Periodos válidos entre 1 y 90 días; errores de datos diferenciados de actividad cero.
+- Visitantes únicos del perfil sin sumar personas repetidas entre páginas.
+
+
+### Moderación
+- Los anuncios nuevos, editados o reactivados quedan en revisión sin llamar automáticamente a OpenAI.
+- La valoración con IA solo puede iniciarla un administrador desde la cola y nunca publica ni rechaza: la decisión final continúa siendo humana.
+- Las valoraciones se reutilizan mientras el contenido no cambie para evitar consumo duplicado de tokens.
+- Una reserva atómica, renovable y ligada a un propietario por versión del anuncio impide que dos peticiones concurrentes consuman tokens duplicados; expira tras cinco minutos si una petición se interrumpe.
+- La versión y propiedad de la reserva se vuelven a validar dentro de la misma transacción que guarda la recomendación IA, evitando registrar resultados obsoletos.
+- Añadir, modificar o borrar una foto invalida la valoración IA anterior, y las señales de texto e imagen se conservan al combinar recomendaciones.
+
+### Panel
+- Los enlaces de navegación mantienen `preview=1`, incluso cuando contienen un fragmento como `#catalogo`.
+
+### Pagos
+- El inicio de Stripe valida en runtime que la URL y los errores recibidos sean texto antes de usarlos.
+
+### Analytics
+- Umami usa un fallback público y validado para la instancia Agama y el sitio TodoPlástico, evitando que un build de Coolify sin variables `NEXT_PUBLIC_*` elimine el tracker de producción.
+- El tracker queda restringido a `todo-plastico.com` y `www.todo-plastico.com`.
 
 ### Security
 - CSRF: añadida verificación `checkOrigin()` al endpoint `/api/moderate` (el único sin protección).
@@ -61,3 +138,23 @@
 - Definición del proyecto: visión, roadmap por fases, especificación del watcher IA, estrategia SEO y stack propuesto (`docs/`).
 - Gobernanza del repo (`CLAUDE.md`): ramas + PR, límites de producto no negociables, seguridad.
 - Tooling base: `.pre-commit-config.yaml` (gitleaks, no-commit-to-main), `playwright.config.ts`, workflow de CI.
+
+### SEO técnico (septiembre 2026)
+- Canonical propio para páginas del catálogo y directorio; variantes filtradas noindex/follow y paginación validada.
+- Datos estructurados acordes al anuncio y empresa, sin inventar existencias ni precios.
+- Sitemap paginado sin recorte a 5.000 filas ni fechas de modificación ficticias; error explícito ante fallo de datos.
+- Estrategia documentada para México completo y ocho familias durante dos meses.
+
+### Correos de autenticación en español
+- Seis plantillas y asuntos versionados con marca TodoPlásticos y enlaces al dominio configurado de la web.
+- Pruebas de compatibilidad de enlaces con el callback y navegación de login/recuperación.
+- Guía de SMTP, verificación DNS y costes. Activación de plantillas y remitente pendiente de acceso al panel de Supabase y dominio confirmado; el merge no cambia la configuración alojada.
+- La confirmación por correo requiere pulsar un botón antes de consumir el token; se evita la validación al abrir el enlace automáticamente y se endurecen los destinos locales del login.
+
+- Los tokens de correo nuevos viajan en fragmentos y se eliminan de la URL antes de confirmar; cabeceras de la ruta protegidas frente a la configuración general.
+
+## 2026-09-29 — Programa SEO y contenidos
+- Ocho familias con metadatos, criterios de cotización y enlaces relacionados.
+- Cuatro guías actualizadas conservando URLs y fechas originales; fecha de revisión en página, marcado y sitemap.
+- Eventos Umami content_catalog_click y catalog_listing_click sin datos personales.
+- Dominio activo conservado: sin redirecciones ni cambios DNS; correo y Supabase aplazados.

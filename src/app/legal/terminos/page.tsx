@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
-export const metadata: Metadata = { title: "Términos de uso", description: "Términos y condiciones de uso de TodoPlástico, directorio B2B de la industria plástica en México.", alternates: { canonical: "/legal/terminos" } };
+export const metadata: Metadata = { title: "Términos de uso", description: "Términos y condiciones de uso de TodoPlásticos, directorio B2B de la industria plástica en México.", alternates: { canonical: "/legal/terminos" } };
 
 export default function TerminosPage() {
   return (
@@ -11,9 +11,9 @@ export default function TerminosPage() {
 
       <h2>1. El servicio</h2>
       <p>
-        TodoPlástico (el «Servicio») es una plataforma impulsada por AGAMA (el «Operador») que permite a
+        TodoPlásticos (el «Servicio») es una plataforma impulsada por AGAMA (el «Operador») que permite a
         empresas y profesionales del sector plástico publicar productos, servicios y anuncios B2B con datos de
-        contacto externos. TodoPlástico es un punto de descubrimiento: <strong>no somos parte de las operaciones de compraventa</strong>, no procesamos
+        contacto externos. TodoPlásticos es un punto de descubrimiento: <strong>no somos parte de las operaciones de compraventa</strong>, no procesamos
         pagos entre usuarios y no intervenimos en envíos, garantías ni facturación entre las partes.
       </p>
 

@@ -1,25 +1,31 @@
 # Resend + magic link
 
-TodoPlástico queda preparado para acceso sin contraseña. La app usa Supabase Auth con PKCE y sesión persistente en el navegador.
+TodoPlásticos queda preparado para acceso sin contraseña. La app usa Supabase Auth con sesión persistente en cookies y confirma los enlaces en el servidor mediante `token_hash`.
 
 ## Supabase Auth
 
 En el proyecto Supabase `tiynnllrcdhsvrzsdsct`, configurar:
 
 - Authentication > URL Configuration:
-  - Site URL local: `http://localhost:3002`
-  - Redirect URL local: `http://localhost:3002/auth/callback`
+  - Site URL: `https://todo-plastico.com`
+  - Redirect URL local: `http://localhost:3000/auth/callback`
   - Redirect URL producción: `https://todo-plastico.com/auth/callback`
 - Authentication > Providers > Email:
   - Enable Email provider
   - Confirm email: activado
   - Secure email change: activado
 - Authentication > SMTP Settings:
-  - Sender: `TodoPlástico <acceso@todo-plastico.com>`
+  - Sender: `TodoPlásticos <acceso@todo-plastico.com>`
   - Host: `smtp.resend.com`
   - Port: `465`
   - Username: `resend`
   - Password: API key de Resend
+
+### Plantillas en español
+
+Los HTML versionados y los asuntos están en `supabase/email-templates/`. La guía vigente de activación y costes es [auth-email-setup.md](auth-email-setup.md). Un merge no activa automáticamente las plantillas en el proyecto alojado.
+
+Los botones usan `{{ .SiteURL }}/auth/confirm` y `{{ .TokenHash }}` para verificar en servidor sin depender del verificador PKCE de otro navegador. Site URL debe coincidir con el dominio HTTPS de producción y no terminar en slash. Los enlaces de acceso llevan al panel; recuperación e invitación llevan a los ajustes de cuenta. Mantener desactivado el seguimiento de enlaces del proveedor.
 
 ## Variables locales
 
@@ -39,4 +45,9 @@ Para sembrar categorías y la empresa AGAMA:
 node scripts/seed-launch-data.mjs
 ```
 
-El usuario admin entra desde `/ingresar` con magic link. No se usa contraseña en la interfaz.
+Desde `/ingresar` se admite contraseña o enlace de acceso por correo.
+
+## Aperturas automáticas del correo
+Los enlaces nuevos abren `/auth/confirm`: GET muestra un botón y no consume el token. Solo el POST del botón verifica el código y crea la sesión. Esta respuesta no incluye analítica ni recursos externos y usa no-store, noindex y strict-origin. El callback anterior se conserva para enlaces antiguos y PKCE. Publicar esta ruta antes de activar las plantillas.
+
+El token viaja en el fragmento del enlace (`#`), no en la consulta enviada al servidor. La página lo retira de la barra de direcciones y prepara el formulario; requiere JavaScript y un clic explícito. La política CSP solo permite el script propio identificado por su hash.

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Normas de la comunidad",
-  description: "Normas de publicación y convivencia en TodoPlástico. Contenido permitido y prohibido en la plataforma.",
+  description: "Normas de publicación y convivencia en TodoPlásticos. Contenido permitido y prohibido en la plataforma.",
   alternates: { canonical: "/legal/comunidad" },
 };
 
@@ -12,7 +12,7 @@ export default function ComunidadPage() {
       <h1 className="text-3xl font-bold text-slate-800">Normas de la comunidad</h1>
       <p className="mt-2 text-sm text-slate-400">Última actualización: agosto de 2026</p>
       <p>
-        TodoPlástico es un directorio B2B especializado en la industria del plástico. Al usar el servicio, aceptas
+        TodoPlásticos es un directorio B2B especializado en la industria del plástico. Al usar el servicio, aceptas
         estas normas junto con los{" "}
         <a href="/legal/terminos" className="text-brand underline">
           Términos de uso
@@ -22,7 +22,7 @@ export default function ComunidadPage() {
 
       <h2>1. Solo industria del plástico</h2>
       <p>
-        TodoPlástico está reservado exclusivamente para empresas y profesionales del sector plástico. Solo se
+        TodoPlásticos está reservado exclusivamente para empresas y profesionales del sector plástico. Solo se
         permiten anuncios de productos, servicios y capacidades directamente relacionados con la cadena de valor del
         plástico: transformación, reciclado, moldes, maquinaria, envases, perfiles, tuberías, empaques y materias
         primas plásticas.
@@ -55,7 +55,7 @@ export default function ComunidadPage() {
       <h2>4. Conducta profesional</h2>
       <ul className="mt-2 list-disc space-y-1 pl-6">
         <li>Comunícate con respeto y sin amenazas, acoso, discriminación o lenguaje de odio.</li>
-        <li>No uses TodoPlástico para spam, fraude, suplantación o captación masiva.</li>
+        <li>No uses TodoPlásticos para spam, fraude, suplantación o captación masiva.</li>
         <li>Respeta la propiedad intelectual y no publiques falsificaciones.</li>
         <li>Si una oferta deja de estar disponible, retira o pausa el anuncio desde tu panel.</li>
       </ul>

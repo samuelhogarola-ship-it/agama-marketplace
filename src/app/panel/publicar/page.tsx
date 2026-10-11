@@ -208,7 +208,7 @@ export default function PublicarPage() {
       return;
     }
 
-    const result = await buildListing(user.id, "draft");
+    const result = await buildListing(user.id, "pending_review");
     if (!result) {
       setLoading(false);
       return;
@@ -216,34 +216,11 @@ export default function PublicarPage() {
 
     await uploadPhotos(result.supabase, result.userId, result.listing.id);
 
-    const modRes = await fetch("/api/moderate", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ listing_id: result.listing.id }),
-    });
-    const modData = await modRes.json().catch(() => ({}));
-
-    if (!modRes.ok) {
-      setError(
-        `No se pudo enviar a revisión: ${modData.error ?? modRes.status}`
-      );
-      setLoading(false);
-      return;
-    }
-
-    if (modData.verdict === "reject") {
-      setError(
-        `Publicación rechazada: ${modData.reason ?? "Contenido no permitido."} Corrige el anuncio y vuelve a enviar.`
-      );
-      setLoading(false);
-      return;
-    }
-
     router.push("/panel");
   }
 
   return (
-    <div className="mx-auto max-w-2xl px-4 py-12">
+    <div className="mx-auto max-w-2xl py-4 lg:py-0">
       <p className="text-xs font-semibold uppercase tracking-[0.2em] text-brand-sky">
         Mi panel
       </p>

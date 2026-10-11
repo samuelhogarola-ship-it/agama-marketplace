@@ -1,7 +1,7 @@
 import { test, expect } from "@playwright/test";
 
 test.describe("smoke — páginas públicas", () => {
-  test("home renderiza con marca TodoPlástico", async ({ page }) => {
+  test("home renderiza con marca TodoPlásticos", async ({ page }) => {
     await page.goto("/");
     await expect(page.getByRole("heading", { level: 1 })).toContainText("Encuentra lo que mueve al plástico");
     await expect(page.getByText(/Patrocinado por: AGAMA Pigmentos y Masterbatch/).first()).toBeVisible();
@@ -9,13 +9,13 @@ test.describe("smoke — páginas públicas", () => {
 
   test("categorías y landing de categoría", async ({ page }) => {
     await page.goto("/c/tarimas-y-contenedores");
-    await expect(page.getByRole("heading", { level: 1 })).toContainText("Comprar Tarimas y contenedores de plástico en México");
+    await expect(page.getByRole("heading", { level: 1 })).toContainText("Tarimas y contenedores de plástico en México");
   });
 
-  test("sponsor AGAMA sigue el formato editorial de TodoPlástico", async ({ page }) => {
+  test("sponsor AGAMA sigue el formato editorial de TodoPlásticos", async ({ page }) => {
     await page.goto("/sponsor/agama");
     await expect(page.getByRole("link", { name: "Inicio", exact: true })).toBeVisible();
-    await expect(page.getByText("TodoPlástico", { exact: true }).first()).toBeVisible();
+    await expect(page.getByText("TodoPlásticos", { exact: true }).first()).toBeVisible();
     await expect(page.getByRole("heading", { level: 1 })).toContainText("AGAMA para la industria plástica");
     await expect(page.getByRole("heading", { name: "Soluciones destacadas" })).toBeVisible();
   });
@@ -90,7 +90,10 @@ test.describe("smoke — páginas públicas", () => {
     expect(robots.status()).toBe(200);
     expect(await robots.text()).toContain("sitemap");
     const sitemap = await request.get("/sitemap.xml");
-    expect(sitemap.status()).toBe(200);
+    // CI deliberately points Supabase at an unavailable endpoint. An outage must
+    // fail rather than publish a successful but incomplete sitemap.
+    const offline = process.env.NEXT_PUBLIC_SUPABASE_URL === "http://127.0.0.1:9";
+    expect(sitemap.status()).toBe(offline ? 500 : 200);
   });
 
   test("SEO: JSON-LD en landing de categoría", async ({ page }) => {

@@ -4,15 +4,15 @@ import { createAdminClient, isAdminUser } from "@/lib/supabase/admin";
 import AdminQueue from "@/components/AdminQueue";
 import AdminCompaniesList from "@/components/AdminCompaniesList";
 import AdminTicketInbox from "@/components/AdminTicketInbox";
+import { resolvePublicUmamiConfig } from "@/lib/umami-public";
 
 const dateFormatter = new Intl.DateTimeFormat("es-MX", { day: "2-digit", month: "short", year: "numeric" });
 
 async function getUmamiStats() {
-  const url = process.env.NEXT_PUBLIC_UMAMI_URL;
-  const websiteId = process.env.NEXT_PUBLIC_UMAMI_WEBSITE_ID;
+  const { url, websiteId } = resolvePublicUmamiConfig();
   const user = process.env.UMAMI_API_USER ?? "admin";
   const pass = process.env.UMAMI_API_PASS;
-  if (!url || !websiteId || !pass) return null;
+  if (!pass) return null;
   try {
     const authRes = await fetch(`${url}/api/auth/login`, {
       method: "POST",
@@ -57,7 +57,7 @@ export default async function AdminPage() {
   }
 
   if (!isAdminUser(user)) {
-    return <div className="mx-auto max-w-xl px-5 py-20"><h1 className="text-3xl font-semibold text-brand-dark">Área privada</h1><p className="mt-4 text-slate-600">Esta sección está reservada para el equipo de TodoPlástico.</p></div>;
+    return <div className="mx-auto max-w-xl px-5 py-20"><h1 className="text-3xl font-semibold text-brand-dark">Área privada</h1><p className="mt-4 text-slate-600">Esta sección está reservada para el equipo de TodoPlásticos.</p></div>;
   }
 
   const admin = createAdminClient();
@@ -105,7 +105,7 @@ export default async function AdminPage() {
     <div className="mx-auto max-w-7xl px-5 py-10 sm:px-8 lg:px-12 lg:py-14">
       <div className="flex flex-wrap items-end justify-between gap-5">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-brand-sky">TodoPlástico · Operación</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-brand-sky">TodoPlásticos · Operación</p>
           <h1 className="mt-3 text-4xl font-semibold tracking-[-0.05em] text-brand-dark sm:text-5xl">Panel de control.</h1>
           <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-600">Usuarios, registros de empresas y revisión de anuncios en un mismo espacio operativo.</p>
         </div>

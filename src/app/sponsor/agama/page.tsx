@@ -6,7 +6,7 @@ import { safeJsonLd } from "@/lib/jsonld";
 export const metadata: Metadata = {
   title: "AGAMA para la industria plástica - Patrocinador oficial",
   description:
-    "AGAMA acompaña a TodoPlástico como patrocinador especializado en color, masterbatch y soluciones técnicas para transformadores plásticos.",
+    "AGAMA acompaña a TodoPlásticos como patrocinador especializado en color, masterbatch y soluciones técnicas para transformadores plásticos.",
   alternates: { canonical: "/sponsor/agama" },
 };
 
@@ -83,13 +83,13 @@ export default function AgamaSponsorPage() {
       <section className="mt-10 grid gap-10 border-b border-slate-200 pb-14 lg:grid-cols-[minmax(0,1fr)_360px] lg:items-start">
         <div className="max-w-3xl">
           <p className="text-xs font-semibold uppercase tracking-[0.24em] text-brand-sky">
-            TodoPlástico · Patrocinador oficial
+            TodoPlásticos · Patrocinador oficial
           </p>
           <h1 className="mt-4 text-4xl font-semibold leading-[1.03] tracking-[-0.045em] text-brand-dark sm:text-6xl">
             AGAMA para la industria plástica.
           </h1>
           <p className="mt-6 max-w-2xl text-lg leading-8 text-slate-600">
-            En TodoPlástico mantenemos el marketplace enfocado en proveedores
+            En TodoPlásticos mantenemos el marketplace enfocado en proveedores
             B2B de productos y servicios plásticos. Cuando una empresa necesita
             color, masterbatch o soporte técnico especializado, el canal
             recomendado es AGAMA.
@@ -137,7 +137,7 @@ export default function AgamaSponsorPage() {
             AGAMA es el punto de contacto externo para pigmentos, masterbatch y
             aditivos. Estos productos no se publican como anuncios dentro del
             marketplace para mantener clara la política comercial de
-            TodoPlástico.
+            TodoPlásticos.
           </p>
         </aside>
       </section>
@@ -209,7 +209,7 @@ export default function AgamaSponsorPage() {
       <section className="border-t border-brand-dark py-10 sm:flex sm:items-start sm:justify-between sm:gap-10">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.24em] text-brand-sky">
-            TodoPlástico
+            TodoPlásticos
           </p>
           <h2 className="mt-3 max-w-2xl text-3xl font-semibold tracking-[-0.04em] text-brand-dark sm:text-4xl">
             El marketplace sigue siendo para productos y servicios plásticos

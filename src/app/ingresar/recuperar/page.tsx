@@ -1,30 +1,23 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Link from "next/link";
-import { createClient } from "@/lib/supabase/client";
+import { sendRecoveryLink } from "../actions";
 
 export default function RecuperarPage() {
   const [email, setEmail] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [sent, setSent] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [origin, setOrigin] = useState("");
-
-  useEffect(() => setOrigin(window.location.origin), []);
-
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
     setLoading(true);
     try {
-      const supabase = createClient();
-      const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${origin}/auth/callback?next=${encodeURIComponent("/panel/perfil")}`,
-      });
+      const result = await sendRecoveryLink(email);
       setLoading(false);
-      if (error) {
-        setError("No se pudo enviar el correo. Verifica el email e inténtalo de nuevo.");
+      if (!result.ok) {
+        setError(result.error);
         return;
       }
       setSent(true);

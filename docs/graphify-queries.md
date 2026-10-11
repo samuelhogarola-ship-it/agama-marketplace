@@ -1,4 +1,4 @@
-# Graphify Queries — Flujos Clave TodoPlástico
+# Graphify Queries — Flujos Clave TodoPlásticos
 
 Usa estas queries cuando necesites reconstruir un flujo, debuggear, o entender qué archivos toca un cambio.
 Ejecutar con: `/graphify query "<pregunta>"`

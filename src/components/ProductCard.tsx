@@ -1,4 +1,4 @@
-import Link from "next/link";
+import TrackedCatalogLink from "@/components/TrackedCatalogLink";
 import Image from "next/image";
 import { photoUrl, productPath, type Product } from "@/lib/types";
 import { categoryBySlug } from "@/lib/categories";
@@ -11,7 +11,10 @@ export function formatPrice(p: number | null): string {
 export default function ProductCard({ product }: { product: Product }) {
   const photo = product.photos?.[0];
   return (
-    <Link
+    <TrackedCatalogLink
+      eventName="catalog_listing_click"
+      category={product.category}
+      listingId={product.id}
       href={productPath(product)}
       className="group rounded-xl border border-slate-200 overflow-hidden bg-white hover:shadow-md transition-shadow"
     >
@@ -34,6 +37,6 @@ export default function ProductCard({ product }: { product: Product }) {
         <p className="text-brand-dark font-bold mt-2">{formatPrice(product.price_mxn)}</p>
         {product.location && <p className="text-xs text-slate-500 mt-1">{product.location}</p>}
       </div>
-    </Link>
+    </TrackedCatalogLink>
   );
 }
