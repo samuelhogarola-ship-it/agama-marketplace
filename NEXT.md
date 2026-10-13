@@ -1,6 +1,6 @@
 # NEXT — TodoPlásticos
 
-## Comprobación final pre-lanzamiento (2026-08-25)
+## Comprobación final pre-lanzamiento (actualizada 2026-10-13)
 
 Verificación end-to-end de todos los paneles y flujos antes de declarar Fase 1 completa.
 
@@ -9,7 +9,7 @@ Verificación end-to-end de todos los paneles y flujos antes de declarar Fase 1 
 - [ ] **Auth:** registro con email + contraseña → llega email de confirmación → clic confirma → login OK *(requiere test manual)*
 - [ ] **Auth:** login con magic link → llega email → clic abre sesión (probar Safari + Chrome) *(requiere test manual)*
 - [ ] **Auth:** recuperación de contraseña → email llega → cambio funciona *(requiere test manual)*
-- [ ] **Panel empresa:** crear perfil completo (logo, contacto, categorías) → se guarda *(requiere auth)*
+- [x] **Panel empresa:** crear perfil completo con teléfono, WhatsApp y dirección separada → se guarda y persiste tras recargar ✅ (2026-10-13, verificado en producción con cuenta temporal QA)
 - [ ] **Panel publicar:** crear anuncio con 5 fotos → pasa a `pending_review` → moderación IA corre (si OPENAI_API_KEY está) *(requiere auth)*
 - [ ] **Panel editar:** editar anuncio publicado → vuelve a `pending_review` *(requiere auth)*
 - [ ] **Panel tickets:** crear ticket de soporte → aparece en admin *(requiere auth)*
@@ -42,7 +42,7 @@ Verificación end-to-end de todos los paneles y flujos antes de declarar Fase 1 
 
 1. **Site URL en Supabase** → cambiar a `https://todo-plastico.com` + añadir callback URL
 2. **OPENAI_API_KEY** → añadir en Coolify
-3. **Migraciones 0011, 0013 + 0014** → aplicar en BD de producción (0014 arregla `/empresas` y `/e/[slug]` que no pueden leer `plan`)
+3. **Supabase/migraciones** → producción sincronizada hasta `0016_company_address.sql`; no queda bloqueante de migración para el guardado de empresa
 4. **Stripe live key** → cuando se active plan Pro
 5. **Google Search Console** → verificar dominio + enviar sitemap
 
