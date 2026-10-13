@@ -27,7 +27,7 @@ No se envían emails, teléfonos, RFC ni nombres personales en los nuevos evento
 
 ## Verificación y dos cortes
 
-Inicio: guardar fecha real de publicación, configuración y línea base de páginas/eventos de la propiedad `6e0256c7-fb46-4ed1-bfd8-fa030d599504`. Se necesita acceso autenticado a Umami para leer esa línea base.
+Inicio: guardar fecha real de publicación, configuración y línea base de páginas/eventos de la propiedad configurada en `NEXT_PUBLIC_UMAMI_WEBSITE_ID`. Se necesita acceso autenticado a Umami para leer esa línea base.
 
 Corte 1, al cierre del primer mes: recepción de eventos, visitas a las ocho familias y cuatro guías, clics a catálogo, fichas y contacto; consultas sin resultados. Corte 2, al cierre del segundo mes: comparar periodos de igual duración, anotar cambios de catálogo/campañas y separar pruebas. No se generan cifras de periodos que aún no han transcurrido.
 

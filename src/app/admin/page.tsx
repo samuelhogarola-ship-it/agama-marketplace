@@ -9,12 +9,12 @@ import { resolvePublicUmamiConfig } from "@/lib/umami-public";
 const dateFormatter = new Intl.DateTimeFormat("es-MX", { day: "2-digit", month: "short", year: "numeric" });
 
 async function getUmamiStats() {
-  const { url, websiteId } = resolvePublicUmamiConfig();
+  const umamiConfig = resolvePublicUmamiConfig();
   const user = process.env.UMAMI_API_USER ?? "admin";
   const pass = process.env.UMAMI_API_PASS;
-  if (!pass) return null;
+  if (!umamiConfig || !pass) return null;
   try {
-    const authRes = await fetch(`${url}/api/auth/login`, {
+    const authRes = await fetch(`${umamiConfig.url}/api/auth/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ username: user, password: pass }),
@@ -27,14 +27,14 @@ async function getUmamiStats() {
     const startAt = startOfDay.getTime();
     const h = { Authorization: `Bearer ${token}` };
     const [statsRes, pagesRes, referrersRes] = await Promise.all([
-      fetch(`${url}/api/websites/${websiteId}/stats?startAt=${startAt}&endAt=${now}`, { headers: h, cache: "no-store" }),
-      fetch(`${url}/api/websites/${websiteId}/metrics?startAt=${startAt}&endAt=${now}&type=path&limit=8`, { headers: h, cache: "no-store" }),
-      fetch(`${url}/api/websites/${websiteId}/metrics?startAt=${startAt}&endAt=${now}&type=referrer&limit=5`, { headers: h, cache: "no-store" }),
+      fetch(`${umamiConfig.url}/api/websites/${umamiConfig.websiteId}/stats?startAt=${startAt}&endAt=${now}`, { headers: h, cache: "no-store" }),
+      fetch(`${umamiConfig.url}/api/websites/${umamiConfig.websiteId}/metrics?startAt=${startAt}&endAt=${now}&type=path&limit=8`, { headers: h, cache: "no-store" }),
+      fetch(`${umamiConfig.url}/api/websites/${umamiConfig.websiteId}/metrics?startAt=${startAt}&endAt=${now}&type=referrer&limit=5`, { headers: h, cache: "no-store" }),
     ]);
     const stats = statsRes.ok ? await statsRes.json() : null;
     const pages = pagesRes.ok ? await pagesRes.json() : [];
     const referrers = referrersRes.ok ? await referrersRes.json() : [];
-    return { stats, pages: Array.isArray(pages) ? pages : [], referrers: Array.isArray(referrers) ? referrers : [], umamiUrl: url };
+    return { stats, pages: Array.isArray(pages) ? pages : [], referrers: Array.isArray(referrers) ? referrers : [], umamiUrl: umamiConfig.url };
   } catch { return null; }
 }
 

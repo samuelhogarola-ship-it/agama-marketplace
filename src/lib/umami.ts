@@ -1,16 +1,16 @@
 import { resolvePublicUmamiConfig } from "@/lib/umami-public";
 
-const { url: UMAMI_URL, websiteId: UMAMI_WEBSITE_ID } = resolvePublicUmamiConfig();
+const umamiConfig = resolvePublicUmamiConfig();
 const UMAMI_USER = process.env.UMAMI_API_USER;
 const UMAMI_PASS = process.env.UMAMI_API_PASS;
 
 let cachedToken: { value: string; expiresAt: number } | null = null;
 
 async function getToken(): Promise<string | null> {
-  if (!UMAMI_USER || !UMAMI_PASS) return null;
+  if (!umamiConfig || !UMAMI_USER || !UMAMI_PASS) return null;
   if (cachedToken && Date.now() < cachedToken.expiresAt) return cachedToken.value;
 
-  const res = await fetch(`${UMAMI_URL}/api/auth/login`, {
+  const res = await fetch(`${umamiConfig.url}/api/auth/login`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ username: UMAMI_USER, password: UMAMI_PASS }),
@@ -22,12 +22,14 @@ async function getToken(): Promise<string | null> {
 }
 
 async function umamiGet<T>(path: string, params: Record<string, string>): Promise<T | null> {
+  if (!umamiConfig) return null;
+
   const token = await getToken();
   if (!token) return null;
 
   const qs = new URLSearchParams(params).toString();
   const res = await fetch(
-    `${UMAMI_URL}/api/websites/${UMAMI_WEBSITE_ID}${path}?${qs}`,
+    `${umamiConfig.url}/api/websites/${umamiConfig.websiteId}${path}?${qs}`,
     { headers: { Authorization: `Bearer ${token}` }, next: { revalidate: 300 } },
   );
   if (!res.ok) return null;
@@ -91,7 +93,7 @@ export async function getPageviews(
 }
 
 export function isConfigured(): boolean {
-  return !!(UMAMI_USER && UMAMI_PASS);
+  return !!(umamiConfig && UMAMI_USER && UMAMI_PASS);
 }
 
 /** Exact page and event filters prevent site-wide contacts leaking into company totals. */
