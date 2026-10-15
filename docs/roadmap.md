@@ -1,6 +1,6 @@
 # Roadmap — TodoPlásticos
 
-Estado actualizado: 2 de agosto de 2026. Las fases de producto están implementadas en código y la infraestructura del nuevo Supabase ya está creada. El trabajo activo es preparación de lanzamiento y operación.
+Estado actualizado: 13 de octubre de 2026. Las fases de producto están implementadas en código y la infraestructura del Supabase propio de TodoPlásticos está operativa. El trabajo activo es preparación de lanzamiento, verificación final de flujos y operación.
 
 ## Fase 0 — Fundaciones
 
@@ -14,7 +14,7 @@ Estado: **completa en código**.
 - [x] CI en pull requests: instalación limpia, typecheck, build y smoke Playwright.
 - [x] Smoke Playwright en Chromium desktop.
 
-Pendientes operativos antes de producción: proyecto Supabase propio, dominio `todo-plastico.com`, claves de Anthropic y carga inicial de datos. SMTP activo con mailer interno Supabase.
+Pendientes operativos antes de producción: configuración final de entorno seguro, usuario admin real, correos de Auth en producción, analítica, revisión legal y carga inicial de datos. SMTP activo con mailer interno Supabase mientras no se verifique un proveedor dedicado.
 
 ## Fase 1 — Directorio y catálogo B2B
 
@@ -22,7 +22,7 @@ Estado: **completa en código**.
 
 - [x] Registro y login por magic link con callback PKCE.
 - [x] Onboarding y edición de ficha profesional de empresa.
-- [ ] Publicar dirección separada con código postal obligatorio y autocompletado local: aplicar primero la migración aditiva `0016_company_address.sql` y verificar guardado.
+- [x] Publicar dirección separada con código postal obligatorio y autocompletado local: migración `0016_company_address.sql` aplicada en Supabase y guardado verificado en producción.
 - [x] Directorio `/empresas` con búsqueda, categoría, ubicación y perfiles públicos.
 - [x] Catálogo por categoría, buscador general y fichas públicas de anuncios.
 - [x] CRUD de anuncios: publicar, editar, pausar, reactivar y eliminar.
@@ -51,14 +51,14 @@ Estado: **completa en código**.
 
 Estado: **operativa en demo; pendiente de hardening y configuración de producción**.
 
-### Prioridad inmediata — migraciones pendientes de aplicar
+### Estado de Supabase y migraciones
 
-Escritas y mergeadas, pero **sin ejecutar contra la base de datos**. Hasta que corran, el arreglo está en el repo y no en producción.
+El proyecto Supabase propio de TodoPlásticos está vinculado y sincronizado hasta la migración `0016_company_address.sql`. El arreglo de guardado de ficha de empresa, teléfono por prefijo y dirección estructurada ya está en el código fusionado y se verificó en producción con una cuenta temporal de QA.
 
-- [ ] **`0012_close_limit_race.sql` — prioridad alta.** Cierra la carrera TOCTOU en los triggers de límite: hoy dos inserts concurrentes de la misma empresa pueden dejar 6 anuncios o 6 fotos, saltándose el límite de 5 que `CLAUDE.md` marca como no negociable. No depende de Stripe ni de la IA: se puede aplicar sola y en cualquier momento.
-- [ ] `0013_stripe_webhook_hardening.sql` — va con el bloque de Stripe (ver abajo). Aplicarla antes de activar los pagos.
-
-Ninguna de las dos se ha validado contra una BD: no había Postgres local ni Docker al escribirlas. Conviene aplicarlas primero en una rama de Supabase.
+- [x] Migraciones de producción aplicadas hasta `0016`.
+- [x] Guardado de perfil de empresa verificado en producción: login, guardado, recarga, persistencia en UI y fila en base de datos.
+- [x] Autocompletado de dirección por código postal verificado contra el endpoint público.
+- [ ] Antes de activar Stripe, repetir una prueba específica de webhook live/test y confirmar que el rol de servicio actualiza el plan sin chocar con las protecciones de columnas administrativas.
 
 - [x] Migrar `mkt_*` a un proyecto Supabase propio y validar tablas, Storage y RLS inicial.
 - [x] Separar envío a revisión de decisiones: solo `service_role` puede publicar o rechazar.

@@ -1,6 +1,17 @@
 import type { NextConfig } from "next";
 import { confirmationHeaders } from "./src/lib/auth-confirmation.js";
 
+function umamiCspOrigin() {
+  const rawUrl = process.env.NEXT_PUBLIC_UMAMI_URL?.trim();
+  if (!rawUrl) return "";
+
+  try {
+    return ` ${new URL(rawUrl).origin}`;
+  } catch {
+    return "";
+  }
+}
+
 const nextConfig: NextConfig = {
   output: "standalone",
   outputFileTracingIncludes: { "/api/codigos-postales": ["./src/data/mx-postal.json.gz"] },
@@ -11,13 +22,14 @@ const nextConfig: NextConfig = {
   },
   async headers() {
     const developmentScriptPolicy = process.env.NODE_ENV === "development" ? " 'unsafe-eval'" : "";
+    const umamiOrigin = umamiCspOrigin();
     const security = [
       { key: "X-Content-Type-Options", value: "nosniff" },
       { key: "X-Frame-Options", value: "DENY" },
       { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
       { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=()" },
       { key: "Strict-Transport-Security", value: "max-age=63072000; includeSubDomains; preload" },
-      { key: "Content-Security-Policy", value: `default-src 'self'; script-src 'self' 'unsafe-inline'${developmentScriptPolicy} https://www.googletagmanager.com https://www.google-analytics.com https://analytics.2.24.10.239.sslip.io; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://*.supabase.co; font-src 'self'; connect-src 'self' https://*.supabase.co https://www.google-analytics.com https://analytics.google.com https://analytics.2.24.10.239.sslip.io; frame-ancestors 'none'; base-uri 'self'; form-action 'self'` },
+      { key: "Content-Security-Policy", value: `default-src 'self'; script-src 'self' 'unsafe-inline'${developmentScriptPolicy} https://www.googletagmanager.com https://www.google-analytics.com${umamiOrigin}; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://*.supabase.co; font-src 'self'; connect-src 'self' https://*.supabase.co https://www.google-analytics.com https://analytics.google.com${umamiOrigin}; frame-ancestors 'none'; base-uri 'self'; form-action 'self'` },
     ];
     return [
       { source: "/:path*", headers: security },
