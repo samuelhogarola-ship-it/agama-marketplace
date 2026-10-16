@@ -1,36 +1,25 @@
 import { expect, test } from "@playwright/test";
 import { resolvePublicUmamiConfig } from "../../src/lib/umami-public";
 
-test("TodoPlásticos deja Umami inerte cuando faltan variables de build", async () => {
+test("TodoPlásticos no carga Umami cuando falta el website ID", async () => {
   expect(resolvePublicUmamiConfig({})).toBeNull();
-});
-
-test("TodoPlásticos usa la pareja de entorno cuando está completa", async () => {
   expect(resolvePublicUmamiConfig({
-    NEXT_PUBLIC_UMAMI_URL: "https://analytics.187.124.55.36.sslip.io",
-    NEXT_PUBLIC_UMAMI_WEBSITE_ID: "personal-site-id",
-  })).toEqual({
-    url: "https://analytics.187.124.55.36.sslip.io",
-    websiteId: "personal-site-id",
-  });
-});
-
-test("una configuración parcial no activa el tracker público", () => {
-  expect(resolvePublicUmamiConfig({
-    NEXT_PUBLIC_UMAMI_WEBSITE_ID: "123e4567-e89b-42d3-a456-426614174000",
-  })).toBeNull();
-
-  expect(resolvePublicUmamiConfig({
-    NEXT_PUBLIC_UMAMI_URL: "https://analytics.2.24.10.239.sslip.io",
+    NEXT_PUBLIC_UMAMI_URL: "https://analytics.example.test",
   })).toBeNull();
 });
 
-test("normaliza la URL para no duplicar barras", () => {
+test("TodoPlásticos usa el sitio Umami configurado por entorno", async () => {
   expect(resolvePublicUmamiConfig({
-    NEXT_PUBLIC_UMAMI_URL: "https://analytics.2.24.10.239.sslip.io/",
-    NEXT_PUBLIC_UMAMI_WEBSITE_ID: "123e4567-e89b-42d3-a456-426614174000",
+    NEXT_PUBLIC_UMAMI_URL: "https://analytics.example.test/",
+    NEXT_PUBLIC_UMAMI_WEBSITE_ID: "staging-website-id",
   })).toEqual({
-    url: "https://analytics.2.24.10.239.sslip.io",
-    websiteId: "123e4567-e89b-42d3-a456-426614174000",
+    url: "https://analytics.example.test",
+    websiteId: "staging-website-id",
   });
+});
+
+test("un ID sin host no activa el tracker público", () => {
+  expect(resolvePublicUmamiConfig({
+    NEXT_PUBLIC_UMAMI_WEBSITE_ID: "staging-website-id",
+  })).toBeNull();
 });

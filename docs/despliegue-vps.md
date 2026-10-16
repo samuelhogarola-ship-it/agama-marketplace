@@ -24,6 +24,8 @@ ALLOW_INDEXING=true
 # Umami (añadir tras instalar — ver sección más abajo)
 NEXT_PUBLIC_UMAMI_URL=https://stats.todo-plastico.com
 NEXT_PUBLIC_UMAMI_WEBSITE_ID=<website-id-de-umami>
+UMAMI_API_USER=admin
+UMAMI_API_PASS=<password-de-umami>
 ```
 
 La `service role key` solo se usa en servidor y nunca debe empezar por `NEXT_PUBLIC_`.
@@ -165,9 +167,17 @@ certbot --nginx -d stats.todo-plastico.com
 ```env
 NEXT_PUBLIC_UMAMI_URL=https://stats.todo-plastico.com
 NEXT_PUBLIC_UMAMI_WEBSITE_ID=<uuid-del-paso-4>
+UMAMI_API_USER=admin
+UMAMI_API_PASS=<password-de-umami>
 ```
 
-Luego redeploy: `docker compose -f docker-compose.prod.yml up -d --build`
+Si `NEXT_PUBLIC_UMAMI_WEBSITE_ID` está vacío, el build no carga `script.js`, no envía eventos y el panel no consulta una propiedad de fallback. Luego redeploy: `docker compose -f docker-compose.prod.yml up -d --build`
+
+### 6. Verificación
+
+1. Abrir la home y comprobar que existe un único `<script data-website-id>` con el ID del entorno esperado.
+2. Revisar la cabecera `Content-Security-Policy`: `script-src` y `connect-src` deben incluir el origen de `NEXT_PUBLIC_UMAMI_URL`.
+3. Si falta el ID, comprobar que no aparece ningún `<script data-website-id>` y que el panel muestra el aviso de configuración en vez de datos de otra propiedad.
 
 ### ¿Qué mide Umami automáticamente?
 

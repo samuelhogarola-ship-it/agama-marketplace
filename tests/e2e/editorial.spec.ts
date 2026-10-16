@@ -24,7 +24,7 @@ for (const article of PUBLISHED_ARTICLES.filter(a=>a.sections && a.familySlugs &
 test('article to catalogue click records the actual article and family once',async({page})=>{
   // CI deliberately uses an unavailable database; allow its bounded fetch retries.
   test.setTimeout(60000);
-  await page.route('https://analytics.2.24.10.239.sslip.io/script.js', route=>route.abort());
+  await page.route('**/script.js', route=>route.abort());
   await page.addInitScript(()=>{
     window.umami={track:(name,data)=>{const events=JSON.parse(sessionStorage.getItem('editorial-events') || '[]'); events.push({name,data}); sessionStorage.setItem('editorial-events',JSON.stringify(events));}};
   });
@@ -41,7 +41,7 @@ test('paginated families do not repeat the extended editorial section',async({pa
 
 test('a catalogue card records its actual listing and category while navigating',async({page})=>{
   test.setTimeout(60000);
-  await page.route('https://analytics.2.24.10.239.sslip.io/script.js', route=>route.abort());
+  await page.route('**/script.js', route=>route.abort());
   await page.addInitScript(()=>{
     window.umami={track:(name,data)=>sessionStorage.setItem('listing-event',JSON.stringify({name,data}))};
   });

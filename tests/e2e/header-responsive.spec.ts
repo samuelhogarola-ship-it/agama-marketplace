@@ -4,7 +4,7 @@ for (const width of [320, 390, 768, 1440]) {
   test(`header stays usable at ${width}px`, async ({ page }) => {
     test.setTimeout(60000);
     await page.setViewportSize({ width, height: 900 });
-    await page.route('https://analytics.2.24.10.239.sslip.io/**', route => route.abort());
+    await page.route('**/script.js', route => route.abort());
     await page.goto('/ingresar', { waitUntil: 'domcontentloaded' });
     await page.getByRole('button', { name: 'Solo esenciales', exact: true }).click();
     const overflow = await page.evaluate(() => document.documentElement.scrollWidth - innerWidth);

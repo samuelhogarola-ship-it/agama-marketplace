@@ -9,12 +9,15 @@ import { resolvePublicUmamiConfig } from "@/lib/umami-public";
 const dateFormatter = new Intl.DateTimeFormat("es-MX", { day: "2-digit", month: "short", year: "numeric" });
 
 async function getUmamiStats() {
-  const umamiConfig = resolvePublicUmamiConfig();
-  const user = process.env.UMAMI_API_USER ?? "admin";
+  const config = resolvePublicUmamiConfig();
+  if (!config) return null;
+
+  const { url, websiteId } = config;
+  const user = process.env.UMAMI_API_USER;
   const pass = process.env.UMAMI_API_PASS;
-  if (!umamiConfig || !pass) return null;
+  if (!pass) return null;
   try {
-    const authRes = await fetch(`${umamiConfig.url}/api/auth/login`, {
+    const authRes = await fetch(`${url}/api/auth/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ username: user, password: pass }),
@@ -27,14 +30,14 @@ async function getUmamiStats() {
     const startAt = startOfDay.getTime();
     const h = { Authorization: `Bearer ${token}` };
     const [statsRes, pagesRes, referrersRes] = await Promise.all([
-      fetch(`${umamiConfig.url}/api/websites/${umamiConfig.websiteId}/stats?startAt=${startAt}&endAt=${now}`, { headers: h, cache: "no-store" }),
-      fetch(`${umamiConfig.url}/api/websites/${umamiConfig.websiteId}/metrics?startAt=${startAt}&endAt=${now}&type=path&limit=8`, { headers: h, cache: "no-store" }),
-      fetch(`${umamiConfig.url}/api/websites/${umamiConfig.websiteId}/metrics?startAt=${startAt}&endAt=${now}&type=referrer&limit=5`, { headers: h, cache: "no-store" }),
+      fetch(`${url}/api/websites/${websiteId}/stats?startAt=${startAt}&endAt=${now}`, { headers: h, cache: "no-store" }),
+      fetch(`${url}/api/websites/${websiteId}/metrics?startAt=${startAt}&endAt=${now}&type=path&limit=8`, { headers: h, cache: "no-store" }),
+      fetch(`${url}/api/websites/${websiteId}/metrics?startAt=${startAt}&endAt=${now}&type=referrer&limit=5`, { headers: h, cache: "no-store" }),
     ]);
     const stats = statsRes.ok ? await statsRes.json() : null;
     const pages = pagesRes.ok ? await pagesRes.json() : [];
     const referrers = referrersRes.ok ? await referrersRes.json() : [];
-    return { stats, pages: Array.isArray(pages) ? pages : [], referrers: Array.isArray(referrers) ? referrers : [], umamiUrl: umamiConfig.url };
+    return { stats, pages: Array.isArray(pages) ? pages : [], referrers: Array.isArray(referrers) ? referrers : [], umamiUrl: url };
   } catch { return null; }
 }
 
@@ -190,7 +193,7 @@ export default async function AdminPage() {
           )}
         </div>
         {!umamiData ? (
-          <p className="mt-5 text-sm text-slate-500">Configura <code className="rounded bg-slate-100 px-1 text-xs">UMAMI_API_PASS</code> en el entorno para ver estadísticas aquí.</p>
+          <p className="mt-5 text-sm text-slate-500">Configura <code className="rounded bg-slate-100 px-1 text-xs">NEXT_PUBLIC_UMAMI_URL</code>, <code className="rounded bg-slate-100 px-1 text-xs">NEXT_PUBLIC_UMAMI_WEBSITE_ID</code>, <code className="rounded bg-slate-100 px-1 text-xs">UMAMI_API_USER</code> y <code className="rounded bg-slate-100 px-1 text-xs">UMAMI_API_PASS</code> en el entorno para ver estadísticas aquí.</p>
         ) : (
           <div className="mt-6 space-y-6">
             <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
