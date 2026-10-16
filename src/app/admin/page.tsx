@@ -9,8 +9,11 @@ import { resolvePublicUmamiConfig } from "@/lib/umami-public";
 const dateFormatter = new Intl.DateTimeFormat("es-MX", { day: "2-digit", month: "short", year: "numeric" });
 
 async function getUmamiStats() {
-  const { url, websiteId } = resolvePublicUmamiConfig();
-  const user = process.env.UMAMI_API_USER ?? "admin";
+  const config = resolvePublicUmamiConfig();
+  if (!config) return null;
+
+  const { url, websiteId } = config;
+  const user = process.env.UMAMI_API_USER;
   const pass = process.env.UMAMI_API_PASS;
   if (!pass) return null;
   try {
@@ -190,7 +193,7 @@ export default async function AdminPage() {
           )}
         </div>
         {!umamiData ? (
-          <p className="mt-5 text-sm text-slate-500">Configura <code className="rounded bg-slate-100 px-1 text-xs">UMAMI_API_PASS</code> en el entorno para ver estadísticas aquí.</p>
+          <p className="mt-5 text-sm text-slate-500">Configura <code className="rounded bg-slate-100 px-1 text-xs">NEXT_PUBLIC_UMAMI_URL</code>, <code className="rounded bg-slate-100 px-1 text-xs">NEXT_PUBLIC_UMAMI_WEBSITE_ID</code>, <code className="rounded bg-slate-100 px-1 text-xs">UMAMI_API_USER</code> y <code className="rounded bg-slate-100 px-1 text-xs">UMAMI_API_PASS</code> en el entorno para ver estadísticas aquí.</p>
         ) : (
           <div className="mt-6 space-y-6">
             <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
