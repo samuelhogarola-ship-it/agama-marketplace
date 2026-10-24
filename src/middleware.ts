@@ -1,9 +1,18 @@
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
+import { LEGACY_SITE_HOSTS } from "@/lib/site";
 
 type CookieToSet = { name: string; value: string; options?: CookieOptions };
 
 export async function middleware(request: NextRequest) {
+  if (LEGACY_SITE_HOSTS.has(request.nextUrl.hostname)) {
+    const url = request.nextUrl.clone();
+    url.protocol = "https:";
+    url.hostname = "todoplasticos.com";
+    url.port = "";
+    return NextResponse.redirect(url, 308);
+  }
+
   let response = NextResponse.next({ request });
 
   const supabase = createServerClient(

@@ -7,6 +7,7 @@ import ProductCard from "@/components/ProductCard";
 import HeroCarousel from "@/components/HeroCarousel";
 import { safeJsonLd } from "@/lib/jsonld";
 import type { Product } from "@/lib/types";
+import { siteUrl } from "@/lib/site";
 
 export const revalidate = 300;
 
@@ -46,23 +47,23 @@ export default async function Home() {
       .limit(8),
   ]);
 
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://todo-plastico.com";
+  const publicSiteUrl = siteUrl();
   const orgJsonLd = {
     "@context": "https://schema.org",
     "@type": "Organization",
     name: "TodoPlásticos",
-    url: siteUrl,
-    logo: `${siteUrl}/todoplastico-symbol.png`,
+    url: publicSiteUrl,
+    logo: `${publicSiteUrl}/todoplastico-symbol.png`,
     description: HOME_DESCRIPTION,
   };
   const siteJsonLd = {
     "@context": "https://schema.org",
     "@type": "WebSite",
     name: "TodoPlásticos",
-    url: siteUrl,
+    url: publicSiteUrl,
     potentialAction: {
       "@type": "SearchAction",
-      target: { "@type": "EntryPoint", urlTemplate: `${siteUrl}/buscar?q={search_term_string}` },
+      target: { "@type": "EntryPoint", urlTemplate: `${publicSiteUrl}/buscar?q={search_term_string}` },
       "query-input": "required name=search_term_string",
     },
   };

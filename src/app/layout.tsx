@@ -7,9 +7,10 @@ import CookieBanner from "@/components/CookieBanner";
 import Analytics from "@/components/Analytics"; // server component — no "use client"
 import CategoryBrowseBar from "@/components/CategoryBrowseBar";
 import MobileNav from "@/components/MobileNav";
+import { siteUrl } from "@/lib/site";
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "https://todo-plastico.com"),
+  metadataBase: new URL(siteUrl()),
   title: {
     default: "TodoPlásticos — Mercado para comprar productos plásticos en México",
     template: "%s | TodoPlásticos",

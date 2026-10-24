@@ -1,4 +1,5 @@
 import type { MetadataRoute } from "next";
+import { siteUrl } from "@/lib/site";
 import { CATEGORIES } from "@/lib/categories";
 import { PUBLISHED_ARTICLES } from "@/lib/articles";
 import { createClient } from "@/lib/supabase/server";
@@ -6,7 +7,7 @@ import { createClient } from "@/lib/supabase/server";
 import { readSitemapRows } from "@/lib/sitemap-pages";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const base = process.env.NEXT_PUBLIC_SITE_URL ?? "https://todo-plastico.com";
+  const base = siteUrl();
   const supabase = await createClient();
 
   const [products, profiles] = await Promise.all([
