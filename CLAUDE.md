@@ -8,6 +8,13 @@
 - `CHANGELOG.md` es el changelog oficial; se actualiza en cada PR con cambios funcionales.
 - `docs/scope-fase1.md` es la fuente canónica del alcance actual. `docs/vision.md` y `docs/roadmap.md` deben mantenerse sincronizados con ese alcance.
 
+## Política de Hostinger
+
+- Nunca uses el panel, API, MCP, CLI, FTP, File Manager ni edición directa de Hostinger.
+- Nunca despliegues ni modifiques producción manualmente en Hostinger.
+- Todo cambio y despliegue debe pasar por Git: rama, commit, push, PR/revisión, merge y el CI/CD o autodeploy configurado.
+- Si el autodeploy falla o no existe, detente y repórtalo. No uses Hostinger como atajo.
+
 ## Reglas de producto no negociables
 
 - TodoPlásticos es una **plataforma B2B gratuita de descubrimiento**, no un marketplace transaccional.
